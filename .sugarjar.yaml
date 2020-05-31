@@ -1,0 +1,5 @@
+on_push: [lint]
+lint:
+  - scripts/lint
+unit:
+  - scripts/unit
