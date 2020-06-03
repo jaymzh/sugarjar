@@ -1,0 +1,24 @@
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 80
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: never
+
+Style/LineEndConcatenation:
+  Enabled: false
