@@ -1,5 +1,7 @@
 # SugjarJar
 
+![CI](https://github.com/jaymzh/sugarjar/workflows/CI/badge.svg)
+
 Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
 [hub](https://hub.github.com/), so you'll need that installed.
 
@@ -78,12 +80,12 @@ It will also allow you to not specify a remote or branch, and will default to
 
 Run any unitests configured in `.sugarjar.yaml`.
 
-# up
+### up
 
 Rebase the current branch on the branch it's tracking, or if it's tracking one
 then, otherise `upstream/master` if it exists, or `origin/master`.
 
-# upall
+### upall
 
 Same as `up`, but for all branches.
 
