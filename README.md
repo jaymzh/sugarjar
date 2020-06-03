@@ -52,7 +52,7 @@ current branch. In order of preference it will be `upstream/master`,
 The same as `smartpush`, but uses `--force-with-lease`. This is a "safer" way
 of doing force-pushes and is the recommended way to push after rebasing or
 amending. Never do this to shared branches. Very convenient for keeping the
-branch behind a pull- request clean.
+branch behind a pull-request clean.
 
 ### lint
 
@@ -70,6 +70,9 @@ remotes so that `origin` is your fork and `upstream` is the upstream.
 
 A smart wrapper to `git push` that runs whatever is defined in `on_push` in
 `.sugarjar.yml`, and only pushes if they succeed.
+
+It will also allow you to not specify a remote or branch, and will default to
+`origin` and whatever your current local branch name is.
 
 ### unit
 
