@@ -104,53 +104,6 @@ COMMANDS:
               Same as "up", but for all branches.
 COMMANDS
 
-  opts.separator <<CONFIG
-
-USER CONFIGURATION:
-Sugarjar will read in both a system-level config file
-(/etc/sugarjar/config.yaml) and a user-level config file ~/config.yaml, if they
-exist. Anything in the user config will override the system config, and command-
-line options override both. The yaml file is a straight key-value pair of
-options without their '--'. For example:
-
-    debug: true
-    github-user: jaymzh
-
-In addition, the environment variable SUGARJAR_DEBUG can be defined to set
-debug on. This is primarily used as a way to turn debug on earlier in order to
-troubleshoot configuration parsing.
-CONFIG
-
-  opts.separator <<REPO_CONFIG
-
-REPOSITORY CONFIGURATION:
-Sugarjar looks for a ".sugarjar.yaml" in the root of the repository to tell it
-how to handle repo-specific things. Currently there are only three
-configurations accepted:
-
-  lint
-              A list of scripts to run on "sj lint". These should be linters
-              like rubocop or pyflake.
-
-  unit
-              A list of scripts to run on "sj unit". These should be unittest
-              runners like rspec or pyunit.
-
-  on_push
-              A list of types ("lint", "unit") of checks to run before pushing.
-              It is highly recommended this is only "lint". The goal here is
-              to allow for the user to get quick stylistic feedback before
-              pushing their branch to avoid the push-fix-push-fix loop.
-
-Example configuration:
-
-    lint:
-      - scripts/lint
-    unit:
-      - scripts/unit
-    on_push:
-      - lint
-REPO_CONFIG
   # rubocop:enable Layout/HeredocIndentation
 end
 
