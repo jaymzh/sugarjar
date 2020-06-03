@@ -5,8 +5,10 @@ Gem::Specification.new do |spec|
   spec.authors = ['Phil Dibowitz']
   spec.email = ['phil@ipom.com']
 
+  spec.add_dependency 'mixlib-log'
   spec.add_dependency 'mixlib-shellout'
 
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'mdl'
   spec.add_development_dependency 'rubocop'
 end
