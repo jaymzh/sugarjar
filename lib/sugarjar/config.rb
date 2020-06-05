@@ -6,7 +6,8 @@ class SugarJar
   # This is stuff like log level, github-user, etc.
   class Config
     DEFAULTS = {
-      'ghuser' => ENV['USER']
+      'ghuser' => ENV['USER'],
+      'fallthru' => true,
     }.freeze
 
     def self._find_ordered_files

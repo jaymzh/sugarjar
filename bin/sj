@@ -6,6 +6,8 @@ require 'mixlib/shellout'
 require_relative '../lib/sugarjar/commands'
 require_relative '../lib/sugarjar/config'
 require_relative '../lib/sugarjar/log'
+require_relative '../lib/sugarjar/util'
+require_relative '../lib/sugarjar/version'
 
 SugarJar::Log.level = Logger::INFO
 
@@ -26,15 +28,26 @@ parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'OPTIONS:'
 
-  opts.on('--log-level LEVEL', 'Enable debug logging') do |level|
-    options['log_level'] = level
+  opts.on('--[no-]fallthru', 'Fall-thru to git') do |fallthru|
+    options['fallthru'] = fallthru
   end
+
+  opts.on('--github-user USER', 'Github username') do |ghuser|
+    options['ghuser'] = ghuser
+  end
+
   opts.on('-h', '--help', 'Print this help message') do
     puts opts
     exit
   end
-  opts.on('--github-user USER', 'Github username') do |ghuser|
-    options['ghuser'] = ghuser
+
+  opts.on('-l', '--log-level LEVEL', 'Enable debug logging') do |level|
+    options['log_level'] = level
+  end
+
+  opts.on('-v', '--version') do
+    puts SugarJar::VERSION
+    exit
   end
 
   # rubocop:disable Layout/HeredocIndentation
@@ -102,14 +115,16 @@ COMMANDS:
 
   upall
               Same as "up", but for all branches.
+
+  verson
+              Print the version of sugarjar, and then run 'hub version'
+              to show the hub and git versions.
 COMMANDS
 
   # rubocop:enable Layout/HeredocIndentation
 end
 
-# The first one is our subcommand
-subcommand = ARGV.shift
-SugarJar::Log.debug("subcommand is #{subcommand}")
+argv_copy = ARGV.dup
 
 extra_opts = []
 
@@ -126,21 +141,36 @@ end
 options = SugarJar::Config.config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
+# The first one is our subcommand
+subcommand = ARGV.shift
+SugarJar::Log.debug("subcommand is #{subcommand}")
+
 # Extra options we got, plus any left over arguements are what we
 # pass to Commands so they can be passed to git as necessary
 extra_opts += ARGV
 SugarJar::Log.debug("extra unknown options: #{extra_opts}")
 
-if subcommand == 'help' || subcommand.start_with?('-h')
+if subcommand == 'help'
   puts parser
   exit
 end
 
 sj = SugarJar::Commands.new(options)
 begin
+  SugarJar::Log.debug("running #{subcommand}")
   sj.send(subcommand.to_sym, *extra_opts)
 rescue NoMethodError
-  SugarJar::Log.error("Unknown command: #{subcommand}")
+  if options['fallthru'] && SugarJar::Log.level == :debug
+    SugarJar::Log.warn('Turning off fall-thru in debug mode')
+    options['fallthru'] = false
+  end
+  msg = "Unknown command: #{subcommand}"
+  if options['fallthru']
+    SugarJar::Log.debug(msg)
+    exec('hub', *argv_copy)
+  end
+  # exec replaces the process, so no need to 'else' this
+  SugarJar::Log.error(msg)
 rescue ArgumentError => e
   SugarJar::Log.error("#{subcommand}: #{e}")
 end

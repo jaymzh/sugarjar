@@ -1,6 +1,7 @@
 require_relative 'util'
 require_relative 'repoconfig'
 require_relative 'log'
+require_relative 'version'
 
 class SugarJar
   # This is the workhorse of SugarJar. Short of #initialize, all other public
@@ -56,7 +57,7 @@ class SugarJar
 
     def br
       assert_in_repo
-      hub('branch', '-v')
+      puts hub('branch', '-v').stdout
     end
 
     def binfo
@@ -174,6 +175,11 @@ class SugarJar
     end
 
     alias fpush forcepush
+
+    def version
+      puts "sugarjar version #{SugarJar::VERSION}"
+      puts hub('version').stdout
+    end
 
     private
 
