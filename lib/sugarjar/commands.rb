@@ -11,9 +11,10 @@ class SugarJar
     include SugarJar::Util
 
     def initialize(options)
-      @debug = options[:debug]
-      @ghuser = options[:ghuser]
+      @ghuser = options['github_user']
+      @ghhost = options['github_host']
       @repo_config = SugarJar::RepoConfig.config
+      set_hub_host if @ghhost
     end
 
     def feature(name, base = nil)
@@ -110,19 +111,26 @@ class SugarJar
       end
     end
 
-    def smartclone(repo, dir, *args)
+    def smartclone(repo, dir = nil, *args)
+      # If the user has specified a hub host, set the environment variable
+      # since we don't have a repo to configure yet
+      ENV['GITHUB_HOST'] = @ghhost if @ghhost
+
       reponame = File.basename(repo, '.git')
       dir ||= reponame
       SugarJar::Log.info("Cloning #{reponame}...")
       hub('clone', repo, dir, *args)
 
-      org = File.basename(File.dirname(repo))
-      if org == @ghuser
-        put 'Cloned forked or self-owned repo. Not creating "upstream".'
-        return
-      end
-
       Dir.chdir dir do
+        # Now that we have a repo, if we have a hub host set it.
+        set_hub_host if @ghhost
+
+        org = File.basename(File.dirname(repo))
+        if org == @ghuser
+          put 'Cloned forked or self-owned repo. Not creating "upstream".'
+          return
+        end
+
         s = hub_nofail('fork', '--remote-name=origin')
         if s.error?
           # if the fork command failed, we already have one, so we have
@@ -182,6 +190,24 @@ class SugarJar
     end
 
     private
+
+    def set_hub_host
+      return unless in_repo
+      s = hub_nofail('config', '--local', '--get', 'hub.host')
+      unless s.error?
+        current = s.stdout
+        if current == @ghost
+          SugarJar::Log.debug("Repo hub.host already set correctly")
+        else
+          SugarJar::Log.info(
+            "Overwriting repo hub.host from #{current} to #{@ghhost}"
+          )
+        end
+      else
+        SugarJar::Log.info("Setting repo hub.host = #{@ghhost}")
+      end
+      hub('config', '--local', '--add', 'hub.host', @ghhost)
+    end
 
     def run_check(type)
       unless @repo_config[type]

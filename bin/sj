@@ -11,14 +11,15 @@ require_relative '../lib/sugarjar/version'
 
 SugarJar::Log.level = Logger::INFO
 
-# Don't put defaults here, put them in SugarJar::Config
+# Don't put defaults here, put them in SugarJar::Config - otherwise
+# these defaults overwrite whatever is in config files.
 options = {}
 # If ENV['SUGARJAR_DEBUG'] is set, it overrides the config file,
 # but not the command line options, so set that one here. Also
 # start the logger at that level, in case we are debugging option loading
 # itself
 if ENV['SUGARJAR_LOGLEVEL']
-  options['log_level'] = SugarJar::Log.log_level = ENV['SUGARJAR_LOGLEVEL']
+  options['log_level'] = SugarJar::Log.level = ENV['SUGARJAR_LOGLEVEL'].to_sym
 end
 parser = OptionParser.new do |opts|
   opts.banner = 'Usage: sj <command> [<args>] [<options>]'
@@ -32,8 +33,19 @@ parser = OptionParser.new do |opts|
     options['fallthru'] = fallthru
   end
 
-  opts.on('--github-user USER', 'Github username') do |ghuser|
-    options['ghuser'] = ghuser
+  opts.on('--github-user USER', 'Github username') do |user|
+    options['github_user'] = user
+  end
+
+  opts.on(
+    '--github-host HOST',
+    'The host for "hub". Note that we will set this in the local repo ' +
+    'config so there is no need to have multiple config files for multiple ' +
+    'github servers. Put your default one in your config file, and simply ' +
+    'specify this option the first time you clone or touch a repo and it ' +
+    'will be part of that repo until changed.'
+  ) do |host|
+    options['github_host'] = host
   end
 
   opts.on('-h', '--help', 'Print this help message') do
@@ -41,11 +53,15 @@ parser = OptionParser.new do |opts|
     exit
   end
 
-  opts.on('-l', '--log-level LEVEL', 'Enable debug logging') do |level|
+  opts.on(
+    '--log-level LEVEL',
+    'Set logging level (fatal, error, warning, info, debug, trace). Default: ' +
+    'info'
+  ) do |level|
     options['log_level'] = level
   end
 
-  opts.on('-v', '--version') do
+  opts.on('--version') do
     puts SugarJar::VERSION
     exit
   end
@@ -125,20 +141,34 @@ COMMANDS
 end
 
 argv_copy = ARGV.dup
-
+sj = SugarJar::Commands.new(options)
 extra_opts = []
 
-# We want to allow people to pass in extra args to be passed to
-# git commands, but OptionParser doesn't easily allow this. So we
-# loop over it, catching exceptions.
-begin
-  parser.parse!
-rescue OptionParser::InvalidOption => e
-  extra_opts += e.args
-  retry
+# as with above, this can't go into 'options', until after we parse
+# the command line args
+config = SugarJar::Config.config
+
+# if we're configured to fall thru and the subcommand isn't one
+# we recognize, don't parse the options as they may be different
+# than git's
+if config['fallthru'] && !sj.respond_to?(ARGV[0].to_sym)
+  SugarJar::Log.debug(
+    'Skipping option parsing: fall-thru is set and we do not recognize ' +
+    'ARGV[0]'
+  )
+else
+  # We want to allow people to pass in extra args to be passed to
+  # git commands, but OptionParser doesn't easily allow this. So we
+  # loop over it, catching exceptions.
+  begin
+    parser.parse!
+  rescue OptionParser::InvalidOption => e
+    extra_opts += e.args
+    retry
+  end
 end
 
-options = SugarJar::Config.config.merge(options)
+options = config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
 # The first one is our subcommand
@@ -155,7 +185,6 @@ if subcommand == 'help'
   exit
 end
 
-sj = SugarJar::Commands.new(options)
 begin
   SugarJar::Log.debug("running #{subcommand}")
   sj.send(subcommand.to_sym, *extra_opts)
