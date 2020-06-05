@@ -1,3 +1,0 @@
-* track the desired upstream instead of assuming
-* Move the description of repo docs and user docs into vars
-  and then auto-generate docs

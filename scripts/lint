@@ -1,8 +1,4 @@
 #!/bin/bash
 
-bundle exec rubocop -D "$@"
-if [ -z "$*" ]; then
-  bundle exec mdl .
-else
-  bundle exec mdl "$@"
-fi
+bundle exec rubocop -D "$@" || { echo "Rubocop failed"; exit 1; }
+bundle exec mdl . "$@" || { echo "Rubocop failed"; exit 1; }

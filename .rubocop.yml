@@ -25,3 +25,15 @@ Style/LineEndConcatenation:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: '{}'
+    '%i': '{}'
+    '%I': '{}'
+    '%w': '{}'
+    '%W': '{}'
+    '%r': '{}'
