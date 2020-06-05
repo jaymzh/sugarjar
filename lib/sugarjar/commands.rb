@@ -193,18 +193,19 @@ class SugarJar
 
     def set_hub_host
       return unless in_repo
+
       s = hub_nofail('config', '--local', '--get', 'hub.host')
-      unless s.error?
+      if s.error?
+        SugarJar::Log.info("Setting repo hub.host = #{@ghhost}")
+      else
         current = s.stdout
         if current == @ghost
-          SugarJar::Log.debug("Repo hub.host already set correctly")
+          SugarJar::Log.debug('Repo hub.host already set correctly')
         else
           SugarJar::Log.info(
             "Overwriting repo hub.host from #{current} to #{@ghhost}"
           )
         end
-      else
-        SugarJar::Log.info("Setting repo hub.host = #{@ghhost}")
       end
       hub('config', '--local', '--add', 'hub.host', @ghhost)
     end

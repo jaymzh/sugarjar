@@ -22,3 +22,6 @@ Style/FrozenStringLiteralComment:
 
 Style/LineEndConcatenation:
   Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma

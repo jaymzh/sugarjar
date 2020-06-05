@@ -1,4 +1,8 @@
 #!/bin/bash
 
 bundle exec rubocop -D "$@"
-bundle exec mdl "$@"
+if [ -z "$*" ]; then
+  bundle exec mdl .
+else
+  bundle exec mdl "$@"
+fi
