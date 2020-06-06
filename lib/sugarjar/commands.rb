@@ -44,7 +44,7 @@ class SugarJar
         # rubocop:disable Style/Next
         unless clean_branch(branch)
           SugarJar::Log.info(
-            "Skipping branch #{branch} - there are unmerged commits"
+            "Skipping branch #{branch} - there are unmerged commits",
           )
         end
         # rubocop:enable Style/Next
@@ -104,7 +104,7 @@ class SugarJar
         else
           SugarJar::Log.error(
             "Failed to rebase #{branch}, aborting that and moving to next " +
-            'branch'
+            'branch',
           )
           hub('rebase', '--abort')
         end
@@ -202,10 +202,15 @@ class SugarJar
         if current == @ghost
           SugarJar::Log.debug('Repo hub.host already set correctly')
         else
-          SugarJar::Log.info(
-            "Overwriting repo hub.host from #{current} to #{@ghhost}"
+          # Even though we have an explicit config, in most cases, it
+          # comes from a global or user config, but the config in the
+          # local repo we likely set. So we'd just constantly revert that.
+          SugarJar::Log.debug(
+            "Not overwriting repo hub.host. Already set to #{current}. " +
+            "To change it, run `git config --local --add hub.host #{@ghhost}`",
           )
         end
+        return
       end
       hub('config', '--local', '--add', 'hub.host', @ghhost)
     end
@@ -287,7 +292,7 @@ class SugarJar
       end
       if out.length.zero?
         SugarJar::Log.debug(
-          "cherry-pick shows branch #{branch} obviously safe to delete"
+          "cherry-pick shows branch #{branch} obviously safe to delete",
         )
         return true
       end
@@ -306,7 +311,7 @@ class SugarJar
         error(
           'Failed to merge changes into current master. This means we could ' +
           'not figure out if this is merged or not. Check manually and use ' +
-          "'git branch -D #{branch}' if it is safe to do so."
+          "'git branch -D #{branch}' if it is safe to do so.",
         )
         return false
       end
@@ -317,12 +322,12 @@ class SugarJar
       cleanup_tmp_branch(tmpbranch, branch)
       if out.empty?
         SugarJar::Log.debug(
-          'After squash-merging, this branch appears safe to delete'
+          'After squash-merging, this branch appears safe to delete',
         )
         true
       else
         SugarJar::Log.debug(
-          'After squash-merging, this branch is NOT fully merged to master'
+          'After squash-merging, this branch is NOT fully merged to master',
         )
         false
       end

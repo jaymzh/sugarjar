@@ -37,3 +37,6 @@ Style/PercentLiteralDelimiters:
     '%w': '{}'
     '%W': '{}'
     '%r': '{}'
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma

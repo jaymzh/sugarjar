@@ -43,7 +43,7 @@ parser = OptionParser.new do |opts|
     'config so there is no need to have multiple config files for multiple ' +
     'github servers. Put your default one in your config file, and simply ' +
     'specify this option the first time you clone or touch a repo and it ' +
-    'will be part of that repo until changed.'
+    'will be part of that repo until changed.',
   ) do |host|
     options['github_host'] = host
   end
@@ -56,7 +56,7 @@ parser = OptionParser.new do |opts|
   opts.on(
     '--log-level LEVEL',
     'Set logging level (fatal, error, warning, info, debug, trace). Default: ' +
-    'info'
+    'info',
   ) do |level|
     options['log_level'] = level
   end
@@ -154,7 +154,7 @@ config = SugarJar::Config.config
 if config['fallthru'] && !sj.respond_to?(ARGV[0].to_sym)
   SugarJar::Log.debug(
     'Skipping option parsing: fall-thru is set and we do not recognize ' +
-    'ARGV[0]'
+    'ARGV[0]',
   )
 else
   # We want to allow people to pass in extra args to be passed to
