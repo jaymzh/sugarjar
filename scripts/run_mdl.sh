@@ -12,4 +12,4 @@ else
     args=('.')
 fi
 # shellcheck disable=SC2086
-exec $BIN -s "$REPODIR/.mdl_style.rb" "${args[@]}"
+exec $BIN "${args[@]}"

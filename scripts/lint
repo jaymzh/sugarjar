@@ -1,4 +1,4 @@
 #!/bin/bash
 
-bundle exec rubocop -D "$@" || { echo "Rubocop failed"; exit 1; }
-bundle exec mdl . "$@" || { echo "Rubocop failed"; exit 1; }
+bundle exec scripts/run_rubocop.sh -D "$@" || { echo "Rubocop failed"; exit 1; }
+bundle exec scripts/run_mdl.sh "$@" || { echo "Rubocop failed"; exit 1; }

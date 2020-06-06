@@ -12,84 +12,206 @@ the Phabricator workflow this aims to bring to the GitHub workflow.
 In particular there are a lot of helpers for using a squash-merge workflow that
 is poorly handled by the standard toolsets.
 
-## Commands
+If you miss Mondrian or Phabrictor - this is the tool for you!
 
-### amend
+If you don't, there's a ton of useful stuff for everyone!
 
-Amend the current commit. Alias for `git commit --amend`.  Accepts other
-arguments such as `-a` or files.
+## Auto cleanup squash-merged branches
 
-### amendq, qamend
+It is common for a PR to go back and forth with a variety of nits, lint fixes,
+typos, etc. that can muddy history. So many projects will "squash and merge"
+when they accept a pull request. Howevet, that means `git branch -d <branch>`
+doesn't work. Git will tell you the branch isn't fully merged. You can, of
+course `git branch -D <branch>`, but that does no safety checks at all, it
+forces the deletion.
 
-Same as `amend` but without changing the message. Alias for `git commit --amend
---no-edit`.
+Enter `sj bclean` - it determines of the contents of your branch has been merge
+and safely deletes if so.
 
-### bclean
+``` shell
+sj bclean
+```
 
-If safe, delete the current branch. Unlike `git branch -d`, bclean can handle
-squash-merged branches. Think of it as a smarter `git branch -d`.
+Will delete a branch, if it has been merged, **even if it was squash-merged**.
 
-### bcleanall
+You can pass it a branch if you'd like (it defaults to the branch you're on):
+`sj bclean <branch>`.
 
-Walk all branches, and try to delete them if it's safe. See `bclean` for
-details.
+**Pro-tip**: Use `sj bcleanall` to remove all branches that have been merged.
 
-### binfo
+## Smarter clones and remotes
 
-Verbose information about the current branch.
+There's a pattern to every new repo we want to contribute to. First we fork,
+then we clone the fork, then we add a remote of the upstream repo. It's
+monotonous. SugarJar does this for you:
 
-### br
+```shell
+sj smartclone jaymzh/sugarjar
+```
 
-Verbose branch list. An alias for `git branch -v`.
+(also `sj sclone`)
 
-### feature
+This will:
 
-Create a "feature branch." It's morally equivalent to `git checkout -b` except
-it defaults to creating it based on some form of 'master' instead of your
-current branch. In order of preference it will be `upstream/master`,
-`origin/master`, or `master`, depending upon what remotes are available.
+* Make a fork of the repo, if you don't already have one
+* Clone your fork
+* Add the original as an 'upstream' remote
 
-### forcepush, fpush
+Note that it takes `hub`s short-names for repos. No need to specify a full URL,
+just a $org/$repo.
 
-The same as `smartpush`, but uses `--force-with-lease`. This is a "safer" way
-of doing force-pushes and is the recommended way to push after rebasing or
-amending. Never do this to shared branches. Very convenient for keeping the
-branch behind a pull-request clean.
+Like `git clone`, `sj sclone` will accept an additional arguement as the
+destination directory to clone to. It will also pass any other unknown options
+to `git clone` under the hood.
 
-### lint
+## Work with stacked branches more easily
 
-Run any linters configured in `.sugarjar.yaml`.
+It's important to break changes into reviewable chunks, but working with
+stacked branches can be confusing. Enter `binfo` - it gives you a view of your
+current branch all the way up to master. In this example imagine we have a
+branch structure like:
 
-### smartclone, sclone
+```text
+                      +- test2.1
+                     /
+master --- test --- test2 --- test3
+```
 
-A smart wrapper to `git clone` that handles forking and managing remotes for
-you.  It will clone a git repository using hub-style short name (`$org/$repo`).
-If the org of the repository is not the same as your github-user then it will
-fork the repo for you to your account (if not already done) and then setup your
-remotes so that `origin` is your fork and `upstream` is the upstream.
+This is what `binfo` on test3 looks like:
 
-### smartpush, spush
+```shell
+$ sj binfo
+* e451865 (HEAD -> test3) test3
+* e545b41 (test2) test2
+* c808eae (test1) test1
+o 44cf9e2 (origin/master, origin/HEAD, master) Lint/gemspec cleanups
+```
 
-A smart wrapper to `git push` that runs whatever is defined in `on_push` in
-`.sugarjar.yml`, and only pushes if they succeed.
+while `binfo` on test2.1 looks like:
 
-It will also allow you to not specify a remote or branch, and will default to
-`origin` and whatever your current local branch name is.
+```shell
+$ sj binfo
+* 36d0136 (HEAD -> test2.1) test2.1
+* e545b41 (test2) test2
+* c808eae (test1) test1
+o 44cf9e2 (origin/master, origin/HEAD, master) Lint/gemspec cleanups
+```
 
-### unit
+## Have a better lint/unittest experience!
 
-Run any unitests configured in `.sugarjar.yaml`.
+Ever made a PR, only to find out later that it failed tests because of some
+small lint issue? Not anymore! SJ can be configured to run things before
+pushing. For example,in the SugarJar repo, we have it run Rubocop (ruby lint)
+and Markdownlint "on_push". If those fail, it lets you know and doesn't push.
 
-### up
+You can configure SugarJar to tell how how to run both lints and unittests for
+a given repo and if one or both should be run prior to pushing.
 
-Rebase the current branch on the branch it's tracking, or if it's tracking one
-then, otherise `upstream/master` if it exists, or `origin/master`.
+The details on the config file format is below, but we provide three commands:
 
-### upall
+```shell
+git lint
+```
 
-Same as `up`, but for all branches.
+Run all linters.
 
-## User Configuration
+```shell
+git unit
+```
+
+Run all unittests.
+
+```shell
+git smartpush # or spush
+```
+
+Run configured push-time actions (nothing, lint, unit, both), and do not
+push if any of them fail.
+
+## Better push defaults
+
+In addition to running pre-push tests for you `smartpush` also picks smart
+defaults for push. So if you `sj spush` with no arguements, it uses the
+`origin` remote and the same branch name you're on as the remote branch.
+
+## Cleaning up your own history
+
+Perhaps you contribute to a project that prefers to use merge commits, so you
+like to clean up your own history. This is often difficult to get right - a
+combination of rebases, amends and force pushes. We provide two commands here
+to help.
+
+The first is pretty straight forward and is basically just an alias: `sj
+amend`. It will ammend whatever you want to the most recent commit (just an
+alias for `git commit --amend`). It has a partner `qamend` (or `amendq` if you
+prefer) that will do so without prompting to update your commit message.
+
+So now you've rebased or amended, pushing becomes challening. You can `git push
+--force`, but everyone knows that's incredibly dangerous. Is there a better
+way? There is! Git provides `git push --force-with-lease` - it checks to make
+sure you're up-to-date with the remote before forcing the push. But man that
+command is a mouthful! Enter `sj fpush`. It has all the smarts of `sj
+smartpush` (runs configured pre-push actions), but adds `--force-with-lease` to
+the command!
+
+## Better feature branches
+
+When you want to start a new feature, you want to start developing against
+latest. That's why `sj feature` defaults to creating a branch against what we
+call "most master". That is, `upstream/master` if it exists, otherwise
+`origin/master` if that exists, otherwise `master`. You can pass in an
+additional arguement to base it off of something else.
+
+```shell
+$ git branch
+  master
+  test1
+  test2
+* test2.1
+  test3
+$ sj feature test-branch
+Created feature branch test-branch based on origin/master
+$ sj feature dependent-feature test-branch
+Created feature branch dependent-feature based on test-branch
+```
+
+## And more!
+
+See `sj help` for more commands!
+
+## Using SugarJar as a git wrapper
+
+SugarJar, by default, will pass any commends it doesn't know straight to `hub`
+(which passes commands **it** doesn't know to `git`). As such you can alias it
+to `git` and just have a super-git.
+
+```shell
+$ alias git=sj
+$ git config -l | grep color
+color.diff=auto
+color.status=auto
+color.branch=auto
+color.branch.current=yellow reverse
+color.branch.local=yellow
+color.branch.remote=green
+$ git br
+* dependent-feature 44cf9e2 Lint/gemspec cleanups
+  master            44cf9e2 Lint/gemspec cleanups
+  test-branch       44cf9e2 Lint/gemspec cleanups
+  test1             c808eae [ahead 1] test1
+  test2             e545b41 test2
+  test2.1           c1831b3 test2.1
+  test3             e451865 test3
+```
+
+It's for this reason that SugarJar doesn't have conflicting command names. You
+can turn off fallthru by setting `fallthru: false` in your config.
+
+The only command we "override" is `version`, in which case we not only print
+our version, but also call `hub version` which prints its version and calls
+`git version` too!
+
+## Configuration
 
 Sugarjar will read in both a system-level config file
 (`/etc/sugarjar/config.yaml`) and a user-level config file
@@ -133,17 +255,41 @@ on_push:
   - lint
 ```
 
+## Enterprise GitHub
+
+Like `hub`, SugarJar supports GitHub Enterprise. In fact, we provide extra
+features just for it.
+
+We recommend the global or user config specify the `github_host`. However, most
+users will also have a few repos from upstream so always specifying a
+`github_host` is sub-optimal.
+
+So, when you overwrite the `github_host` on the command line, we go ahead and
+set the `hub.host` git config in that single repo so that it'll "just work"
+from there on out.
+
+In other words, assuming your global SJ config has `github_host:
+github.sample.com`, and the you clone sugarjar with:
+
+```shell
+sj clone jaymzh/sugarjar --github-host githuh.com
+```
+
+We will add the `hub.host` to the `sugarjar` clone so that future `hub` or `sj`
+commands work without needing to specify..
+
 ## FAQ
 
 Why the name SugarJar?
 
-It's mostly a backranym. Like jellyfish, I wanted two letters that were on
-home row on different sides of the keyboard to make it easy to type. I looked
-at the possible options that where there and not taken and tried to find one
-I could make an appropriate name out of. Since this utility adds lots of sugar
-to git and github, it seemed appropriate.
+It's mostly a backranym. Like jellyfish, I wanted two letters that were on home
+row on different sides of the keyboard to make it easy to type. I looked at the
+possible options that where there and not taken and tried to find one I could
+make an appropriate name out of. Since this utility adds lots of sugar to git
+and github, it seemed appropriate.
 
 Why did you use `hub` instead of the newer `gh` CLI?
 
-`gh` is less feature-rich (currently). I'm also considering making this optionally
-act as a wrapper to `hub` the way `hub` can be a wrapper to `git`.
+`gh` is still new and not yet as feature rich as `hub`. Also I wanted SugarJar
+to be able to be a git wrapper, and so wrapping `hub` allows us to do that but
+wrapping `gh` does not.
