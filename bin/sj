@@ -171,13 +171,18 @@ end
 options = config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
-# The first one is our subcommand
-subcommand = ARGV.shift
+# The first one is our subcommand. Sometimes parse! seems to drop
+# non-option arguements... so if that happens, fall back on the first
+# thing pass into us
+
+subcommand = ARGV.shift || argv_copy[0]
 SugarJar::Log.debug("subcommand is #{subcommand}")
 
 # Extra options we got, plus any left over arguements are what we
 # pass to Commands so they can be passed to git as necessary
-extra_opts += ARGV
+# in the event that parser swallows non-option args, do our best
+# to reconstruct them
+extra_opts += ARGV || argv_copy.reject { |x| x.start_with?('-') }
 SugarJar::Log.debug("extra unknown options: #{extra_opts}")
 
 if subcommand == 'help'
@@ -186,16 +191,13 @@ if subcommand == 'help'
 end
 
 begin
-  SugarJar::Log.debug("running #{subcommand}")
+  SugarJar::Log.debug("running #{subcommand}, #{extra_opts.join(', ')}")
   sj.send(subcommand.to_sym, *extra_opts)
 rescue NoMethodError
-  if options['fallthru'] && SugarJar::Log.level == :debug
-    SugarJar::Log.warn('Turning off fall-thru in debug mode')
-    options['fallthru'] = false
-  end
   msg = "Unknown command: #{subcommand}"
   if options['fallthru']
     SugarJar::Log.debug(msg)
+    SugarJar::Log.debug("Falling thru to: hub #{argv_copy.join(' ')}")
     exec('hub', *argv_copy)
   end
   # exec replaces the process, so no need to 'else' this
