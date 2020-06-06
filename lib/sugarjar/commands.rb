@@ -22,6 +22,8 @@ class SugarJar
       SugarJar::Log.debug("Feature: #{name}, #{base}")
       die("#{name} already exists!") if all_branches.include?(name)
       base ||= most_master
+      base_pieces = base.split('/')
+      hub('fetch', base_pieces[0]) if base_pieces.length > 1
       hub('checkout', '-b', name, base)
       SugarJar::Log.info("Created feature branch #{name} based on #{base}")
     end
