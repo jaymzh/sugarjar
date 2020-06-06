@@ -37,7 +37,20 @@ Will delete a branch, if it has been merged, **even if it was squash-merged**.
 You can pass it a branch if you'd like (it defaults to the branch you're on):
 `sj bclean <branch>`.
 
-**Pro-tip**: Use `sj bcleanall` to remove all branches that have been merged.
+But it gets better! You can use `sj bcleanall` to remove all branches that have
+been merged:
+
+```shell
+$ git branch
+* argparse
+  master
+  feature
+  hubhost
+$ git bcleanall
+Skipping branch argparse - there are unmerged commits
+Reaped branch feature
+Reaped branch hubhost
+```
 
 ## Smarter clones and remotes
 
