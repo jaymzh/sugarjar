@@ -140,6 +140,9 @@ COMMANDS
   # rubocop:enable Layout/HeredocIndentation
 end
 
+# we make a copy of these because we will assign back to the ARGV
+# we parse later. We also need a pristine copy in case we want to
+# run git as we were called.
 argv_copy = ARGV.dup
 sj = SugarJar::Commands.new(options)
 extra_opts = []
@@ -150,7 +153,8 @@ config = SugarJar::Config.config
 
 # if we're configured to fall thru and the subcommand isn't one
 # we recognize, don't parse the options as they may be different
-# than git's
+# than git's. For example `git config -l` - we error because we
+# require an arguement to `-l`.
 if config['fallthru'] && !sj.respond_to?(ARGV[0].to_sym)
   SugarJar::Log.debug(
     'Skipping option parsing: fall-thru is set and we do not recognize ' +
@@ -161,9 +165,31 @@ else
   # git commands, but OptionParser doesn't easily allow this. So we
   # loop over it, catching exceptions.
   begin
-    parser.parse!
+    # HOWEVER, anytime it throws an exception, for some reason, it clears
+    # out all of ARGV, or whatever you passed to as ARGV.
+    #
+    # This not only prevents further parsing, but also means we lose
+    # any non-option arguements (like the subcommand!)
+    #
+    # So we save a copy, and if we throw an exception, save the option that
+    # caused it, remove that option from our copy, and then re-populate argv
+    # with what's left.
+    #
+    # By doing this we not only get to parse all the options properly and
+    # save unknown ones, but non-option arguements, which OptionParser
+    # normally leaves in ARGV stay in ARGV.
+    saved_argv = argv_copy.dup
+    parser.parse!(argv_copy)
   rescue OptionParser::InvalidOption => e
+    SugarJar::Log.debug("Saving unknown argument #{e.args}")
     extra_opts += e.args
+
+    # e.args is an array, but it's only ever one arguement per exception
+    saved_argv.delete(e.args.first)
+    argv_copy = saved_argv.dup
+    SugarJar::Log.debug(
+      "Continuing option parsing with remaining ARGV: #{argv_copy}",
+    )
     retry
   end
 end
@@ -171,18 +197,12 @@ end
 options = config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
-# The first one is our subcommand. Sometimes parse! seems to drop
-# non-option arguements... so if that happens, fall back on the first
-# thing pass into us
-
-subcommand = ARGV.shift || argv_copy[0]
+subcommand = argv_copy.shift
 SugarJar::Log.debug("subcommand is #{subcommand}")
 
 # Extra options we got, plus any left over arguements are what we
 # pass to Commands so they can be passed to git as necessary
-# in the event that parser swallows non-option args, do our best
-# to reconstruct them
-extra_opts += ARGV || argv_copy.reject { |x| x.start_with?('-') }
+extra_opts += argv_copy
 SugarJar::Log.debug("extra unknown options: #{extra_opts}")
 
 if subcommand == 'help'
@@ -197,8 +217,8 @@ rescue NoMethodError
   msg = "Unknown command: #{subcommand}"
   if options['fallthru']
     SugarJar::Log.debug(msg)
-    SugarJar::Log.debug("Falling thru to: hub #{argv_copy.join(' ')}")
-    exec('hub', *argv_copy)
+    SugarJar::Log.debug("Falling thru to: hub #{ARGV.join(' ')}")
+    exec('hub', *ARGV)
   end
   # exec replaces the process, so no need to 'else' this
   SugarJar::Log.error(msg)
