@@ -194,7 +194,7 @@ See `sj help` for more commands!
 
 ## Using SugarJar as a git wrapper
 
-SugarJar, by default, will pass any commends it doesn't know straight to `hub`
+SugarJar, by default, will pass any command it doesn't know straight to `hub`
 (which passes commands **it** doesn't know to `git`). As such you can alias it
 to `git` and just have a super-git.
 
