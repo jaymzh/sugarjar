@@ -22,7 +22,9 @@ class SugarJar
       c = DEFAULTS.dup
       _find_ordered_files.each do |f|
         SugarJar::Log.debug("Loading config #{f}")
-        c.merge!(YAML.safe_load(File.read(f)))
+        data = YAML.safe_load(File.read(f))
+        # an empty file is a `nil` which you can't merge
+        c.merge!(YAML.safe_load(File.read(f))) if data
         SugarJar::Log.debug("Modified config: #{c}")
       end
       c

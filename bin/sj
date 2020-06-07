@@ -1,4 +1,4 @@
-#!/opt/chef/embedded/bin/ruby
+#!/usr/bin/env ruby
 # SugarJar
 
 require 'optparse'
@@ -155,7 +155,7 @@ config = SugarJar::Config.config
 # we recognize, don't parse the options as they may be different
 # than git's. For example `git config -l` - we error because we
 # require an arguement to `-l`.
-if config['fallthru'] && !sj.respond_to?(ARGV[0].to_sym)
+if config['fallthru'] && !ARGV.empty? && !sj.respond_to?(ARGV[0].to_sym)
   SugarJar::Log.debug(
     'Skipping option parsing: fall-thru is set and we do not recognize ' +
     'ARGV[0]',
@@ -194,6 +194,11 @@ else
   end
 end
 
+if ARGV.empty?
+  puts parser
+  exit
+end
+
 options = config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
@@ -213,8 +218,9 @@ end
 begin
   SugarJar::Log.debug("running #{subcommand}, #{extra_opts.join(', ')}")
   sj.send(subcommand.to_sym, *extra_opts)
-rescue NoMethodError
+rescue NoMethodError => e
   msg = "Unknown command: #{subcommand}"
+  SugarJar::Log.debug("caught exception: #{e.inspect}")
   if options['fallthru']
     SugarJar::Log.debug(msg)
     SugarJar::Log.debug("Falling thru to: hub #{ARGV.join(' ')}")
