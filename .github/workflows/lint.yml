@@ -22,8 +22,8 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Rubocop checks
-      uses: gimenete/rubocop-action@1.0
+    - name: Rubocop Linter Action
+      uses: andrewmcodes/rubocop-linter-action@v3.2.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
