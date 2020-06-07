@@ -1,4 +1,4 @@
-# SugjarJar
+# SugarJar
 
 ![CI](https://github.com/jaymzh/sugarjar/workflows/CI/badge.svg)
 
