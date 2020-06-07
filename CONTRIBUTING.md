@@ -17,10 +17,16 @@ Make a branch for your change:
 sj feature mychange
 ```
 
-Make whatever changes you want, commit with a clear commit message:
+Make whatever changes you want, commit with a clear commit message, and a DCO.
+
+We require [Developer Certificate of Origin
+(DCO)](https://developercertificate.org/) via a 'signed-off-by:` line in your
+commit (the `git commit -s` does this for you). The Chef community has a lot of
+great documentation on this which you can find
+[here](https://docs.chef.io/community_contributions/#developer-certification-of-origin-dco).
 
 ```shell
-git commit -a
+git commit -as
 ```
 
 Make a pull request:
