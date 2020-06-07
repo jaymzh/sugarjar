@@ -84,7 +84,7 @@ class SugarJar
     def amend(*args)
       assert_in_repo
       # This cannot use shellout since we need a full terminal for the editor
-      exit(system('/usr/bin/git', 'commit', '--amend', *args))
+      exit(system(which('git'), 'commit', '--amend', *args))
     end
 
     def qamend(*args)
@@ -310,7 +310,7 @@ class SugarJar
       s = hub_nofail('merge', '--squash', branch)
       if s.error?
         cleanup_tmp_branch(tmpbranch, branch)
-        error(
+        SugarJar::Log.error(
           'Failed to merge changes into current master. This means we could ' +
           'not figure out if this is merged or not. Check manually and use ' +
           "'git branch -D #{branch}' if it is safe to do so.",
