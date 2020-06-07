@@ -53,9 +53,9 @@ class SugarJar
       end
     end
 
-    def co(name)
+    def co(*args)
       assert_in_repo
-      hub('checkout', name)
+      hub('checkout', *args)
     end
 
     def br
