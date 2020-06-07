@@ -8,24 +8,24 @@ If you'd like to contribute code, here's how.
 Simply use SugarJar to make a fork and setup your repo:
 
 ```shell
-$ sj sclone jaymzh/sugarjar
+sj sclone jaymzh/sugarjar
 ```
 
 Make a branch for your change:
 
 ```shell
-$ sj feature mychange
+sj feature mychange
 ```
 
 Make whatever changes you want, commit with a clear commit message:
 
 ```shell
-$ git commit -a
+git commit -a
 ```
 
 Make a pull request:
 
 ```shell
-$ sj spush
-$ sj pull-request
+sj spush
+sj pull-request
 ```
