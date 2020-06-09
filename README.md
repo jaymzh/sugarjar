@@ -1,6 +1,7 @@
 # SugarJar
 
 ![CI](https://github.com/jaymzh/sugarjar/workflows/CI/badge.svg)
+[![Gem Version](https://badge.fury.io/rb/sugarjar.svg)](https://badge.fury.io/rb/sugarjar)
 
 Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
 [hub](https://hub.github.com/), so you'll need that installed.
