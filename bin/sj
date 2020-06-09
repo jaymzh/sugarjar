@@ -151,14 +151,18 @@ extra_opts = []
 # the command line args
 config = SugarJar::Config.config
 
+valid_commands = sj.public_methods - Object.public_methods
+
+is_valid_command = ARGV.any? { |arg| valid_commands.include?(arg.to_s.to_sym) }
+
 # if we're configured to fall thru and the subcommand isn't one
 # we recognize, don't parse the options as they may be different
 # than git's. For example `git config -l` - we error because we
 # require an arguement to `-l`.
-if config['fallthru'] && !ARGV.empty? && !sj.respond_to?(ARGV[0].to_sym)
+if config['fallthru'] && !is_valid_command
   SugarJar::Log.debug(
     'Skipping option parsing: fall-thru is set and we do not recognize ' +
-    'ARGV[0]',
+    'any subcommands'
   )
 else
   # We want to allow people to pass in extra args to be passed to
@@ -202,7 +206,8 @@ end
 options = config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
-subcommand = argv_copy.shift
+subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
+argv_copy.delete(subcommand)
 SugarJar::Log.debug("subcommand is #{subcommand}")
 
 # Extra options we got, plus any left over arguements are what we
@@ -215,19 +220,12 @@ if subcommand == 'help'
   exit
 end
 
-begin
+if is_valid_command
   SugarJar::Log.debug("running #{subcommand}, #{extra_opts.join(', ')}")
   sj.send(subcommand.to_sym, *extra_opts)
-rescue NoMethodError => e
-  msg = "Unknown command: #{subcommand}"
-  SugarJar::Log.debug("caught exception: #{e.inspect}")
-  if options['fallthru']
-    SugarJar::Log.debug(msg)
-    SugarJar::Log.debug("Falling thru to: hub #{ARGV.join(' ')}")
-    exec('hub', *ARGV)
-  end
-  # exec replaces the process, so no need to 'else' this
-  SugarJar::Log.error(msg)
-rescue ArgumentError => e
-  SugarJar::Log.error("#{subcommand}: #{e}")
+elsif options['fallthru']
+  SugarJar::Log.debug("Falling thru to: hub #{ARGV.join(' ')}")
+  exec('hub', *ARGV)
+else
+  SugarJar::Log.error("No such subcommand: #{subcommand}")
 end
