@@ -15,3 +15,7 @@
 
 * Build a gem: `gem build sugarjar.gemspec`
 * Push the gem: `gem push sugarjar-0.0.X.gem`
+
+## Publish omnibus builds
+
+* (from omnibus directory): `bundle install; bundle exec omnibus build sugarjar`

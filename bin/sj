@@ -162,7 +162,7 @@ is_valid_command = ARGV.any? { |arg| valid_commands.include?(arg.to_s.to_sym) }
 if config['fallthru'] && !is_valid_command
   SugarJar::Log.debug(
     'Skipping option parsing: fall-thru is set and we do not recognize ' +
-    'any subcommands'
+    'any subcommands',
   )
 else
   # We want to allow people to pass in extra args to be passed to
