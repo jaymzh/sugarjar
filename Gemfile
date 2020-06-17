@@ -1,3 +1,9 @@
 source 'https://rubygems.org'
 
-gemspec
+gem 'appbundler'
+gem 'sugarjar', :path => '.'
+
+group :test do
+  gem 'mdl'
+  gem 'rubocop'
+end
