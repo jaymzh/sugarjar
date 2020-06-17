@@ -1,5 +1,10 @@
 # SugarJar Changelog
 
+## 0.0.4 (2020-06-17)
+
+* Fix gemspec to include executables
+* Add support for building omnibus releases
+
 ## 0.0.3 (2020-06-08)
 
 * Stop rescuing NoMethodError (fixing a variety of confusing error cases)
