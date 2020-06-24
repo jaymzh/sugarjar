@@ -11,6 +11,7 @@ class SugarJar
     include SugarJar::Util
 
     def initialize(options)
+      SugarJar::Log.debug("Commands.initialize options: #{options}")
       @ghuser = options['github_user']
       @ghhost = options['github_host']
       @repo_config = SugarJar::RepoConfig.config
