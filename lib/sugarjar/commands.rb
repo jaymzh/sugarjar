@@ -130,7 +130,7 @@ class SugarJar
 
         org = File.basename(File.dirname(repo))
         if org == @ghuser
-          put 'Cloned forked or self-owned repo. Not creating "upstream".'
+          puts 'Cloned forked or self-owned repo. Not creating "upstream".'
           return
         end
 
