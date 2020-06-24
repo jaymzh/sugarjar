@@ -144,6 +144,9 @@ end
 # we parse later. We also need a pristine copy in case we want to
 # run git as we were called.
 argv_copy = ARGV.dup
+
+# We don't have options yet, but we need an instance of SJ in order
+# to list public methods. We will recreate it
 sj = SugarJar::Commands.new(options)
 extra_opts = []
 
@@ -204,6 +207,9 @@ if ARGV.empty?
 end
 
 options = config.merge(options)
+
+# Recreate SJ with all of our options
+sj = SugarJar::Commands.new(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
 subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
