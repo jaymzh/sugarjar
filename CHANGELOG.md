@@ -1,5 +1,11 @@
 # SugarJar Changelog
 
+## 0.0.5 (2020-06-24)
+
+* Fix global config file handling
+* Better logging around lint/unit failuers
+* Handle incorrect tracked branches better
+
 ## 0.0.4 (2020-06-17)
 
 * Fix gemspec to include executables
