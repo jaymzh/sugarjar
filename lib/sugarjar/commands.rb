@@ -356,6 +356,15 @@ class SugarJar
       fetch_upstream
       SugarJar::Log.debug('Rebasing')
       base = tracked_branch
+      if base == "origin/#{current_branch}"
+        SugarJar::Log.warn(
+          "This branch is tracking origin/#{current_branch}, which is " +
+          "probably your downstream (where you push _to_) as opposed to " +
+          "your upstream (where you pull _from_). This means that 'sj up' " +
+          "is probably rebasing on the wrong thing and doing nothing. " +
+          "You probably want to do a 'git branch -u upstream'."
+        )
+      end
       s = hub_nofail('rebase', base)
       s.error? ? nil : base
     end
