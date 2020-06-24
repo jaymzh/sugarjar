@@ -232,10 +232,14 @@ class SugarJar
             return false
           end
           s = Mixlib::ShellOut.new(check).run_command
-          if s.error?
-            SugarJar::Log.info("#{type} #{check} failed\n#{s.stdout}")
-            return false
-          end
+          next unless s.error?
+
+          SugarJar::Log.info(
+            "#{type} #{check} failed, output follows (use debug for more)\n" +
+            s.stdout.to_s,
+          )
+          SugarJar::Log.debug(s.format_for_exception)
+          return false
         end
       end
     end
