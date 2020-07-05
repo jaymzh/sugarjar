@@ -147,7 +147,7 @@ argv_copy = ARGV.dup
 
 # We don't have options yet, but we need an instance of SJ in order
 # to list public methods. We will recreate it
-sj = SugarJar::Commands.new(options)
+sj = SugarJar::Commands.new(options.merge({ 'no_change' => true }))
 extra_opts = []
 
 # as with above, this can't go into 'options', until after we parse
@@ -209,8 +209,8 @@ end
 options = config.merge(options)
 
 # Recreate SJ with all of our options
-sj = SugarJar::Commands.new(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
+sj = SugarJar::Commands.new(options)
 
 subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
 argv_copy.delete(subcommand)
@@ -227,7 +227,9 @@ if subcommand == 'help'
 end
 
 if is_valid_command
-  SugarJar::Log.debug("running #{subcommand}, #{extra_opts.join(', ')}")
+  SugarJar::Log.debug(
+    "running #{subcommand}; extra opts: #{extra_opts.join(', ')}",
+  )
   sj.send(subcommand.to_sym, *extra_opts)
 elsif options['fallthru']
   SugarJar::Log.debug("Falling thru to: hub #{ARGV.join(' ')}")

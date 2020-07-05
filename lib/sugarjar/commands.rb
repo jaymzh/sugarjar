@@ -15,7 +15,10 @@ class SugarJar
       @ghuser = options['github_user']
       @ghhost = options['github_host']
       @repo_config = SugarJar::RepoConfig.config
+      return if options['no_change']
+
       set_hub_host if @ghhost
+      set_commit_template if @repo_config['commit_template']
     end
 
     def feature(name, base = nil)
@@ -224,6 +227,47 @@ class SugarJar
         return
       end
       hub('config', '--local', '--add', 'hub.host', @ghhost)
+    end
+
+    def set_commit_template
+      unless in_repo
+        SugarJar::Log.debug('Skipping set_commit_template: not in repo')
+        return
+      end
+
+      realpath = if @repo_config['commit_template'].start_with?('/')
+                   @repo_config['commit_template']
+                 else
+                   "#{repo_root}/#{@repo_config['commit_template']}"
+                 end
+      unless File.exist?(realpath)
+        die(
+          "Repo config specifies #{@repo_config['commit_template']} as the " +
+          'commit template, but that file does not exist.',
+        )
+      end
+
+      s = hub_nofail('config', '--local', 'commit.template')
+      unless s.error?
+        current = s.stdout.strip
+        if current == @repo_config['commit_template']
+          SugarJar::Log.debug('Commit template already set correctly')
+          return
+        else
+          SugarJar::Log.warn(
+            "Updating repo-specific commit template from #{current} " +
+            "to #{@repo_config['commit_template']}",
+          )
+        end
+      end
+
+      SugarJar::Log.debug(
+        'Setting repo-specific commit template to ' +
+        "#{@repo_config['commit_template']} per sugarjar repo config.",
+      )
+      hub(
+        'config', '--local', 'commit.template', @repo_config['commit_template']
+      )
     end
 
     def run_check(type)
