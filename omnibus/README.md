@@ -111,7 +111,8 @@ section:
 ```shell
 $ bin/kitchen login ubuntu-1804
 [vagrant@ubuntu...] $ .  load-omnibus-toolchain.sh
-[vagrant@ubuntu...] $ cd sugarjar
+[vagrant@ubuntu...] $ [ -e .bundle ] && chown -R vagrant:vagrant .bundle
+[vagrant@ubuntu...] $ cd sugarjar/omnibus
 [vagrant@ubuntu...] $ bundle install
 [vagrant@ubuntu...] $ bin/omnibus build sugarjar
 ```
