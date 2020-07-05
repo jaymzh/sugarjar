@@ -246,17 +246,19 @@ troubleshoot configuration parsing.
 ## Repository Configuration
 
 Sugarjar looks for a `.sugarjar.yaml` in the root of the repository to tell it
-how to handle repo-specific things. Currently there are only three
-configurations accepted:
+how to handle repo-specific things. Currently there options are:
 
-* lint - A list of scripts to run on `sj lint`. These should be linters like
+* `lint` - A list of scripts to run on `sj lint`. These should be linters like
   rubocop or pyflake.
-* unit - A list of scripts to run on `sj unit`. These should be unittest
+* `unit` - A list of scripts to run on `sj unit`. These should be unittest
   runners like rspec or pyunit.
-* on_push - A list of types (`lint`, `unit`) of checks to run before pushing.
+* `on_push` - A list of types (`lint`, `unit`) of checks to run before pushing.
   It is highly recommended this is only `lint`. The goal here is to allow for
   the user to get quick stylistic feedback before pushing their branch to avoid
   the push-fix-push-fix loop.
+* `commit_template` - A path to a commit template to set in the `commit.template`
+  git config for this repo. Should be either a fully-qualified path, or a path
+  relative to the repo root.
 
 Example configuration:
 
@@ -267,7 +269,16 @@ unit:
   - scripts/unit
 on_push:
   - lint
+commit_template: .commit-template.txt
 ```
+
+### Commit Templates
+
+While GitHub provides a way to specify a pull-request template by putting the
+right file into a repo, there is no way to tell git to automatically pick up a
+commit template by dropping a file in the repo. Users must do something like:
+`git config commit.template <file>`. Making each developer do this is error
+prone, so this setting will automatically set this up for each developer.
 
 ## Enterprise GitHub
 
