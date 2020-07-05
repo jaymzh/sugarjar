@@ -3,8 +3,8 @@
 SCRIPTS=$(dirname "$(realpath "$0")")
 REPODIR="$SCRIPTS/.."
 
-BIN='bundle exec rubocop'
-CMD="$BIN --display-cop-names"
+BIN='bundle exec rspec'
+CMD="$BIN --format d"
 
 if [ -n "$1" ]; then
     args=( "$@" )

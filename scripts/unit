@@ -1,0 +1,3 @@
+#!/bin/bash
+
+scripts/run_rspec.sh "$@" || { echo "rspec failed"; exit 1; }
