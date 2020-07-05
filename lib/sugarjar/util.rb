@@ -28,7 +28,26 @@ class SugarJar
 
     def hub_nofail(*args)
       SugarJar::Log.trace("Running: hub #{args.join(' ')}")
-      Mixlib::ShellOut.new([which('hub')] + args).run_command
+      s = Mixlib::ShellOut.new([which('hub')] + args).run_command
+      # depending on hub version and possibly other things, STDERR
+      # is either "Requires authentication" or "Must authenticate"
+      if s.error? && s.stderr =~ /^(Must|Requires) authenticat/
+        SugarJar::Log.info(
+          'Hub was run but no github token exists. Will run "hub api user" ' +
+          "to force\nhub to authenticate...",
+        )
+        unless system(which('hub'), 'api', 'user')
+          SugarJar::Log.fatal(
+            'That failed, I will bail out. Hub needs to get a github ' +
+            'token. Try running "hub api user" (will list info about ' +
+            'your account) and try this again when that works.',
+          )
+          exit(1)
+        end
+        SugarJar::Log.info('Re-running original hub command...')
+        s = Mixlib::ShellOut.new([which('hub')] + args).run_command
+      end
+      s
     end
 
     def hub(*args)
