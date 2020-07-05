@@ -56,7 +56,7 @@ class SugarJar
 
       # Return to the branch we were on, or master
       if all_branches.include?(curr)
-        hub('checkout', 'current')
+        hub('checkout', curr)
       else
         hub('checkout', 'master')
       end
