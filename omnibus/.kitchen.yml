@@ -5,7 +5,7 @@ driver:
     cpus: 2
     memory: 2048
   synced_folders:
-    - ['.', '/home/vagrant/sugarjar']
+    - ['..', '/home/vagrant/sugarjar']
 
 provisioner:
   name: chef_zero
