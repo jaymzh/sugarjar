@@ -41,6 +41,7 @@ class SugarJar
 
     def bcleanall
       assert_in_repo
+      curr = current_branch
       all_branches.each do |branch|
         next if branch == 'master'
 
@@ -51,6 +52,13 @@ class SugarJar
           )
         end
         # rubocop:enable Style/Next
+      end
+
+      # Return to the branch we were on, or master
+      if all_branches.include?(curr)
+        hub('checkout', 'current')
+      else
+        hub('checkout', 'master')
       end
     end
 
