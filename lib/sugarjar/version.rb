@@ -1,3 +1,3 @@
 class SugarJar
-  VERSION = '0.0.5'.freeze
+  VERSION = '0.0.6'.freeze
 end
