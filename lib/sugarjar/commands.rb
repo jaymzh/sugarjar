@@ -166,7 +166,7 @@ class SugarJar
     end
 
     def unit
-      exit(1) unless run_check('lint')
+      exit(1) unless run_check('unit')
     end
 
     def smartpush(remote = nil, branch = nil)

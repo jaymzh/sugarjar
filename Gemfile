@@ -5,5 +5,6 @@ gem 'sugarjar', :path => '.'
 
 group :test do
   gem 'mdl'
+  gem 'rspec'
   gem 'rubocop'
 end
