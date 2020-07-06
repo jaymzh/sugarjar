@@ -1,5 +1,14 @@
 # SugarJar Changelog
 
+## 0.0.6 (2020-07-05)
+
+* Add automatic commit template configuration (closes #38)
+* bcleanall: Return to reasonable branch (fixes #37)
+* Handle case where `hub` has no auth token (fixes #39)
+* Fix crash in `smartclone`
+* Improve logging
+* Fix `sj unit` running lints instead of units
+
 ## 0.0.5 (2020-06-24)
 
 * Fix global config file handling
