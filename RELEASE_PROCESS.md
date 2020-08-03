@@ -18,4 +18,13 @@
 
 ## Publish omnibus builds
 
-* (from omnibus directory): `bundle install; bundle exec omnibus build sugarjar`
+* From omnibus directory, prep: `bundle install`
+  * For each of Ubuntu 18.04, Debian 9, CentOS7
+    * `kitchen converge ubuntu-1804; kitchen login ubuntu-1804`
+    * `.  load-omnibus-toolchain.sh`
+    * `[ -e .bundle ] && sudo chown -R vagrant:vagrant .bundle`
+    * `cd sugarjar/omnibus`
+    * `bundle install`
+    * `bin/omnibus build sugarjar`
+    * `bin/omnibus clean sugarjar` # required so next build works
+    * grab/rename the package out of sugarjar/omnibus/pkg
