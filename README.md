@@ -13,7 +13,7 @@ the Phabricator workflow this aims to bring to the GitHub workflow.
 In particular there are a lot of helpers for using a squash-merge workflow that
 is poorly handled by the standard toolsets.
 
-If you miss Mondrian or Phabrictor - this is the tool for you!
+If you miss Mondrian or Phabricator - this is the tool for you!
 
 If you don't, there's a ton of useful stuff for everyone!
 
@@ -21,7 +21,7 @@ If you don't, there's a ton of useful stuff for everyone!
 
 It is common for a PR to go back and forth with a variety of nits, lint fixes,
 typos, etc. that can muddy history. So many projects will "squash and merge"
-when they accept a pull request. Howevet, that means `git branch -d <branch>`
+when they accept a pull request. However, that means `git branch -d <branch>`
 doesn't work. Git will tell you the branch isn't fully merged. You can, of
 course `git branch -D <branch>`, but that does no safety checks at all, it
 forces the deletion.
@@ -74,7 +74,7 @@ This will:
 Note that it takes `hub`s short-names for repos. No need to specify a full URL,
 just a $org/$repo.
 
-Like `git clone`, `sj sclone` will accept an additional arguement as the
+Like `git clone`, `sj sclone` will accept an additional argument as the
 destination directory to clone to. It will also pass any other unknown options
 to `git clone` under the hood.
 
@@ -145,7 +145,7 @@ push if any of them fail.
 ## Better push defaults
 
 In addition to running pre-push tests for you `smartpush` also picks smart
-defaults for push. So if you `sj spush` with no arguements, it uses the
+defaults for push. So if you `sj spush` with no arguments, it uses the
 `origin` remote and the same branch name you're on as the remote branch.
 
 ## Cleaning up your own history
@@ -156,11 +156,11 @@ combination of rebases, amends and force pushes. We provide two commands here
 to help.
 
 The first is pretty straight forward and is basically just an alias: `sj
-amend`. It will ammend whatever you want to the most recent commit (just an
+amend`. It will amend whatever you want to the most recent commit (just an
 alias for `git commit --amend`). It has a partner `qamend` (or `amendq` if you
 prefer) that will do so without prompting to update your commit message.
 
-So now you've rebased or amended, pushing becomes challening. You can `git push
+So now you've rebased or amended, pushing becomes challenging. You can `git push
 --force`, but everyone knows that's incredibly dangerous. Is there a better
 way? There is! Git provides `git push --force-with-lease` - it checks to make
 sure you're up-to-date with the remote before forcing the push. But man that
@@ -174,7 +174,7 @@ When you want to start a new feature, you want to start developing against
 latest. That's why `sj feature` defaults to creating a branch against what we
 call "most master". That is, `upstream/master` if it exists, otherwise
 `origin/master` if that exists, otherwise `master`. You can pass in an
-additional arguement to base it off of something else.
+additional argument to base it off of something else.
 
 ```shell
 $ git branch
