@@ -1,6 +1,7 @@
 # SugarJar
 
-![CI](https://github.com/jaymzh/sugarjar/workflows/CI/badge.svg)
+[![Lint](https://github.com/jaymzh/sugarjar/workflows/Lint/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3ALint)
+[![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 [![Gem Version](https://badge.fury.io/rb/sugarjar.svg)](https://badge.fury.io/rb/sugarjar)
 
 Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
