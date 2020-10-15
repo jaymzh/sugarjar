@@ -132,7 +132,7 @@ COMMANDS:
   upall
               Same as "up", but for all branches.
 
-  verson
+  version
               Print the version of sugarjar, and then run 'hub version'
               to show the hub and git versions.
 COMMANDS
