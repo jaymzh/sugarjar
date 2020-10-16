@@ -4,7 +4,7 @@
 # All Rights Reserved.
 #
 
-require_relative '../../../lib/sugarjar/version.rb'
+require_relative '../../../lib/sugarjar/version'
 
 name 'sugarjar'
 friendly_name 'SugarJar'
