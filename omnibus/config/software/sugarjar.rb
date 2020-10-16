@@ -1,4 +1,4 @@
-require_relative '../../../lib/sugarjar/version.rb'
+require_relative '../../../lib/sugarjar/version'
 
 name 'sugarjar'
 dependency 'ruby'
