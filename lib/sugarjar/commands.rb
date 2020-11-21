@@ -1,3 +1,5 @@
+require 'mixlib/shellout'
+
 require_relative 'util'
 require_relative 'repoconfig'
 require_relative 'log'
@@ -139,7 +141,8 @@ class SugarJar
         # Now that we have a repo, if we have a hub host set it.
         set_hub_host if @ghhost
 
-        org = File.basename(File.dirname(repo))
+        org = extract_org(repo)
+        SugarJar::Log.debug("Comparing org #{org} to ghuser #{@ghuser}")
         if org == @ghuser
           puts 'Cloned forked or self-owned repo. Not creating "upstream".'
           return
@@ -149,9 +152,10 @@ class SugarJar
         if s.error?
           # if the fork command failed, we already have one, so we have
           # to swap the remote names ourselves
+          # newer 'hub's don't fail and do the right thing...
           SugarJar::Log.info("Fork (#{@ghuser}/#{reponame}) detected.")
           hub('remote', 'rename', 'origin', 'upstream')
-          hub('remote', 'add', 'origin', repo.gsub("#{org}/", "#{@ghuser}/"))
+          hub('remote', 'add', 'origin', forked_path(repo, @ghuser))
         else
           SugarJar::Log.info("Forked #{reponame} to #{@ghuser}")
         end
@@ -205,6 +209,26 @@ class SugarJar
 
     private
 
+    def extract_org(path)
+      if path.start_with?('http')
+        File.basename(File.dirname(path))
+      elsif path.start_with?('git@')
+        path.split(':')[1].split('/')[0]
+      else
+        # assume they passed in a hub-friendly name
+        path.split('/').first
+      end
+    end
+
+    def forked_path(path, username)
+      repo = if path.start_with?('http', 'git@')
+               File.basename(path)
+             else
+               "#{File.basename(path)}.git"
+             end
+      "git@github.com:#{username}/#{repo}"
+    end
+
     def set_hub_host
       return unless in_repo
 
@@ -213,7 +237,7 @@ class SugarJar
         SugarJar::Log.info("Setting repo hub.host = #{@ghhost}")
       else
         current = s.stdout
-        if current == @ghost
+        if current == @ghhost
           SugarJar::Log.debug('Repo hub.host already set correctly')
         else
           # Even though we have an explicit config, in most cases, it

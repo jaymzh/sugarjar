@@ -28,6 +28,9 @@ Style/LineEndConcatenation:
 Style/StringConcatenation:
   Enabled: false
 
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
@@ -48,3 +51,6 @@ Style/TrailingCommaInArguments:
 
 Metrics/PerceivedComplexity:
   Enabled: false
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
