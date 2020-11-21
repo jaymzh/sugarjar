@@ -16,6 +16,8 @@ class SugarJar
       SugarJar::Log.debug("Commands.initialize options: #{options}")
       @ghuser = options['github_user']
       @ghhost = options['github_host']
+      @ignore_dirty = options['ignore_dirty']
+      @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
       return if options['no_change']
 
@@ -166,38 +168,25 @@ class SugarJar
     alias sclone smartclone
 
     def lint
+      assert_in_repo
       exit(1) unless run_check('lint')
     end
 
     def unit
+      assert_in_repo
       exit(1) unless run_check('unit')
     end
 
     def smartpush(remote = nil, branch = nil)
-      unless remote && branch
-        remote ||= 'origin'
-        branch ||= current_branch
-      end
-
-      if run_prepush
-        puts hub('push', remote, branch).stderr
-      else
-        SugarJar::Log.error('Pre-push checks failed. Not pushing.')
-      end
+      assert_in_repo
+      _smartpush(remote, branch, false)
     end
 
     alias spush smartpush
 
     def forcepush(remote = nil, branch = nil)
-      unless remote && branch
-        remote ||= 'origin'
-        branch ||= current_branch
-      end
-      if run_prepush
-        puts hub('push', '--force-with-lease', remote, branch).stderr
-      else
-        SugarJar::Log.error('Pre-push checks failed. Not pushing.')
-      end
+      assert_in_repo
+      _smartpush(remote, branch, true)
     end
 
     alias fpush forcepush
@@ -207,7 +196,65 @@ class SugarJar
       puts hub('version').stdout
     end
 
+    def smartpullrequest
+      assert_in_repo
+      if dirty?
+        SugarJar::Log.warn(
+          'Your repo is dirty, so I am not going to create a pull request. ' +
+          'You should commit or amend and push it to your remote first.',
+        )
+        exit(1)
+      end
+      system(which('hub'), 'pull-request')
+    end
+
+    alias spr smartpullrequest
+    alias smartpr smartpullrequest
+
     private
+
+    def _smartpush(remote, branch, force)
+      unless remote && branch
+        remote ||= 'origin'
+        branch ||= current_branch
+      end
+
+      if dirty?
+        if @ignore_dirty
+          SugarJar::Log.warn(
+            'Your repo is dirty, but --ignore-dirty was specified, so ' +
+            'carrying on anyway.',
+          )
+        else
+          SugarJar::Log.error(
+            'Your repo is dirty, so I am not going to push. Please commit ' +
+            'or amend first.',
+          )
+          exit(1)
+        end
+      end
+
+      unless run_prepush
+        if @ignore_prerun_failure
+          SugarJar::Log.warn(
+            'Pre-push checks failed, but --ignore-prerun-failure was ' +
+            'specified, so carrying on anyway',
+          )
+        else
+          SugarJar::Log.error('Pre-push checks failed. Not pushing.')
+          exit(1)
+        end
+      end
+
+      args = ['push', remote, branch]
+      args << '--force-with-lease' if force
+      puts hub(*args).stderr
+    end
+
+    def dirty?
+      s = hub_nofail('diff', '--quiet')
+      s.error?
+    end
 
     def extract_org(path)
       if path.start_with?('http')

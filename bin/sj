@@ -61,6 +61,20 @@ parser = OptionParser.new do |opts|
     options['log_level'] = level
   end
 
+  opts.on(
+    '--ignore-dirty',
+    'Tell command that check for a dirty repo to carry on anyway.',
+  ) do
+    options['ignore_dirty'] = true
+  end
+
+  opts.on(
+    '--ignore-prerun-failure',
+    'Ignore preprun failure on *push commands.',
+  ) do
+    options['ignore_prerun_failure'] = true
+  end
+
   opts.on('--version') do
     puts SugarJar::VERSION
     exit
@@ -118,6 +132,10 @@ COMMANDS:
               as your github-user then it will fork the repo for you to
               your account (if not already done) and then setup your remotes
               so that "origin" is your fork and "upstream" is the upstream.
+
+  smartpullrequest, smartpr, spr
+              A smart wrapper to "hub pull-request" that checks if your repo
+              is dirty before creating the pull request.
 
   smartpush, spush
               A smart wrapper to "git push" that runs whatever is defined in
