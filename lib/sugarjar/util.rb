@@ -32,7 +32,8 @@ class SugarJar
       if s.error?
         # depending on hub version and possibly other things, STDERR
         # is either "Requires authentication" or "Must authenticate"
-        if s.stderr =~ /^(Must|Requires) authenticat/
+        case s.stderr
+        when /^(Must|Requires) authenticat/
           SugarJar::Log.info(
             'Hub was run but no github token exists. Will run "hub api user" ' +
             "to force\nhub to authenticate...",
@@ -47,7 +48,7 @@ class SugarJar
           end
           SugarJar::Log.info('Re-running original hub command...')
           s = Mixlib::ShellOut.new([which('hub')] + args).run_command
-        elsif s.stderr =~ /^fatal: could not read Username/
+        when /^fatal: could not read Username/
           # On http(s) URLs, git may prompt for username/passwd
           SugarJar::Log.info(
             'Hub was run but git prompted for authentication. This probably ' +
@@ -55,7 +56,7 @@ class SugarJar
             "is recommended you reclone\nusing 'sj sclone' to setup your " +
             "remotes properly. However, in the meantime,\nwe'll go ahead " +
             "and re-run the command in a shell so you can type in the\n" +
-            'credentials.'
+            'credentials.',
           )
           unless system(which('hub'), *args)
             SugarJar::Log.fatal(
