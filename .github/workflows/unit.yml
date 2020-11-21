@@ -1,15 +1,15 @@
 # the rspec-tests action doesn't yet work:
 # https://github.com/bartosian/rspec-tests-docker-action/issues/1
 
-#name: Unit
-#
-#on:
-#  push:
-#    branches: [ master ]
-#  pull_request:
-#    branches: [ master ]
-#
-#jobs:
+name: Unittests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
 #  rspec:
 #    runs-on: ubuntu-latest
 #    steps:
@@ -17,3 +17,21 @@
 #        uses: actions/checkout@v2
 #      - name: rspec-tests
 #        uses: bartosian/rspec-tests-docker-action@v1
+#
+  rspec:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [2.6, 2.7]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+    - name: Install dependencies
+      run: bundle install
+    - name: Run rspec
+      run: ./scripts/run_rspec.sh
