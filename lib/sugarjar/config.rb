@@ -13,7 +13,7 @@ class SugarJar
     def self._find_ordered_files
       [
         '/etc/sugarjar/config.yaml',
-        "#{ENV['HOME']}/.config/sugarjar/config.yaml"
+        "#{ENV['HOME']}/.config/sugarjar/config.yaml",
       ].select { |f| File.exist?(f) }
     end
 

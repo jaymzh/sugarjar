@@ -2,7 +2,7 @@
 require_relative '../lib/sugarjar/commands'
 
 describe 'SugarJar::Commands' do
-  context 'set_commit_template' do
+  context '#set_commit_template' do
     it 'Does nothing if not in repo' do
       expect(SugarJar::RepoConfig).to receive(:config).and_return(
         { 'commit_template' => '.commit_template.txt' },
@@ -20,8 +20,8 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
       expect(sj).to receive(:in_repo).and_return(true)
       expect(sj).to receive(:repo_root).and_return('/nonexistent')
-      expect(File).to receive(:exist?)
-        .with('/nonexistent/.commit_template.txt').and_return(false)
+      expect(File).to receive(:exist?).
+        with('/nonexistent/.commit_template.txt').and_return(false)
       expect(SugarJar::Log).to receive(:fatal).with(/exist/)
       expect { sj.send(:set_commit_template) }.to raise_error(SystemExit)
     end
@@ -33,8 +33,8 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
       expect(sj).to receive(:in_repo).and_return(true)
       expect(sj).to receive(:repo_root).and_return('/nonexistent')
-      expect(File).to receive(:exist?)
-        .with('/nonexistent/.commit_template.txt').and_return(true)
+      expect(File).to receive(:exist?).
+        with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
       expect(so).to receive(:error?).and_return(false)
       expect(so).to receive(:stdout).and_return(".commit_template.txt\n")
@@ -50,8 +50,8 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
       expect(sj).to receive(:in_repo).and_return(true)
       expect(sj).to receive(:repo_root).and_return('/nonexistent')
-      expect(File).to receive(:exist?)
-        .with('/nonexistent/.commit_template.txt').and_return(true)
+      expect(File).to receive(:exist?).
+        with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
       expect(so).to receive(:error?).and_return(false)
       expect(so).to receive(:stdout).and_return(".not_commit_template.txt\n")
@@ -70,8 +70,8 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
       expect(sj).to receive(:in_repo).and_return(true)
       expect(sj).to receive(:repo_root).and_return('/nonexistent')
-      expect(File).to receive(:exist?)
-        .with('/nonexistent/.commit_template.txt').and_return(true)
+      expect(File).to receive(:exist?).
+        with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
       expect(so).to receive(:error?).and_return(true)
       expect(sj).to receive(:hub_nofail).and_return(so)
@@ -80,6 +80,49 @@ describe 'SugarJar::Commands' do
       )
       expect(SugarJar::Log).to receive(:debug).with(/^Setting/)
       sj.send(:set_commit_template)
+    end
+  end
+
+  context '#extract_org' do
+    let(:sj) do
+      SugarJar::Commands.new({ 'no_change' => true })
+    end
+
+    [
+      # ssh
+      'git@github.com:org/repo.git',
+      # http
+      'http://github.com/org/repo.git',
+      # https
+      'https://github.com/org/repo.git',
+      # hub
+      'org/repo',
+    ].each do |url|
+      it "detects the org from #{url}" do
+        expect(sj.send(:extract_org, url)).to eq('org')
+      end
+    end
+  end
+
+  context '#forked_path' do
+    let(:sj) do
+      SugarJar::Commands.new({ 'no_change' => true })
+    end
+
+    [
+      # ssh
+      'git@github.com:org/repo.git',
+      # http
+      'http://github.com/org/repo.git',
+      # https
+      'https://github.com/org/repo.git',
+      # hub
+      'org/repo',
+    ].each do |url|
+      it "generates correct URL from #{url}" do
+        expect(sj.send(:forked_path, url, 'test')).
+          to eq('git@github.com:test/repo.git')
+      end
     end
   end
 end
