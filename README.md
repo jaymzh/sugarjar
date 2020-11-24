@@ -1,6 +1,7 @@
 # SugarJar
 
 [![Lint](https://github.com/jaymzh/sugarjar/workflows/Lint/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3ALint)
+[![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 [![Gem Version](https://badge.fury.io/rb/sugarjar.svg)](https://badge.fury.io/rb/sugarjar)
 
@@ -8,7 +9,7 @@ Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
 [hub](https://hub.github.com/), so you'll need that installed.
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
-it's replacement at Facebook, JellyFish. Many of the features they provide for
+its replacement at Facebook, JellyFish. Many of the features they provide for
 the Phabricator workflow this aims to bring to the GitHub workflow.
 
 In particular there are a lot of helpers for using a squash-merge workflow that
@@ -27,7 +28,7 @@ doesn't work. Git will tell you the branch isn't fully merged. You can, of
 course `git branch -D <branch>`, but that does no safety checks at all, it
 forces the deletion.
 
-Enter `sj bclean` - it determines of the contents of your branch has been merge
+Enter `sj bclean` - it determines if the contents of your branch has been merge
 and safely deletes if so.
 
 ``` shell
@@ -119,7 +120,7 @@ small lint issue? Not anymore! SJ can be configured to run things before
 pushing. For example,in the SugarJar repo, we have it run Rubocop (ruby lint)
 and Markdownlint "on_push". If those fail, it lets you know and doesn't push.
 
-You can configure SugarJar to tell how how to run both lints and unittests for
+You can configure SugarJar to tell it how to run both lints and unittests for
 a given repo and if one or both should be run prior to pushing.
 
 The details on the config file format is below, but we provide three commands:
