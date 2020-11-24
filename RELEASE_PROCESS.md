@@ -8,23 +8,35 @@
 
 ## Tag the release
 
-* Add a tag: `git tag -a v0.0.X -m 'version 0.0.x'
+* version='0.0.X'
+* Add a tag: `git tag -a v${version?} -m "version ${version?}" -s`
 * Push the tag: `git push origin --tags`
 
 ## Publish a gem
 
 * Build a gem: `gem build sugarjar.gemspec`
-* Push the gem: `gem push sugarjar-0.0.X.gem`
+* Push the gem: `gem push sugarjar-${version?}.gem`
 
 ## Publish omnibus builds
 
 * From omnibus directory, prep: `bundle install`
-  * For each of Ubuntu 18.04, Debian 9, CentOS7
-    * `kitchen converge ubuntu-1804; kitchen login ubuntu-1804`
-    * `.  load-omnibus-toolchain.sh`
-    * `[ -e .bundle ] && sudo chown -R vagrant:vagrant .bundle`
-    * `cd sugarjar/omnibus`
-    * `bundle install`
-    * `bin/omnibus build sugarjar`
-    * `bin/omnibus clean sugarjar` # required so next build works
-    * grab/rename the package out of sugarjar/omnibus/pkg
+* Inside of each VM...
+
+  ```shell
+  for d in ubuntu-1804 debian-9 centos-7; do
+    kitchen converge default-$d && kitchen login default-$d
+  done
+  ```
+
+  * Do a build...
+
+    ```shell
+    .  load-omnibus-toolchain.sh
+    [ -e .bundle ] && sudo chown -R vagrant:vagrant .bundle
+    cd sugarjar/omnibus
+    bundle install
+    bin/omnibus build sugarjar
+    bin/omnibus clean sugarjar # required so next build works
+    ```
+
+  * Grab/rename the package out of sugarjar/omnibus/pkg
