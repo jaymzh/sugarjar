@@ -41,7 +41,10 @@ class SugarJar
       name ||= current_branch
       # rubocop:disable Style/GuardClause
       unless clean_branch(name)
-        die("Cannot clean #{name} - there are unmerged commits")
+        die(
+          "Cannot clean #{name} - there are unmerged commits; use " +
+          "'git branch -D #{name}' to forcefully delete it.",
+        )
       end
       # rubocop:enable Style/GuardClause
     end
@@ -55,7 +58,8 @@ class SugarJar
         # rubocop:disable Style/Next
         unless clean_branch(branch)
           SugarJar::Log.info(
-            "Skipping branch #{branch} - there are unmerged commits",
+            "Skipping branch #{branch} - there are unmerged commits; use " +
+            "'git branch -D #{branch}' to forcefully delete it.",
           )
         end
         # rubocop:enable Style/Next
