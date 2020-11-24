@@ -1,5 +1,18 @@
 # SugarJar Changelog
 
+## 0.0.7 (2020-11-23)
+
+* Add new command `smartpullrequest` (or `smartpr` or `spr`) for creating
+  pull requests (closes #51)
+* Add checks for dirty repos before `smartpush`, `forcepush`, and
+  `smartpullrequest`
+* Add `--ignore-dirty` and `--ignore-prerun-failure` options
+* Handle when git prompts for a username (closes #52)
+* Always use SSH for the forked remote (closes #56)
+* Better handling of various forms of repo URLs
+* Fix typo of `version` in help message
+* Fix typos in `README.md`
+
 ## 0.0.6 (2020-07-05)
 
 * Add automatic commit template configuration (closes #38)
