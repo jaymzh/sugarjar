@@ -8,7 +8,7 @@ Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
 [hub](https://hub.github.com/), so you'll need that installed.
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
-it's replacement at Facebook, JellyFish. Many of the features they provide for
+its replacement at Facebook, JellyFish. Many of the features they provide for
 the Phabricator workflow this aims to bring to the GitHub workflow.
 
 In particular there are a lot of helpers for using a squash-merge workflow that
