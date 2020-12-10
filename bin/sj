@@ -133,6 +133,11 @@ COMMANDS:
               your account (if not already done) and then setup your remotes
               so that "origin" is your fork and "upstream" is the upstream.
 
+  smartlog, sl
+              Inspired by Facebook's "sl" extension to Mercurial, this command
+              will show you a tree of all your local branches relative to your
+              upstream.
+
   smartpullrequest, smartpr, spr
               A smart wrapper to "hub pull-request" that checks if your repo
               is dirty before creating the pull request.
