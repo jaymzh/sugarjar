@@ -86,10 +86,21 @@ class SugarJar
     def binfo
       assert_in_repo
       SugarJar::Log.info(hub(
-        'log', '--graph', '--oneline', '--decorate', '--boundary',
+        'log', '--graph', '--oneline', '--decorate', '--boundary', '--color',
         "#{tracked_branch}.."
-      ).stdout)
+      ).stdout.chomp)
     end
+
+    # binfo for all branches
+    def smartlog
+      assert_in_repo
+      SugarJar::Log.info(hub(
+        'log', '--graph', '--oneline', '--decorate', '--boundary', '--color',
+        '--branches', "#{most_master}.."
+      ).stdout.chomp)
+    end
+
+    alias sl smartlog
 
     def up
       assert_in_repo
