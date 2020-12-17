@@ -23,8 +23,9 @@
 * Inside of each VM...
 
   ```shell
-  for d in ubuntu-1804 debian-9 centos-7; do
-    kitchen converge default-$d && kitchen login default-$d
+  for d in ubuntu-1804 debian-10 centos-7; do
+    bundle exec kitchen converge default-$d && \
+      bundle exec kitchen login default-$d
   done
   ```
 

@@ -8,7 +8,7 @@ require_relative '../../../lib/sugarjar/version'
 
 name 'sugarjar'
 friendly_name 'SugarJar'
-maintainer 'Phil DIbowitz <phil@ipom.com>'
+maintainer 'Phil Dibowitz <phil@ipom.com>'
 homepage 'https://github.com/jaymzh/sugarjar'
 license 'Apache-2.0'
 
@@ -19,7 +19,7 @@ install_dir "#{default_root}/#{name}"
 build_version SugarJar::VERSION
 build_iteration 1
 
-override 'ruby', :version => '2.7.1'
+override 'ruby', :version => '2.7.2'
 
 dependency 'preparation'
 dependency 'sugarjar'
