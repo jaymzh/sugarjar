@@ -193,7 +193,8 @@ Created feature branch dependent-feature based on test-branch
 
 ## Smartlog
 
-Smartlog will show you a tree diagram of your branches!
+Smartlog will show you a tree diagram of your branches! Simply run `sj
+smartlog` or `sj sl` for short.
 
 ![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/master/smartlog.png)
 
