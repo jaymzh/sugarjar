@@ -19,6 +19,7 @@ class SugarJar
       @ignore_dirty = options['ignore_dirty']
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
+      @color = options['color']
       return if options['no_change']
 
       set_hub_host if @ghhost
@@ -33,36 +34,43 @@ class SugarJar
       base_pieces = base.split('/')
       hub('fetch', base_pieces[0]) if base_pieces.length > 1
       hub('checkout', '-b', name, base)
-      SugarJar::Log.info("Created feature branch #{name} based on #{base}")
+      SugarJar::Log.info(
+        "Created feature branch #{color(name, :green)} based on " +
+        color(base, :green),
+      )
     end
 
     def bclean(name = nil)
       assert_in_repo
       name ||= current_branch
-      # rubocop:disable Style/GuardClause
-      unless clean_branch(name)
+      if clean_branch(name)
+        SugarJar::Log.info("#{name}: #{color('reaped', :green)}")
+      else
         die(
-          "Cannot clean #{name} - there are unmerged commits; use " +
-          "'git branch -D #{name}' to forcefully delete it.",
+          "#{color("Cannot clean #{name}", :red)}! there are unmerged " +
+          "commits; use 'git branch -D #{name}' to forcefully delete it.",
         )
       end
-      # rubocop:enable Style/GuardClause
     end
 
     def bcleanall
       assert_in_repo
       curr = current_branch
       all_branches.each do |branch|
-        next if branch == 'master'
+        if branch == 'master'
+          SugarJar::Log.debug('Skipping master')
+          next
+        end
 
-        # rubocop:disable Style/Next
-        unless clean_branch(branch)
-          SugarJar::Log.info(
-            "Skipping branch #{branch} - there are unmerged commits; use " +
-            "'git branch -D #{branch}' to forcefully delete it.",
+        if clean_branch(branch)
+          SugarJar::Log.info("#{branch}: #{color('reaped', :green)}")
+        else
+          SugarJar::Log.info("#{branch}: skipped")
+          SugarJar::Log.debug(
+            "There are unmerged commits; use 'git branch -D #{branch}' to " +
+            'forcefully delete it)',
           )
         end
-        # rubocop:enable Style/Next
       end
 
       # Return to the branch we were on, or master
@@ -75,18 +83,19 @@ class SugarJar
 
     def co(*args)
       assert_in_repo
-      hub('checkout', *args)
+      s = hub('checkout', *args)
+      SugarJar::Log.info(s.stderr + s.stdout.chomp)
     end
 
     def br
       assert_in_repo
-      puts hub('branch', '-v').stdout
+      SugarJar::Log.info(hub('branch', '-v').stdout.chomp)
     end
 
     def binfo
       assert_in_repo
       SugarJar::Log.info(hub(
-        'log', '--graph', '--oneline', '--decorate', '--boundary', '--color',
+        'log', '--graph', '--oneline', '--decorate', '--boundary',
         "#{tracked_branch}.."
       ).stdout.chomp)
     end
@@ -95,7 +104,7 @@ class SugarJar
     def smartlog
       assert_in_repo
       SugarJar::Log.info(hub(
-        'log', '--graph', '--oneline', '--decorate', '--boundary', '--color',
+        'log', '--graph', '--oneline', '--decorate', '--boundary',
         '--branches', "#{most_master}.."
       ).stdout.chomp)
     end
@@ -106,9 +115,11 @@ class SugarJar
       assert_in_repo
       result = gitup
       if result
-        SugarJar::Log.info("Rebased branch on #{result}")
+        SugarJar::Log.info(
+          "#{color(current_branch, :green)} rebased on #{result}",
+        )
       else
-        die('Failed to rebase current branch')
+        die("#{color(current_branch, :red)}: Failed to rebase")
       end
     end
 
@@ -133,11 +144,13 @@ class SugarJar
         hub('checkout', branch)
         result = gitup
         if result
-          SugarJar::Log.info("Rebased #{branch} on #{result}")
+          SugarJar::Log.info(
+            "#{color(branch, :green)} rebased on #{color(result, :green)}",
+          )
         else
           SugarJar::Log.error(
-            "Failed to rebase #{branch}, aborting that and moving to next " +
-            'branch',
+            "#{color(branch, :red)} failed rebase. Reverting attempt and " +
+            'moving to next branch',
           )
           hub('rebase', '--abort')
         end
@@ -363,18 +376,23 @@ class SugarJar
       end
       Dir.chdir repo_root do
         @repo_config[type].each do |check|
-          SugarJar::Log.info("Running #{type} #{check}")
+          SugarJar::Log.debug("Running #{type} #{check}")
 
-          unless File.exist?(check)
+          unless File.exist?(check.split.first)
             SugarJar::Log.error("Configured #{type} #{check} does not exist!")
             return false
           end
           s = Mixlib::ShellOut.new(check).run_command
-          next unless s.error?
+          unless s.error?
+            SugarJar::Log.info(
+              "[#{type}] #{check}: #{color('OK', :green)}",
+            )
+            next
+          end
 
           SugarJar::Log.info(
-            "#{type} #{check} failed, output follows (use debug for more)\n" +
-            s.stdout.to_s,
+            "[#{type}] #{check} #{color('failed', :red)}, output follows " +
+            "(see debug for more)\n#{s.stdout}",
           )
           SugarJar::Log.debug(s.format_for_exception)
           return false
@@ -386,7 +404,7 @@ class SugarJar
       @repo_config['on_push']&.each do |item|
         SugarJar::Log.debug("Running on_push check type #{item}")
         unless send(:run_check, item)
-          SugarJar::Log.info("Push check #{item} failed.")
+          SugarJar::Log.info("[prepush]: #{item} #{color('failed', :red)}.")
           return false
         end
       end
@@ -412,7 +430,6 @@ class SugarJar
       hub('checkout', 'master')
       hub('branch', '-D', name)
       gitup
-      SugarJar::Log.info("Reaped branch #{name}")
       true
     end
 
@@ -453,7 +470,7 @@ class SugarJar
       s = hub_nofail('merge', '--squash', branch)
       if s.error?
         cleanup_tmp_branch(tmpbranch, branch)
-        SugarJar::Log.error(
+        SugarJar::Log.debug(
           'Failed to merge changes into current master. This means we could ' +
           'not figure out if this is merged or not. Check manually and use ' +
           "'git branch -D #{branch}' if it is safe to do so.",
@@ -551,6 +568,21 @@ class SugarJar
         raise 'Could not determine "upstream" remote to use...'
       end
       @remote
+    end
+
+    def color(string, *colors)
+      if @color
+        pastel.decorate(string, *colors)
+      else
+        string
+      end
+    end
+
+    def pastel
+      @pastel ||= begin
+        require 'pastel'
+        Pastel.new
+      end
     end
   end
 end

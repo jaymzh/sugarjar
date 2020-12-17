@@ -17,5 +17,6 @@ Steps to reproduce the behavior including commands and output
 A clear and concise description of what you expected to happen.
 
 **Environment (please complete the following information):**
- - OS: 
- - Output of `sj version`
+
+- OS:
+- Output of `sj version`

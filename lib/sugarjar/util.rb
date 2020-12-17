@@ -27,6 +27,10 @@ class SugarJar
     end
 
     def hub_nofail(*args)
+      if %w{diff log grep branch}.include?(args[0]) &&
+         args.none? { |x| x.include?('color') }
+        args << (@color ? '--color' : '--no-color')
+      end
       SugarJar::Log.trace("Running: hub #{args.join(' ')}")
       s = Mixlib::ShellOut.new([which('hub')] + args).run_command
       if s.error?

@@ -2,7 +2,8 @@ AllCops:
   TargetRubyVersion: 2.6
   NewCops: enable
   Exclude:
-    - 'omnibus/bin/*'
+    - 'omnibus/bin/**/*'
+    - 'omnibus/local/**/*'
 
 Layout/LineLength:
   Max: 80
