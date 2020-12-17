@@ -191,6 +191,12 @@ $ sj feature dependent-feature test-branch
 Created feature branch dependent-feature based on test-branch
 ```
 
+## Smartlog
+
+Smartlog will show you a tree diagram of your branches!
+
+![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/master/smartlog.png)
+
 ## And more!
 
 See `sj help` for more commands!
