@@ -1,5 +1,11 @@
 # SugarJar Changelog
 
+## 0.0.8 (2020-12-16)
+
+* Colorize and simplify output
+* New smartlog feature
+* Doc fixes
+
 ## 0.0.7 (2020-11-23)
 
 * Add new command `smartpullrequest` (or `smartpr` or `spr`) for creating
