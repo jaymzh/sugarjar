@@ -104,7 +104,7 @@ describe 'SugarJar::Commands' do
     end
   end
 
-  context '#forked_path' do
+  context '#forked_repo' do
     let(:sj) do
       SugarJar::Commands.new({ 'no_change' => true })
     end
@@ -120,9 +120,35 @@ describe 'SugarJar::Commands' do
       'org/repo',
     ].each do |url|
       it "generates correct URL from #{url}" do
-        expect(sj.send(:forked_path, url, 'test')).
+        expect(sj.send(:forked_repo, url, 'test')).
           to eq('git@github.com:test/repo.git')
       end
+    end
+  end
+
+  context '#canonicalize_repo' do
+    let(:sj) do
+      SugarJar::Commands.new({ 'no_change' => true })
+    end
+
+    [
+      # ssh
+      'git@github.com:org/repo.git',
+      # http
+      'http://github.com/org/repo.git',
+      # https
+      'https://github.com/org/repo.git',
+    ].each do |url|
+      it "keeps fully-qualified URL #{url} the same" do
+        expect(sj.send(:canonicalize_repo, url)).to eq(url)
+      end
+    end
+
+    # hub
+    url = 'org/repo'
+    it "canonicalizes short name #{url}" do
+      expect(sj.send(:canonicalize_repo, url)).
+        to eq('git@github.com:org/repo.git')
     end
   end
 end
