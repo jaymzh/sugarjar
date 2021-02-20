@@ -52,7 +52,8 @@ class SugarJar
           end
           SugarJar::Log.info('Re-running original hub command...')
           s = Mixlib::ShellOut.new([which('hub')] + args).run_command
-        when /^fatal: could not read Username/
+        when /^fatal: could not read Username/, /Anonymous access denied/
+
           # On http(s) URLs, git may prompt for username/passwd
           SugarJar::Log.info(
             'Hub was run but git prompted for authentication. This probably ' +
