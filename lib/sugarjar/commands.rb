@@ -165,7 +165,7 @@ class SugarJar
       reponame = File.basename(repo, '.git')
       dir ||= reponame
       SugarJar::Log.info("Cloning #{reponame}...")
-      hub('clone', repo, dir, *args)
+      hub('clone', canonicalize_repo(repo), dir, *args)
 
       Dir.chdir dir do
         # Now that we have a repo, if we have a hub host set it.
@@ -185,7 +185,7 @@ class SugarJar
           # newer 'hub's don't fail and do the right thing...
           SugarJar::Log.info("Fork (#{@ghuser}/#{reponame}) detected.")
           hub('remote', 'rename', 'origin', 'upstream')
-          hub('remote', 'add', 'origin', forked_path(repo, @ghuser))
+          hub('remote', 'add', 'origin', forked_repo(repo, @ghuser))
         else
           SugarJar::Log.info("Forked #{reponame} to #{@ghuser}")
         end
@@ -284,24 +284,34 @@ class SugarJar
       s.error?
     end
 
-    def extract_org(path)
-      if path.start_with?('http')
-        File.basename(File.dirname(path))
-      elsif path.start_with?('git@')
-        path.split(':')[1].split('/')[0]
+    def extract_org(repo)
+      if repo.start_with?('http')
+        File.basename(File.dirname(repo))
+      elsif repo.start_with?('git@')
+        repo.split(':')[1].split('/')[0]
       else
         # assume they passed in a hub-friendly name
-        path.split('/').first
+        repo.split('/').first
       end
     end
 
-    def forked_path(path, username)
-      repo = if path.start_with?('http', 'git@')
-               File.basename(path)
+    def forked_repo(repo, username)
+      repo = if repo.start_with?('http', 'git@')
+               File.basename(repo)
              else
-               "#{File.basename(path)}.git"
+               "#{File.basename(repo)}.git"
              end
       "git@github.com:#{username}/#{repo}"
+    end
+
+    # Hub will default to https, but we should always default to SSH
+    # unless otherwise specified since https will cause prompting.
+    def canonicalize_repo(repo)
+      # if they fully-qualified it, we're good
+      return repo if repo.start_with?('http', 'git@')
+
+      # otherwise, ti's a shortname
+      "git@github.com:#{repo}.git"
     end
 
     def set_hub_host
