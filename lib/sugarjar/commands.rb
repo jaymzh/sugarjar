@@ -378,24 +378,53 @@ class SugarJar
         @repo_config[type].each do |check|
           SugarJar::Log.debug("Running #{type} #{check}")
 
-          unless File.exist?(check.split.first)
-            SugarJar::Log.error("Configured #{type} #{check} does not exist!")
+          short = check.split.first
+          unless File.exist?(short)
+            SugarJar::Log.error("Configured #{type} #{short} does not exist!")
             return false
           end
           s = Mixlib::ShellOut.new(check).run_command
-          unless s.error?
+
+          # Linters auto-correct, lets handle that gracefully
+          if type == 'lint' && dirty?
             SugarJar::Log.info(
-              "[#{type}] #{check}: #{color('OK', :green)}",
+              "[#{type}] #{short}: #{color('Corrected', :yellow)}",
             )
-            next
+            SugarJar::Log.warn(
+              "The linter modified the repo. Here's the diff:\n",
+            )
+            puts hub('diff').stdout
+            loop do
+              $stdout.print(
+                "\nWould you like to\n\t[q]uit and inspect\n\t[a]mend the " +
+                "changes to the current commit and re-run\n  > ",
+              )
+              ans = $stdin.gets.strip
+              case ans
+              when /^q/
+                SugarJar::Log.info('Exiting at user request.')
+                exit(1)
+              when /^a/
+                qamend('-a')
+                # break here, if we get out of this loop we 'redo', assuming
+                # the user chose this option
+                break
+              end
+            end
+            redo
           end
 
+          if s.error?
+            SugarJar::Log.info(
+              "[#{type}] #{short} #{color('failed', :red)}, output follows " +
+              "(see debug for more)\n#{s.stdout}",
+            )
+            SugarJar::Log.debug(s.format_for_exception)
+            return false
+          end
           SugarJar::Log.info(
-            "[#{type}] #{check} #{color('failed', :red)}, output follows " +
-            "(see debug for more)\n#{s.stdout}",
+            "[#{type}] #{short}: #{color('OK', :green)}",
           )
-          SugarJar::Log.debug(s.format_for_exception)
-          return false
         end
       end
     end
