@@ -1,5 +1,12 @@
 # SugarJar Changelog
 
+## 0.0.9 (2021-02-20)
+
+* Fix smartclone not honoring `--github-host`
+* Use SSH protocol by default on short repo names
+* Handle anonymous auth failures gracefully
+* Better support for autocorrecting linters
+
 ## 0.0.8 (2020-12-16)
 
 * Colorize and simplify output
