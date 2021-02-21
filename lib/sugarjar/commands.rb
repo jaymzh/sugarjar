@@ -301,7 +301,7 @@ class SugarJar
              else
                "#{File.basename(repo)}.git"
              end
-      "git@github.com:#{username}/#{repo}"
+      "git@#{@ghhost || 'github.com'}:#{username}/#{repo}"
     end
 
     # Hub will default to https, but we should always default to SSH
@@ -311,7 +311,9 @@ class SugarJar
       return repo if repo.start_with?('http', 'git@')
 
       # otherwise, ti's a shortname
-      "git@github.com:#{repo}.git"
+      cr = "git@#{@ghhost || 'github.com'}:#{repo}.git"
+      SugarJar::Log.debug("canonicalized #{repo} to #{cr}")
+      cr
     end
 
     def set_hub_host
