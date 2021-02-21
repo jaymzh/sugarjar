@@ -19,7 +19,7 @@ install_dir "#{default_root}/#{name}"
 build_version SugarJar::VERSION
 build_iteration 1
 
-override 'ruby', :version => '2.7.2'
+override 'ruby', :version => '2.7.1'
 
 dependency 'preparation'
 dependency 'sugarjar'

@@ -23,9 +23,10 @@
 * Inside of each VM...
 
   ```shell
-  for d in ubuntu-1804 debian-10 centos-7; do
+  for d in ubuntu-1804 ubuntu-2004 debian-10 centos-7 centos-8; do
     bundle exec kitchen converge default-$d && \
-      bundle exec kitchen login default-$d
+      bundle exec kitchen login default-$d && \
+      bundle exec kitchen destroy default-$d
   done
   ```
 
@@ -36,8 +37,8 @@
     [ -e .bundle ] && sudo chown -R vagrant:vagrant .bundle
     cd sugarjar/omnibus
     bundle install
-    bin/omnibus build sugarjar
-    bin/omnibus clean sugarjar # required so next build works
+    bin/omnibus build sugarjar && \
+      bin/omnibus clean sugarjar # required so next build works
     ```
 
   * Grab/rename the package out of sugarjar/omnibus/pkg
