@@ -312,6 +312,22 @@ sj clone jaymzh/sugarjar --github-host githuh.com
 We will add the `hub.host` to the `sugarjar` clone so that future `hub` or `sj`
 commands work without needing to specify..
 
+## Installing
+
+There are many ways to install SugarJar. The easiest is to use one of the
+packages we provide in the
+[releases](https://github.com/jaymzh/sugarjar/releases) section. Currently we
+provide packages for Fedora, CentOS, Debian, and Ubuntu, but if you want
+others, file an Issue. Since these packages are
+[omnibus](https://github.com/chef/omnibus) packages which means they are bundled
+with all of their dependencies. This means these packages will likely work as-is
+on later releases of these distros or any similar distros.
+
+We also distribute SugarJar via [RubyGems](https://rubygems.org/gems/sugarjar/),
+so you can install it as a gem either via system ruby or via rvm/rbenv.
+
+Finally you can clone the git repo and run it from within the repo if you'd like.
+
 ## FAQ
 
 Why the name SugarJar?
