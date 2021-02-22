@@ -23,7 +23,7 @@
 * Inside of each VM...
 
   ```shell
-  for d in ubuntu-1804 ubuntu-2004 debian-10 centos-7 centos-8; do
+  for d in ubuntu-1804 ubuntu-2004 debian-10 centos-7 centos-8 fedora-31; do
     bundle exec kitchen converge default-$d && \
       bundle exec kitchen login default-$d && \
       bundle exec kitchen destroy default-$d
@@ -31,6 +31,8 @@
   ```
 
   * Do a build...
+
+    (for fedora you'll need to `sudo dnf install rpm-build`)
 
     ```shell
     .  load-omnibus-toolchain.sh
