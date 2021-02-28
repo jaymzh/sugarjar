@@ -6,6 +6,11 @@
 %define version 0.0.9
 %define release 1
 
+%global common_description %{expand:
+Sugarjar is a utility to help making working with git
+and GitHub easier. In particular it has a lot of features
+to make rebase-based and squash-based workflows simpler.}
+
 Name: rubygem-%{gem_name}
 Summary: A git/github helper utility
 Version: %{version}
@@ -22,9 +27,13 @@ Source0: https://rubygems.org/downloads/sugarjar-%{version}.gem
 Source1: %{name}-%{version}-specs.tar.gz
 
 %description
-Sugarjar is a utility to help making working with git
-and GitHub easier. In particular it has a lot of features
-to make rebase-based and squash-based workflows simpler.
+%{common_description}
+
+%package -n sugarjar
+Summary: A git/github helper utility
+Requires: hub, git
+%description -n sugarjar
+%{common_description}
 
 %prep
 %setup -q -n %{gem_name}-%{version} -b 1
@@ -52,7 +61,7 @@ popd
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -n sugarjar
 %dir %{gem_instdir}
 %{_bindir}/sj
 %{gem_instdir}/bin
