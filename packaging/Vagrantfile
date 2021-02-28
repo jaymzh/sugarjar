@@ -7,4 +7,5 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder '..', '/home/vagrant/sugarjar'
   config.vm.synced_folder '../../pastel', '/home/vagrant/pastel'
   config.vm.synced_folder '../../tty-color', '/home/vagrant/tty-color'
+  config.ssh.insert_key = false
 end
