@@ -4,6 +4,7 @@ AllCops:
   Exclude:
     - 'omnibus/bin/**/*'
     - 'omnibus/local/**/*'
+    - 'sugarjar.spec'
 
 Layout/LineLength:
   Max: 80
