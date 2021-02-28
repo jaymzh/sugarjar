@@ -4,7 +4,7 @@ AllCops:
   Exclude:
     - 'omnibus/bin/**/*'
     - 'omnibus/local/**/*'
-    - 'sugarjar.spec'
+    - 'rubygem-sugarjar.spec'
 
 Layout/LineLength:
   Max: 80
