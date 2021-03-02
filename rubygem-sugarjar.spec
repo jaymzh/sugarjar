@@ -1,10 +1,10 @@
 # tests won't work until dependent packages are available
-%bcond_with tests
+%bcond_without tests
 
 %global app_root %{_datadir}/%{name}
-%define gem_name sugarjar
-%define version 0.0.9
-%define release 1
+%global gem_name sugarjar
+%global version 0.0.9
+%global release 3
 
 %global common_description %{expand:
 Sugarjar is a utility to help making working with git
@@ -19,8 +19,15 @@ License: ASL 2.0
 URL: http://www.github.com/jaymzh/sugarjar
 BuildRequires: rubygems-devel
 BuildRequires: rubygem-mixlib-shellout
+%if %{with tests}
+BuildRequires: rubygem-rspec
+BuildRequires: rubygem-mixlib-log
+BuildRequires: hub
+%endif
+Requires: hub
+Requires: git-core
 BuildArch: noarch
-Source0: https://rubygems.org/downloads/sugarjar-%{version}.gem
+Source0: https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 # git clone https://github.com/jaymzh/sugarjar.git
 # git checkout v0.0.9
 # tar -cf rubygem-sugarjar-0.0.9-specs.tar.gz spec/
@@ -52,10 +59,10 @@ find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
 %if %{with tests}
 %check
-pushd .%{gem_instdir}
-ln -s %{_builddir}/spec .
+cd ..
+ln -s sugarjar-%{version}/lib .
+find
 rspec spec
-popd
 %endif
 
 %clean
@@ -65,7 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{gem_instdir}
 %{_bindir}/sj
 %{gem_instdir}/bin
-%doc %{gem_instdir}/LICENSE
+%license %{gem_instdir}/LICENSE
 %doc %{gem_instdir}/README.md
 %{gem_libdir}
 %exclude %{gem_cache}
@@ -75,5 +82,13 @@ rm -rf $RPM_BUILD_ROOT
 %{gem_spec}
 
 %changelog
+* Mon Mar 08 2021 Phil Dibowitz <phil@ipom.com> - 0.0.9-3
+- Add rspec BuildRequires for tests
+
+* Mon Mar 01 2021 Phil Dibowitz <phil@ipom.com> - 0.0.9-2
+- Use global instead of define
+- Mark the license as a license
+- Re-enable tests now that rubygem-mixlib-log exists
+
 * Sun Feb 28 2021 Phil Dibowitz <phil@ipom.com> - 0.0.9-1
 - Initial package
