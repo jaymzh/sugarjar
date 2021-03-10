@@ -66,7 +66,7 @@ rspec spec
 %endif
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %files -n sugarjar
 %dir %{gem_instdir}
