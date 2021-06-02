@@ -244,8 +244,8 @@ yaml file is a straight key-value pair of options without their '--'. For
 example:
 
 ```yaml
-debug: true
-github-user: jaymzh
+log_level: debug
+github_user: jaymzh
 ```
 
 In addition, the environment variable `SUGARJAR_DEBUG` can be defined to set
