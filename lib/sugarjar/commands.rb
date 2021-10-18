@@ -12,6 +12,8 @@ class SugarJar
   class Commands
     include SugarJar::Util
 
+    MAIN_BRANCHES = %w{master main}.freeze
+
     def initialize(options)
       SugarJar::Log.debug("Commands.initialize options: #{options}")
       @ghuser = options['github_user']
@@ -30,7 +32,7 @@ class SugarJar
       assert_in_repo
       SugarJar::Log.debug("Feature: #{name}, #{base}")
       die("#{name} already exists!") if all_branches.include?(name)
-      base ||= most_master
+      base ||= most_main
       base_pieces = base.split('/')
       hub('fetch', base_pieces[0]) if base_pieces.length > 1
       hub('checkout', '-b', name, base)
@@ -57,8 +59,8 @@ class SugarJar
       assert_in_repo
       curr = current_branch
       all_branches.each do |branch|
-        if branch == 'master'
-          SugarJar::Log.debug('Skipping master')
+        if MAIN_BRANCHES.include?(branch)
+          SugarJar::Log.debug("Skipping #{branch}")
           next
         end
 
@@ -73,11 +75,11 @@ class SugarJar
         end
       end
 
-      # Return to the branch we were on, or master
+      # Return to the branch we were on, or main
       if all_branches.include?(curr)
         hub('checkout', curr)
       else
-        hub('checkout', 'master')
+        checkout_main_branch
       end
     end
 
@@ -105,7 +107,7 @@ class SugarJar
       assert_in_repo
       SugarJar::Log.info(hub(
         'log', '--graph', '--oneline', '--decorate', '--boundary',
-        '--branches', "#{most_master}.."
+        '--branches', "#{most_main}.."
       ).stdout.chomp)
     end
 
@@ -139,7 +141,7 @@ class SugarJar
     def upall
       assert_in_repo
       all_branches.each do |branch|
-        next if branch == 'master'
+        next if MAIN_BRANCHES.include?(branch)
 
         hub('checkout', branch)
         result = gitup
@@ -461,14 +463,22 @@ class SugarJar
       die('sugarjar must be run from inside a git repo') unless in_repo
     end
 
+    def main_branch
+      @main_branch = all_branches.include?('main') ? 'main' : 'master'
+    end
+
+    def checkout_main_branch
+      hub('checkout', main_branch)
+    end
+
     def clean_branch(name)
-      die('Cannot remove master branch') if name == 'master'
+      die("Cannot remove #{name} branch") if MAIN_BRANCHES.include?(name)
       SugarJar::Log.debug('Fetch relevant remote...')
       fetch_upstream
       return false unless safe_to_clean(name)
 
       SugarJar::Log.debug('branch deemed safe to delete...')
-      hub('checkout', 'master')
+      checkout_main_branch
       hub('branch', '-D', name)
       gitup
       true
@@ -477,8 +487,6 @@ class SugarJar
     def all_branches
       branches = []
       hub('branch', '--format', '%(refname)').stdout.lines.each do |line|
-        next if line == 'master'
-
         branches << line.strip.split('/')[2]
       end
       branches
@@ -502,7 +510,7 @@ class SugarJar
 
       # if the "easy" check didn't work, it's probably because there
       # was a squash-merge. To check for that we make our own squash
-      # merge to upstream/master and see if that has any delta
+      # merge to upstream/main and see if that has any delta
 
       # First we need a temp branch to work on
       tmpbranch = "_sugar_jar.#{Process.pid}"
@@ -512,7 +520,7 @@ class SugarJar
       if s.error?
         cleanup_tmp_branch(tmpbranch, branch)
         SugarJar::Log.debug(
-          'Failed to merge changes into current master. This means we could ' +
+          'Failed to merge changes into current main. This means we could ' +
           'not figure out if this is merged or not. Check manually and use ' +
           "'git branch -D #{branch}' if it is safe to do so.",
         )
@@ -530,7 +538,7 @@ class SugarJar
         true
       else
         SugarJar::Log.debug(
-          'After squash-merging, this branch is NOT fully merged to master',
+          'After squash-merging, this branch is NOT fully merged to main',
         )
         false
       end
@@ -557,7 +565,7 @@ class SugarJar
       curr = current_branch
       SugarJar::Log.debug('Rebasing')
       base = tracked_branch
-      if curr != 'master' && base == "origin/#{curr}"
+      if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}"
         SugarJar::Log.warn(
           "This branch is tracking origin/#{curr}, which is probably your " +
           'downstream (where you push _to_) as opposed to your upstream ' +
@@ -575,18 +583,18 @@ class SugarJar
         'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'
       )
       if s.error?
-        most_master
+        most_main
       else
         s.stdout.strip
       end
     end
 
-    def most_master
+    def most_main
       us = upstream
       if us
-        "#{us}/master"
+        "#{us}/#{main_branch}"
       else
-        master
+        main_branch
       end
     end
 
