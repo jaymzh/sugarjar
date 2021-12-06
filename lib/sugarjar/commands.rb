@@ -182,12 +182,26 @@ class SugarJar
 
         s = hub_nofail('fork', '--remote-name=origin')
         if s.error?
-          # if the fork command failed, we already have one, so we have
-          # to swap the remote names ourselves
-          # newer 'hub's don't fail and do the right thing...
-          SugarJar::Log.info("Fork (#{@ghuser}/#{reponame}) detected.")
-          hub('remote', 'rename', 'origin', 'upstream')
-          hub('remote', 'add', 'origin', forked_repo(repo, @ghuser))
+          if s.stdout.include?('SAML enforcement')
+            SugarJar::Log.info(
+              'Forking the repo failed because the repo requires SAML ' +
+              "authentication. Full output:\n\n\t#{s.stdout}",
+            )
+            exit(1)
+          else
+            # In old versions of hub, it would fail if the upstream fork
+            # already existed. If we got an error, but didn't recognize
+            # that, we'll assume that's what happened and try to add the
+            # remote ourselves.
+            SugarJar::Log.info("Fork (#{@ghuser}/#{reponame}) detected.")
+            SugarJar::Log.debug(
+              'The above is a bit of a lie. "hub" failed to fork and it was ' +
+              'not a SAML error, so our best guess is that a fork exists ' +
+              'and so we will try to configure it.',
+            )
+            hub('remote', 'rename', 'origin', 'upstream')
+            hub('remote', 'add', 'origin', forked_repo(repo, @ghuser))
+          end
         else
           SugarJar::Log.info("Forked #{reponame} to #{@ghuser}")
         end
