@@ -182,19 +182,23 @@ extra_opts = []
 config = SugarJar::Config.config
 
 valid_commands = sj.public_methods - Object.public_methods
-
-is_valid_command = ARGV.any? { |arg| valid_commands.include?(arg.to_s.to_sym) }
+possible_valid_command = ARGV.any? do |arg|
+  valid_commands.include?(arg.to_s.to_sym)
+end
 
 # if we're configured to fall thru and the subcommand isn't one
 # we recognize, don't parse the options as they may be different
 # than git's. For example `git config -l` - we error because we
 # require an arguement to `-l`.
-if config['fallthru'] && !is_valid_command
+if config['fallthru'] && !possible_valid_command
   SugarJar::Log.debug(
     'Skipping option parsing: fall-thru is set and we do not recognize ' +
     'any subcommands',
   )
 else
+  SugarJar::Log.debug(
+    'We MIGHT have a valid command... parse-command line options',
+  )
   # We want to allow people to pass in extra args to be passed to
   # git commands, but OptionParser doesn't easily allow this. So we
   # loop over it, catching exceptions.
@@ -240,6 +244,7 @@ SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 sj = SugarJar::Commands.new(options)
 
 subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
+is_valid_command = valid_commands.include?(subcommand.to_sym)
 argv_copy.delete(subcommand)
 SugarJar::Log.debug("subcommand is #{subcommand}")
 
