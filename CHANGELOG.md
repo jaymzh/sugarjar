@@ -1,5 +1,13 @@
 # SugarJar Changelog
 
+## 0.0.10 (2021-12-06)
+
+* Support 'main' as a default/primary branch
+* Fix doc errors
+* Handle rebase failures more gracefully, give users hints (closes #88)
+* Handle SAML errors better (closes #95)
+* Don't parse option args as subcommands (closes #89)
+
 ## 0.0.9 (2021-02-20)
 
 * Fix smartclone not honoring `--github-host`
