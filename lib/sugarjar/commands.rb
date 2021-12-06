@@ -115,13 +115,22 @@ class SugarJar
 
     def up
       assert_in_repo
+      # get a copy of our current branch, if rebase fails, we won't
+      # be able to determine it without backing out
+      curr = current_branch
       result = gitup
-      if result
-        SugarJar::Log.info(
-          "#{color(current_branch, :green)} rebased on #{result}",
+      if result['so'].error?
+        die(
+          "#{color(curr, :red)}: Failed to rebase on " +
+          "#{result['base']}. Leaving the repo as-is. You can get out of " +
+          'this with a `git rebase --abort`. Output from failed rebase is: ' +
+          "\nSTDOUT:\n#{result['so'].stdout.lines.map { |x| "\t#{x}" }.join}" +
+          "\nSTDERR:\n#{result['so'].stderr.lines.map { |x| "\t#{x}" }.join}",
         )
       else
-        die("#{color(current_branch, :red)}: Failed to rebase")
+        SugarJar::Log.info(
+          "#{color(current_branch, :green)} rebased on #{result['base']}",
+        )
       end
     end
 
@@ -145,16 +154,17 @@ class SugarJar
 
         hub('checkout', branch)
         result = gitup
-        if result
-          SugarJar::Log.info(
-            "#{color(branch, :green)} rebased on #{color(result, :green)}",
-          )
-        else
+        if result['so'].error?
           SugarJar::Log.error(
             "#{color(branch, :red)} failed rebase. Reverting attempt and " +
-            'moving to next branch',
+            'moving to next branch. Try `sj up` manually on that branch.',
           )
           hub('rebase', '--abort')
+        else
+          SugarJar::Log.info(
+            "#{color(branch, :green)} rebased on " +
+            color(result['base'], :green).to_s,
+          )
         end
       end
     end
@@ -563,7 +573,6 @@ class SugarJar
       SugarJar::Log.debug('Fetching upstream')
       fetch_upstream
       curr = current_branch
-      SugarJar::Log.debug('Rebasing')
       base = tracked_branch
       if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}"
         SugarJar::Log.warn(
@@ -574,8 +583,12 @@ class SugarJar
           'to do a "git branch -u upstream".',
         )
       end
+      SugarJar::Log.debug('Rebasing')
       s = hub_nofail('rebase', base)
-      s.error? ? nil : base
+      {
+        'so' => s,
+        'base' => base,
+      }
     end
 
     def tracked_branch
