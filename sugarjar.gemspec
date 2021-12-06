@@ -20,4 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mixlib-log'
   spec.add_dependency 'mixlib-shellout'
   spec.add_dependency 'pastel'
+  spec.metadata = {
+    'rubygems_mfa_required' => 'true',
+  }
 end
