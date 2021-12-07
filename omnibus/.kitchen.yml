@@ -19,7 +19,7 @@ platforms:
     run_list: apt::default
   - name: debian-9
     run_list: apt::default
-  - name: debian-10
+  - name: debian-11
     run_list: apt::default
   - name: fedora-31
     run_list: yum-fedora::default
