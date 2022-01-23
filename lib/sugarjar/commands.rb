@@ -511,7 +511,7 @@ class SugarJar
     def all_branches
       branches = []
       hub('branch', '--format', '%(refname)').stdout.lines.each do |line|
-        branches << line.strip.split('/')[2]
+        branches << branch_from_ref(line.strip)
       end
       branches
     end
@@ -575,7 +575,7 @@ class SugarJar
     end
 
     def current_branch
-      hub('symbolic-ref', 'HEAD').stdout.strip.split('/')[2]
+      branch_from_ref(hub('symbolic-ref', 'HEAD').stdout.strip)
     end
 
     def fetch_upstream
@@ -644,6 +644,10 @@ class SugarJar
         raise 'Could not determine "upstream" remote to use...'
       end
       @remote
+    end
+
+    def branch_from_ref(ref)
+      ref.split('/')[2..].join('/')
     end
 
     def color(string, *colors)
