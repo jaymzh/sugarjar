@@ -3,8 +3,8 @@
 
 %global app_root %{_datadir}/%{name}
 %global gem_name sugarjar
-%global version 0.0.9
-%global release 3
+%global version 0.0.10
+%global release 1
 
 %global common_description %{expand:
 Sugarjar is a utility to help making working with git
@@ -29,8 +29,8 @@ Requires: git-core
 BuildArch: noarch
 Source0: https://rubygems.org/downloads/%{gem_name}-%{version}.gem
 # git clone https://github.com/jaymzh/sugarjar.git
-# git checkout v0.0.9
-# tar -cf rubygem-sugarjar-0.0.9-specs.tar.gz spec/
+# git checkout v0.0.10
+# tar -cf rubygem-sugarjar-0.0.10-specs.tar.gz spec/
 Source1: %{name}-%{version}-specs.tar.gz
 
 %description
@@ -82,6 +82,9 @@ rm -rf %{buildroot}
 %{gem_spec}
 
 %changelog
+* Tue Aug 23 2022 Phil Dibowitz <phil@ipom.com> - 0.0.10-1
+- Update to upstream 0.0.10
+
 * Mon Mar 08 2021 Phil Dibowitz <phil@ipom.com> - 0.0.9-3
 - Add rspec BuildRequires for tests
 
