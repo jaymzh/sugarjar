@@ -2,9 +2,12 @@ This is mostly notes to myself.
 
 Start the vagrant machine, ssh to it (`vagrant up; vagrant ssh`)
 
-In the mounted repo, create the source file for the tests, see the comment in the spec file
+In the mounted repo, create the source file for the tests, see the comment in
+the spec file
 
-Then in another dir (ala ~/builddir or whatever), copy the specfile and the test source file in, as well as wget the gem file from the URL in the spec file.
+Then in another dir (ala ~/builddir or whatever), copy the specfile and the
+test source file in, as well as wget the gem file from the URL in the spec
+file.
 
 Use fedpkg to get a srpm (you may have to install various deps):
 
