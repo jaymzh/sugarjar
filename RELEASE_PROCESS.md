@@ -44,3 +44,7 @@
     ```
 
   * Grab/rename the package out of sugarjar/omnibus/pkg
+
+## Publish Fedora builds
+
+See `packaging/README.md`.
