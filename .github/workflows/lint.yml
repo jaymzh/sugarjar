@@ -1,3 +1,5 @@
+# rubocop action doesn't work yet:
+# https://github.com/gimenete/rubocop-action/issues/12
 name: Lint
 
 on:
@@ -8,15 +10,31 @@ on:
 
 jobs:
   rubocop:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [2.6, 2.7]
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: Rubocop Linter Action
-        uses: andrewmcodes/rubocop-linter-action@v3.3.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Setup ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+    - name: install deps
+      run: bundle install
+    - name: Run rubocop
+      run: bundle exec rubocop --display-cop-names
+#  rubocop:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: checkout
+#        uses: actions/checkout@v2
+#      - name: Rubocop checks
+#        uses: gimenete/rubocop-action@1.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   markdownlint:
     runs-on: ubuntu-latest
     steps:
