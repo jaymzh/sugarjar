@@ -3,7 +3,6 @@
 [![Lint](https://github.com/jaymzh/sugarjar/workflows/Lint/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3ALint)
 [![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
-[![Gem Version](https://badge.fury.io/rb/sugarjar.svg)](https://badge.fury.io/rb/sugarjar)
 
 Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
 [hub](https://hub.github.com/), so you'll need that installed.
@@ -18,6 +17,29 @@ is poorly handled by the standard toolsets.
 If you miss Mondrian or Phabricator - this is the tool for you!
 
 If you don't, there's a ton of useful stuff for everyone!
+
+## Installation
+
+Sugarjar is packaged in a variety of Linux distributions - see if it's on the
+list here, and if so, use your package manager to install it.
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/ruby:sugarjar.svg)](https://repology.org/project/ruby:sugarjar/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg)](https://repology.org/project/sugarjar/versions)
+
+Alternatively, you can install the gem.
+
+[![Gem Version](https://badge.fury.io/rb/sugarjar.svg)](https://badge.fury.io/rb/sugarjar)
+
+Another option is to use our [omnibus
+packages](https://github.com/jaymzh/sugarjar/releases). We keep Omnibus
+packages for most distros that do not package Sugarjar. Omnibus packages are
+distro packages (deb, rpm, etc.) that have all dependencies bundled up together
+(including Ruby), and install in `/opt/sugarjar` allowing you to manage the
+installation with your package manager, but with as a hermetically sealed app
+that doesn't depend on the rest of your distro.
+
+Finally, if none of those work for you, you can clone this repo and run it
+directly from there.
 
 ## Auto cleanup squash-merged branches
 
@@ -312,22 +334,6 @@ sj clone jaymzh/sugarjar --github-host githuh.com
 We will add the `hub.host` to the `sugarjar` clone so that future `hub` or `sj`
 commands work without needing to specify..
 
-## Installing
-
-There are many ways to install SugarJar. The easiest is to use one of the
-packages we provide in the
-[releases](https://github.com/jaymzh/sugarjar/releases) section. Currently we
-provide packages for Fedora, CentOS, Debian, and Ubuntu, but if you want
-others, file an Issue. Since these packages are
-[omnibus](https://github.com/chef/omnibus) packages which means they are bundled
-with all of their dependencies. This means these packages will likely work as-is
-on later releases of these distros or any similar distros.
-
-We also distribute SugarJar via [RubyGems](https://rubygems.org/gems/sugarjar/),
-so you can install it as a gem either via system ruby or via rvm/rbenv.
-
-Finally you can clone the git repo and run it from within the repo if you'd like.
-
 ## FAQ
 
 Why the name SugarJar?
@@ -343,3 +349,13 @@ Why did you use `hub` instead of the newer `gh` CLI?
 `gh` is still new and not yet as feature rich as `hub`. Also I wanted SugarJar
 to be able to be a git wrapper, and so wrapping `hub` allows us to do that but
 wrapping `gh` does not.
+
+I'd like to package SugarJar for my favorite distro/OS, is that OK?
+
+Of course! But I'd appreciate you emailing me to give me a heads up. Doing so
+will allow me to make sure it shows up in the Repology badge above as well as
+stop building Omnibus packages for whatever distro.
+
+Does it work on Windows/Mac?
+
+It should! Though I will admit I don't regularly test on non-Linux OSes.
