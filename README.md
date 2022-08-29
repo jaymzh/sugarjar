@@ -21,14 +21,9 @@ If you don't, there's a ton of useful stuff for everyone!
 ## Installation
 
 Sugarjar is packaged in a variety of Linux distributions - see if it's on the
-list here, and if so, use your package manager to install it.
+list here, and if so, use your package manager (or `gem`) to install it:
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/ruby:sugarjar.svg)](https://repology.org/project/ruby:sugarjar/versions)
 [![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg)](https://repology.org/project/sugarjar/versions)
-
-Alternatively, you can install the gem.
-
-[![Gem Version](https://badge.fury.io/rb/sugarjar.svg)](https://badge.fury.io/rb/sugarjar)
 
 Another option is to use our [omnibus
 packages](https://github.com/jaymzh/sugarjar/releases). We keep Omnibus
