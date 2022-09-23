@@ -1,0 +1,2 @@
+echo "scripts/run_rubocop.sh -D -a
+scripts/run_mdl.sh -g ."

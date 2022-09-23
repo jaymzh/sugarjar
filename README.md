@@ -275,9 +275,15 @@ Sugarjar looks for a `.sugarjar.yaml` in the root of the repository to tell it
 how to handle repo-specific things. Currently there options are:
 
 * `lint` - A list of scripts to run on `sj lint`. These should be linters like
-  rubocop or pyflake.
+  rubocop or pyflake. Linters will be run from the root of the repo.
+* `lint_list_cmd` - A command to run which will print out linters to run, one
+  per line. Takes precedence over `lint`. The command (and the resulting
+  linters) will be run from the root of the repo.
 * `unit` - A list of scripts to run on `sj unit`. These should be unittest
-  runners like rspec or pyunit.
+  runners like rspec or pyunit. Test will be run fro mthe root of the repo.
+* `unit_list_cmd` - A command to run which will print out the unit tests to
+  run, one more line. Takes precedence over `unit`. The command (and the
+  resulting unit tests) will be run from the root of the repo.
 * `on_push` - A list of types (`lint`, `unit`) of checks to run before pushing.
   It is highly recommended this is only `lint`. The goal here is to allow for
   the user to get quick stylistic feedback before pushing their branch to avoid
