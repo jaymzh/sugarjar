@@ -22,6 +22,7 @@ class SugarJar
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
       @color = options['color']
+      @checks = {}
       return if options['no_change']
 
       set_hub_host if @ghhost
@@ -407,13 +408,55 @@ class SugarJar
       )
     end
 
-    def run_check(type)
-      unless @repo_config[type]
-        SugarJar::Log.debug("No #{type} configured. Returning success")
-        return true
+    def get_checks_from_command(type)
+      return nil unless @repo_config["#{type}_list_cmd"]
+
+      cmd = @repo_config["#{type}_list_cmd"]
+      short = cmd.split.first
+      unless File.exist?(short)
+        SugarJar::Log.error(
+          "Configured #{type}_list_cmd #{short} does not exist!",
+        )
+        return false
       end
+      s = Mixlib::ShellOut.new(cmd).run_command
+      if s.error?
+        SugarJar::Log.error(
+          "#{type}_list_cmd (#{cmd}) failed: #{s.format_for_exception}",
+        )
+        return false
+      end
+      s.stdout.split("\n")
+    end
+
+    # determine if we're using the _list_cmd and if so run it to get the
+    # checks, or just use the directly-defined check, and cache it
+    def get_checks(type)
+      return @checks[type] if @checks[type]
+
+      ret = get_checks_from_command(type)
+      if ret
+        SugarJar::Log.debug("Found #{type}s: #{ret}")
+        @checks[type] = ret
+      # if it's explicitly false, we failed to run the command
+      elsif ret == false
+        @checks[type] = false
+      # otherwise, we move on (basically: it's nil, there was no _list_cmd)
+      else
+        SugarJar::Log.debug("[#{type}]: using listed linters: #{ret}")
+        @checks[type] = @repo_config[type] || []
+      end
+      @checks[type]
+    end
+
+    def run_check(type)
       Dir.chdir repo_root do
-        @repo_config[type].each do |check|
+        checks = get_checks(type)
+        # if we failed to determine the checks, the the checks have effectively
+        # failed
+        return false unless checks
+
+        checks.each do |check|
           SugarJar::Log.debug("Running #{type} #{check}")
 
           short = check.split.first

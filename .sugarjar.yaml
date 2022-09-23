@@ -1,8 +1,4 @@
 on_push: [lint]
-lint:
-  - scripts/run_rubocop.sh -D -a
-  - scripts/run_mdl.sh -g .
+lint_list_cmd: scripts/get_linters
 unit:
   - scripts/unit
-#!/bin/bash
-
