@@ -26,11 +26,25 @@ class SugarJar
       exit(1)
     end
 
-    def hub_nofail(*args)
+    def git_nofail(*args)
       if %w{diff log grep branch}.include?(args[0]) &&
          args.none? { |x| x.include?('color') }
         args << (@color ? '--color' : '--no-color')
       end
+      SugarJar::Log.trace("Running: git #{args.join(' ')}")
+      Mixlib::ShellOut.new([which('git')] + args).run_command
+    end
+
+    def git(*args)
+      s = git_nofail(*args)
+      s.error!
+      s
+    end
+
+    def hub_nofail(*args)
+      # this allows us to use 'hub' stuff that's top-level, but is under
+      # repo for this.
+      args.delete_at(0) if args[0] == 'repo'
       SugarJar::Log.trace("Running: hub #{args.join(' ')}")
       s = Mixlib::ShellOut.new([which('hub')] + args).run_command
       if s.error?
@@ -84,13 +98,39 @@ class SugarJar
       s
     end
 
+    def gh_nofail(*args)
+      SugarJar::Log.trace("Running: gh #{args.join(' ')}")
+      s = Mixlib::ShellOut.new([which('gh')] + args).run_command
+      if s.error? && s.stderr.include?('gh auth')
+        SugarJar::Log.info(
+          'gh was run but no github token exists. Will run "gh auth login" ' +
+          "to force\ngh to authenticate...",
+        )
+        unless system(which('gh'), 'auth', 'login', '-p', 'ssh')
+          SugarJar::Log.fatal(
+            'That failed, I will bail out. Hub needs to get a github ' +
+            'token. Try running "gh auth login" (will list info about ' +
+            'your account) and try this again when that works.',
+          )
+          exit(1)
+        end
+      end
+      s
+    end
+
+    def gh(*args)
+      s = gh_nofail(*args)
+      s.error!
+      s
+    end
+
     def in_repo
-      s = hub_nofail('rev-parse', '--is-inside-work-tree')
+      s = git_nofail('rev-parse', '--is-inside-work-tree')
       !s.error? && s.stdout.strip == 'true'
     end
 
     def repo_root
-      hub('rev-parse', '--show-toplevel').stdout.strip
+      git('rev-parse', '--show-toplevel').stdout.strip
     end
   end
 end

@@ -4,8 +4,10 @@
 [![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 
-Welcome to SugarJar - a git/github helper. It leverages the amazing GitHub cli,
-[hub](https://hub.github.com/), so you'll need that installed.
+Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
+the current default is [hub](https://hub.github.com/), but there is
+experimental support for [gh](https://cli.github.com/). So you will need one of
+those two installed.
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
 its replacement at Facebook, JellyFish. Many of the features they provide for
@@ -90,7 +92,7 @@ This will:
 * Clone your fork
 * Add the original as an 'upstream' remote
 
-Note that it takes `hub`s short-names for repos. No need to specify a full URL,
+Note that it takes short names for repos. No need to specify a full URL,
 just a $org/$repo.
 
 Like `git clone`, `sj sclone` will accept an additional argument as the
@@ -222,8 +224,11 @@ See `sj help` for more commands!
 ## Using SugarJar as a git wrapper
 
 SugarJar, by default, will pass any command it doesn't know straight to `hub`
-(which passes commands **it** doesn't know to `git`). As such you can alias it
-to `git` and just have a super-git.
+(which passes commands **it** doesn't know to `git`). If you have configured
+SugarJar to use `gh` instead of `hub`, then it will pass commands straight to
+`git` since `gh` doesn't act as a `git` wrapper.
+
+As such you can alias it to `git` and just have a super-git.
 
 ```shell
 $ alias git=sj
@@ -335,6 +340,16 @@ sj clone jaymzh/sugarjar --github-host githuh.com
 We will add the `hub.host` to the `sugarjar` clone so that future `hub` or `sj`
 commands work without needing to specify..
 
+## Support for `gh`
+
+As of version 0.11 there is experimental support for the `gh` CLI (instead of
+`hub`). If you would like to use `gh`, install it and then add the following
+to your configuration:
+
+```yaml
+github_cli: gh
+```
+
 ## FAQ
 
 Why the name SugarJar?
@@ -347,9 +362,12 @@ and github, it seemed appropriate.
 
 Why did you use `hub` instead of the newer `gh` CLI?
 
-`gh` is still new and not yet as feature rich as `hub`. Also I wanted SugarJar
-to be able to be a git wrapper, and so wrapping `hub` allows us to do that but
-wrapping `gh` does not.
+When I originally wrote SugarJar, `gh` was in early development, and `hub` had
+many more features. Now that `gh` has matured, we have experimental support for
+`gh` and will switch it to the default at some point.
+
+In addition, I wanted SugarJar to be able to be a git wrapper, and so wrapping
+`hub` allows us to do that but wrapping `gh` does not.
 
 I'd like to package SugarJar for my favorite distro/OS, is that OK?
 

@@ -15,6 +15,9 @@ Metrics/CyclomaticComplexity:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/ModuleLength:
+  Enabled: false
+
 Metrics/MethodLength:
   Enabled: false
 

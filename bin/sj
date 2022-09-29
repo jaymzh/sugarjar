@@ -33,8 +33,13 @@ parser = OptionParser.new do |opts|
     options['fallthru'] = fallthru
   end
 
-  opts.on('--github-user USER', 'Github username') do |user|
-    options['github_user'] = user
+  opts.on(
+    '--github-cli CLI',
+    %w{gh cli},
+    'Github CLI to use ("gh" or "hub"). Note that support for "gh" is ' +
+    'currently experimental. default: "hub"',
+  ) do |cli|
+    options['github_cli'] = cli
   end
 
   opts.on(
@@ -46,6 +51,10 @@ parser = OptionParser.new do |opts|
     'will be part of that repo until changed.',
   ) do |host|
     options['github_host'] = host
+  end
+
+  opts.on('--github-user USER', 'Github username') do |user|
+    options['github_user'] = user
   end
 
   opts.on('-h', '--help', 'Print this help message') do
@@ -265,7 +274,13 @@ if is_valid_command
   sj.send(subcommand.to_sym, *extra_opts)
 elsif options['fallthru']
   SugarJar::Log.debug("Falling thru to: hub #{ARGV.join(' ')}")
-  exec('hub', *ARGV)
+  if options['github_cli'] == 'hub'
+    exec('hub', *ARGV)
+  else
+    # If we're using 'gh', it doesn't have 'git fall thru' support, so
+    # we pass thru directly to 'git'
+    exec('git', *ARGV)
+  end
 else
   SugarJar::Log.error("No such subcommand: #{subcommand}")
 end

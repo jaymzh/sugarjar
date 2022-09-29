@@ -6,6 +6,7 @@ class SugarJar
   # This is stuff like log level, github-user, etc.
   class Config
     DEFAULTS = {
+      'github_cli' => 'hub',
       'github_user' => ENV.fetch('USER'),
       'fallthru' => true,
     }.freeze

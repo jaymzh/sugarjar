@@ -18,6 +18,7 @@ class SugarJar
       SugarJar::Log.debug("Commands.initialize options: #{options}")
       @ghuser = options['github_user']
       @ghhost = options['github_host']
+      @cli = options['github_cli']
       @ignore_dirty = options['ignore_dirty']
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
@@ -25,7 +26,7 @@ class SugarJar
       @checks = {}
       return if options['no_change']
 
-      set_hub_host if @ghhost
+      set_hub_host
       set_commit_template if @repo_config['commit_template']
     end
 
@@ -35,8 +36,8 @@ class SugarJar
       die("#{name} already exists!") if all_branches.include?(name)
       base ||= most_main
       base_pieces = base.split('/')
-      hub('fetch', base_pieces[0]) if base_pieces.length > 1
-      hub('checkout', '-b', name, base)
+      git('fetch', base_pieces[0]) if base_pieces.length > 1
+      git('checkout', '-b', name, base)
       SugarJar::Log.info(
         "Created feature branch #{color(name, :green)} based on " +
         color(base, :green),
@@ -78,7 +79,7 @@ class SugarJar
 
       # Return to the branch we were on, or main
       if all_branches.include?(curr)
-        hub('checkout', curr)
+        git('checkout', curr)
       else
         checkout_main_branch
       end
@@ -86,18 +87,18 @@ class SugarJar
 
     def co(*args)
       assert_in_repo
-      s = hub('checkout', *args)
+      s = git('checkout', *args)
       SugarJar::Log.info(s.stderr + s.stdout.chomp)
     end
 
     def br
       assert_in_repo
-      SugarJar::Log.info(hub('branch', '-v').stdout.chomp)
+      SugarJar::Log.info(git('branch', '-v').stdout.chomp)
     end
 
     def binfo
       assert_in_repo
-      SugarJar::Log.info(hub(
+      SugarJar::Log.info(git(
         'log', '--graph', '--oneline', '--decorate', '--boundary',
         "#{tracked_branch}.."
       ).stdout.chomp)
@@ -106,7 +107,7 @@ class SugarJar
     # binfo for all branches
     def smartlog
       assert_in_repo
-      SugarJar::Log.info(hub(
+      SugarJar::Log.info(git(
         'log', '--graph', '--oneline', '--decorate', '--boundary',
         '--branches', "#{most_main}.."
       ).stdout.chomp)
@@ -143,7 +144,7 @@ class SugarJar
 
     def qamend(*args)
       assert_in_repo
-      SugarJar::Log.info(hub('commit', '--amend', '--no-edit', *args).stdout)
+      SugarJar::Log.info(git('commit', '--amend', '--no-edit', *args).stdout)
     end
 
     alias amendq qamend
@@ -153,14 +154,14 @@ class SugarJar
       all_branches.each do |branch|
         next if MAIN_BRANCHES.include?(branch)
 
-        hub('checkout', branch)
+        git('checkout', branch)
         result = gitup
         if result['so'].error?
           SugarJar::Log.error(
             "#{color(branch, :red)} failed rebase. Reverting attempt and " +
             'moving to next branch. Try `sj up` manually on that branch.',
           )
-          hub('rebase', '--abort')
+          git('rebase', '--abort')
         else
           SugarJar::Log.info(
             "#{color(branch, :green)} rebased on " +
@@ -177,21 +178,36 @@ class SugarJar
 
       reponame = File.basename(repo, '.git')
       dir ||= reponame
-      SugarJar::Log.info("Cloning #{reponame}...")
-      hub('clone', canonicalize_repo(repo), dir, *args)
 
+      SugarJar::Log.info("Cloning #{reponame}...")
+
+      # GH's 'fork' command (with the --clone arg) will fork, if necessary,
+      # then clone, and then setup the remotes with the appropriate names. So
+      # we just let it do all the work for us and return.
+      if gh?
+        ghcli('repo', 'fork', '--clone', canonicalize_repo(repo), dir, *args)
+        SugarJar::Log.info('Remotes "origin" and "upstream" configured.')
+        return
+      end
+
+      # For 'hub', first we clone, using git, as 'hub' always needs a repo
+      # to operate on.
+      git('clone', canonicalize_repo(repo), dir, *args)
+
+      # Then we go into it and attempt to use the 'fork' capability
       Dir.chdir dir do
         # Now that we have a repo, if we have a hub host set it.
-        set_hub_host if @ghhost
+        set_hub_host
 
         org = extract_org(repo)
         SugarJar::Log.debug("Comparing org #{org} to ghuser #{@ghuser}")
         if org == @ghuser
           puts 'Cloned forked or self-owned repo. Not creating "upstream".'
+          SugarJar::Log.info('Remotes "origin" and "upstream" configured.')
           return
         end
 
-        s = hub_nofail('fork', '--remote-name=origin')
+        s = ghcli_nofail('repo', 'fork', '--remote-name=origin')
         if s.error?
           if s.stdout.include?('SAML enforcement')
             SugarJar::Log.info(
@@ -200,18 +216,18 @@ class SugarJar
             )
             exit(1)
           else
-            # In old versions of hub, it would fail if the upstream fork
-            # already existed. If we got an error, but didn't recognize
-            # that, we'll assume that's what happened and try to add the
-            # remote ourselves.
+            # gh as well as old versions of hub, it would fail if the upstream
+            # fork already existed. If we got an error, but didn't recognize
+            # that, we'll assume that's what happened and try to add the remote
+            # ourselves.
             SugarJar::Log.info("Fork (#{@ghuser}/#{reponame}) detected.")
             SugarJar::Log.debug(
               'The above is a bit of a lie. "hub" failed to fork and it was ' +
               'not a SAML error, so our best guess is that a fork exists ' +
               'and so we will try to configure it.',
             )
-            hub('remote', 'rename', 'origin', 'upstream')
-            hub('remote', 'add', 'origin', forked_repo(repo, @ghuser))
+            git('remote', 'rename', 'origin', 'upstream')
+            git('remote', 'add', 'origin', forked_repo(repo, @ghuser))
           end
         else
           SugarJar::Log.info("Forked #{reponame} to #{@ghuser}")
@@ -248,10 +264,10 @@ class SugarJar
 
     def version
       puts "sugarjar version #{SugarJar::VERSION}"
-      puts hub('version').stdout
+      puts ghcli('version').stdout
     end
 
-    def smartpullrequest
+    def smartpullrequest(*args)
       assert_in_repo
       if dirty?
         SugarJar::Log.warn(
@@ -260,7 +276,13 @@ class SugarJar
         )
         exit(1)
       end
-      system(which('hub'), 'pull-request')
+      if gh?
+        SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
+        system(which('gh'), 'pr', 'create', *args)
+      else
+        SugarJar::Log.trace("Running: hub pull-request #{args.join(' ')}")
+        system(which('hub'), 'pull-request', *args)
+      end
     end
 
     alias spr smartpullrequest
@@ -303,11 +325,11 @@ class SugarJar
 
       args = ['push', remote, branch]
       args << '--force-with-lease' if force
-      puts hub(*args).stderr
+      puts git(*args).stderr
     end
 
     def dirty?
-      s = hub_nofail('diff', '--quiet')
+      s = git_nofail('diff', '--quiet')
       s.error?
     end
 
@@ -344,9 +366,9 @@ class SugarJar
     end
 
     def set_hub_host
-      return unless in_repo
+      return unless hub? && in_repo && @ghhost
 
-      s = hub_nofail('config', '--local', '--get', 'hub.host')
+      s = git_nofail('config', '--local', '--get', 'hub.host')
       if s.error?
         SugarJar::Log.info("Setting repo hub.host = #{@ghhost}")
       else
@@ -364,7 +386,7 @@ class SugarJar
         end
         return
       end
-      hub('config', '--local', '--add', 'hub.host', @ghhost)
+      git('config', '--local', '--add', 'hub.host', @ghhost)
     end
 
     def set_commit_template
@@ -385,7 +407,7 @@ class SugarJar
         )
       end
 
-      s = hub_nofail('config', '--local', 'commit.template')
+      s = git_nofail('config', '--local', 'commit.template')
       unless s.error?
         current = s.stdout.strip
         if current == @repo_config['commit_template']
@@ -403,7 +425,7 @@ class SugarJar
         'Setting repo-specific commit template to ' +
         "#{@repo_config['commit_template']} per sugarjar repo config.",
       )
-      hub(
+      git(
         'config', '--local', 'commit.template', @repo_config['commit_template']
       )
     end
@@ -474,7 +496,7 @@ class SugarJar
             SugarJar::Log.warn(
               "The linter modified the repo. Here's the diff:\n",
             )
-            puts hub('diff').stdout
+            puts git('diff').stdout
             loop do
               $stdout.print(
                 "\nWould you like to\n\t[q]uit and inspect\n\t[a]mend the " +
@@ -535,7 +557,7 @@ class SugarJar
     end
 
     def checkout_main_branch
-      hub('checkout', main_branch)
+      git('checkout', main_branch)
     end
 
     def clean_branch(name)
@@ -546,14 +568,14 @@ class SugarJar
 
       SugarJar::Log.debug('branch deemed safe to delete...')
       checkout_main_branch
-      hub('branch', '-D', name)
+      git('branch', '-D', name)
       gitup
       true
     end
 
     def all_branches
       branches = []
-      hub('branch', '--format', '%(refname)').stdout.lines.each do |line|
+      git('branch', '--format', '%(refname)').stdout.lines.each do |line|
         branches << branch_from_ref(line.strip)
       end
       branches
@@ -563,7 +585,7 @@ class SugarJar
       # cherry -v will output 1 line per commit on the target branch
       # prefixed by a - or + - anything with a - can be dropped, anything
       # else cannot.
-      out = hub(
+      out = git(
         'cherry', '-v', tracked_branch, branch
       ).stdout.lines.reject do |line|
         line.start_with?('-')
@@ -582,8 +604,8 @@ class SugarJar
       # First we need a temp branch to work on
       tmpbranch = "_sugar_jar.#{Process.pid}"
 
-      hub('checkout', '-b', tmpbranch, tracked_branch)
-      s = hub_nofail('merge', '--squash', branch)
+      git('checkout', '-b', tmpbranch, tracked_branch)
+      s = git_nofail('merge', '--squash', branch)
       if s.error?
         cleanup_tmp_branch(tmpbranch, branch)
         SugarJar::Log.debug(
@@ -594,7 +616,7 @@ class SugarJar
         return false
       end
 
-      s = hub('diff', '--staged')
+      s = git('diff', '--staged')
       out = s.stdout
       SugarJar::Log.debug("Squash-merged diff: #{out}")
       cleanup_tmp_branch(tmpbranch, branch)
@@ -612,18 +634,18 @@ class SugarJar
     end
 
     def cleanup_tmp_branch(tmp, backto)
-      hub('reset', '--hard', tracked_branch)
-      hub('checkout', backto)
-      hub('branch', '-D', tmp)
+      git('reset', '--hard', tracked_branch)
+      git('checkout', backto)
+      git('branch', '-D', tmp)
     end
 
     def current_branch
-      branch_from_ref(hub('symbolic-ref', 'HEAD').stdout.strip)
+      branch_from_ref(git('symbolic-ref', 'HEAD').stdout.strip)
     end
 
     def fetch_upstream
       us = upstream
-      hub('fetch', us) if us
+      git('fetch', us) if us
     end
 
     def gitup
@@ -641,7 +663,7 @@ class SugarJar
         )
       end
       SugarJar::Log.debug('Rebasing')
-      s = hub_nofail('rebase', base)
+      s = git_nofail('rebase', base)
       {
         'so' => s,
         'base' => base,
@@ -649,7 +671,7 @@ class SugarJar
     end
 
     def tracked_branch
-      s = hub_nofail(
+      s = git_nofail(
         'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'
       )
       if s.error?
@@ -671,7 +693,7 @@ class SugarJar
     def upstream
       return @remote if @remote
 
-      s = hub('remote')
+      s = git('remote')
 
       remotes = s.stdout.lines.map(&:strip)
       SugarJar::Log.debug("remotes is #{remotes}")
@@ -706,6 +728,22 @@ class SugarJar
         require 'pastel'
         Pastel.new
       end
+    end
+
+    def hub?
+      @cli == 'hub'
+    end
+
+    def gh?
+      @cli == 'gh'
+    end
+
+    def ghcli_nofail(*args)
+      gh? ? gh_nofail(*args) : hub_nofail(*args)
+    end
+
+    def ghcli(*args)
+      gh? ? gh(*args) : hub(*args)
     end
   end
 end
