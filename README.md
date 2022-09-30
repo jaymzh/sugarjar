@@ -217,6 +217,15 @@ smartlog` or `sj sl` for short.
 
 ![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/master/smartlog.png)
 
+## Pulling in suggestions from the web
+
+When someone 'suggests' a change in the GitHub WebUI, once you choose to commit
+them, your origin and local branches are no longer in-sync. The
+`pullsuggestions` command will attempt to merge in any remote commits to your
+local branch. This command will show a diff and ask for confirmation before
+attempting the merge and  - if allowed to continue - will use a fast-forward
+merge.
+
 ## And more!
 
 See `sj help` for more commands!

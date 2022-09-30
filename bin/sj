@@ -137,6 +137,11 @@ COMMANDS:
   lint
               Run any linters configured in .sugarjar.yaml.
 
+  pullsuggestions, ps
+              Pull any suggestions *that have been committed* in the GitHub UI.
+              This will show the diff and prompt for confirmation before
+              merging. Note that a fast-forward merge will be used.
+
   smartclone, sclone
               A smart wrapper to "git clone" that handles forking and managing
               remotes for you.
