@@ -739,10 +739,6 @@ class SugarJar
       branch_from_ref(git('symbolic-ref', 'HEAD').stdout.strip)
     end
 
-    def repo_name
-      git('rev-parse', '--show-toplevel').stdout.strip.split('/').last
-    end
-
     def fetch_upstream
       us = upstream
       fetch(us) if us

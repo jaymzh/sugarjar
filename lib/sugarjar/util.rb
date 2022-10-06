@@ -132,5 +132,9 @@ class SugarJar
     def repo_root
       git('rev-parse', '--show-toplevel').stdout.strip
     end
+
+    def repo_name
+      repo_root.split('/').last
+    end
   end
 end
