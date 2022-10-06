@@ -24,6 +24,8 @@ class SugarJar
       @repo_config = SugarJar::RepoConfig.config
       @color = options['color']
       @checks = {}
+      @main_branch = nil
+      @main_remote_branches = {}
       return if options['no_change']
 
       set_hub_host
@@ -33,7 +35,7 @@ class SugarJar
     def feature(name, base = nil)
       assert_in_repo
       SugarJar::Log.debug("Feature: #{name}, #{base}")
-      die("#{name} already exists!") if all_branches.include?(name)
+      die("#{name} already exists!") if all_local_branches.include?(name)
       base ||= most_main
       base_pieces = base.split('/')
       git('fetch', base_pieces[0]) if base_pieces.length > 1
@@ -60,7 +62,7 @@ class SugarJar
     def bcleanall
       assert_in_repo
       curr = current_branch
-      all_branches.each do |branch|
+      all_local_branches.each do |branch|
         if MAIN_BRANCHES.include?(branch)
           SugarJar::Log.debug("Skipping #{branch}")
           next
@@ -78,7 +80,7 @@ class SugarJar
       end
 
       # Return to the branch we were on, or main
-      if all_branches.include?(curr)
+      if all_local_branches.include?(curr)
         git('checkout', curr)
       else
         checkout_main_branch
@@ -151,7 +153,7 @@ class SugarJar
 
     def upall
       assert_in_repo
-      all_branches.each do |branch|
+      all_local_branches.each do |branch|
         next if MAIN_BRANCHES.include?(branch)
 
         git('checkout', branch)
@@ -272,6 +274,7 @@ class SugarJar
 
     def smartpullrequest(*args)
       assert_in_repo
+      assert_common_main_branch
       if dirty?
         SugarJar::Log.warn(
           'Your repo is dirty, so I am not going to create a pull request. ' +
@@ -594,12 +597,49 @@ class SugarJar
       exit(1)
     end
 
+    def assert_common_main_branch
+      upstream_branch = main_remote_branch(upstream)
+      unless main_branch == upstream_branch
+        die(
+          "The local main branch is '#{main_branch}', but the main branch " +
+          "of the #{upstream} remote is '#{upstream_branch}'. You probably " +
+          "want to rename your local branch by doing:\n\t" +
+          "git branch -m #{main_branch} #{upstream_branch}\n\t" +
+          "git fetch #{upstream}\n\t" +
+          "git branch -u #{upstream}/#{upstream_branch} #{upstream_branch}\n" +
+          "\tgit remote set-head #{upstream} -a"
+        )
+      end
+      unless upstream_branch == 'origin'
+        origin_branch = main_remote_branch('origin')
+        unless origin_branch == upstream_branch
+          die(
+            "The main branch of your upstream (#{upstream_branch}) and your " +
+            "fork/origin (#{origin_branch}) are not the same. You should go " +
+            "to https://#{@ghhost || 'github.com'}/#{@ghuser}/#{repo_name}/" +
+            'branches/ and rename the 'default' branch to ' +
+            "'#{upstream_branch}'. It will then give you some commands to " +
+            'run to update this clone.'
+          )
+        end
+      end
+    end
+
     def assert_in_repo
       die('sugarjar must be run from inside a git repo') unless in_repo
     end
 
+    def determine_main_branch(branches)
+      branches.include?('main') ? 'main' : 'master'
+    end
+
     def main_branch
-      @main_branch = all_branches.include?('main') ? 'main' : 'master'
+      @main_branch = determine_main_branch(all_local_branches)
+    end
+
+    def main_remote_branch(remote)
+      @main_remote_branches[remote] ||=
+        determine_main_branch(all_remote_branches(remote))
     end
 
     def checkout_main_branch
@@ -619,7 +659,16 @@ class SugarJar
       true
     end
 
-    def all_branches
+    def all_remote_branches(remote='origin')
+     branches = []
+      git('branch', '-r', '--format', '%(refname)').stdout.lines.each do |line|
+        next unless line.start_with?("refs/remotes/#{remote}/")
+        branches << branch_from_ref(line.strip, :remote)
+      end
+      branches
+    end
+
+    def all_local_branches
       branches = []
       git('branch', '--format', '%(refname)').stdout.lines.each do |line|
         branches << branch_from_ref(line.strip)
@@ -687,6 +736,10 @@ class SugarJar
 
     def current_branch
       branch_from_ref(git('symbolic-ref', 'HEAD').stdout.strip)
+    end
+
+    def repo_name
+      git('rev-parse', '--show-toplevel').stdout.strip.split('/').last
     end
 
     def fetch_upstream
@@ -761,8 +814,11 @@ class SugarJar
       @remote
     end
 
-    def branch_from_ref(ref)
-      ref.split('/')[2..].join('/')
+    def branch_from_ref(ref, type=:local)
+      # local branches are refs/head/XXXX
+      # remote branches are refs/remotes/<remote>/XXXX
+      base = type == :local ? 2 : 3
+      ref.split('/')[base..].join('/')
     end
 
     def color(string, *colors)
