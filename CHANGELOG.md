@@ -1,5 +1,15 @@
 # SugarJar Changelog
 
+## 0.0.11 (2022-10-06)
+
+* Properly handle slashes in branch names (closes #101)
+* Support for running a command to determine checks (linters, units) to run
+* Support for using `gh` CLI instead of `hub` (experimental)
+* Add new `pullsuggestions` command to pull in (accepted) suggestions from a
+  GitHub code review.
+* Detect mismatched primary branch names to assist with projects changing from
+  `master` to `main`
+
 ## 0.0.10 (2021-12-06)
 
 * Support 'main' as a default/primary branch
