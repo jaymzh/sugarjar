@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: [2.6, 2.7]
+        # don't really need to do linting on multiple versions of ruby
+        ruby: [3.1.1]
     runs-on: ubuntu-latest
     steps:
     - name: checkout
