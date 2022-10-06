@@ -38,7 +38,7 @@ describe 'SugarJar::Commands' do
       so = double('shell_out')
       expect(so).to receive(:error?).and_return(false)
       expect(so).to receive(:stdout).and_return(".commit_template.txt\n")
-      expect(sj).to receive(:hub_nofail).and_return(so)
+      expect(sj).to receive(:git_nofail).and_return(so)
       expect(SugarJar::Log).to receive(:debug).with(/already/)
       sj.send(:set_commit_template)
     end
@@ -55,8 +55,8 @@ describe 'SugarJar::Commands' do
       so = double('shell_out')
       expect(so).to receive(:error?).and_return(false)
       expect(so).to receive(:stdout).and_return(".not_commit_template.txt\n")
-      expect(sj).to receive(:hub_nofail).and_return(so)
-      expect(sj).to receive(:hub).with(
+      expect(sj).to receive(:git_nofail).and_return(so)
+      expect(sj).to receive(:git).with(
         'config', '--local', 'commit.template', '.commit_template.txt'
       )
       expect(SugarJar::Log).to receive(:warn).with(/^Updating/)
@@ -74,8 +74,8 @@ describe 'SugarJar::Commands' do
         with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
       expect(so).to receive(:error?).and_return(true)
-      expect(sj).to receive(:hub_nofail).and_return(so)
-      expect(sj).to receive(:hub).with(
+      expect(sj).to receive(:git_nofail).and_return(so)
+      expect(sj).to receive(:git).with(
         'config', '--local', 'commit.template', '.commit_template.txt'
       )
       expect(SugarJar::Log).to receive(:debug).with(/^Setting/)
