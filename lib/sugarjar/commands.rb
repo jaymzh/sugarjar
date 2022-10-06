@@ -607,22 +607,22 @@ class SugarJar
           "git branch -m #{main_branch} #{upstream_branch}\n\t" +
           "git fetch #{upstream}\n\t" +
           "git branch -u #{upstream}/#{upstream_branch} #{upstream_branch}\n" +
-          "\tgit remote set-head #{upstream} -a"
+          "\tgit remote set-head #{upstream} -a",
         )
       end
-      unless upstream_branch == 'origin'
-        origin_branch = main_remote_branch('origin')
-        unless origin_branch == upstream_branch
-          die(
-            "The main branch of your upstream (#{upstream_branch}) and your " +
-            "fork/origin (#{origin_branch}) are not the same. You should go " +
-            "to https://#{@ghhost || 'github.com'}/#{@ghuser}/#{repo_name}/" +
-            'branches/ and rename the 'default' branch to ' +
-            "'#{upstream_branch}'. It will then give you some commands to " +
-            'run to update this clone.'
-          )
-        end
-      end
+      return if upstream_branch == 'origin'
+
+      origin_branch = main_remote_branch('origin')
+      return if origin_branch == upstream_branch
+
+      die(
+        "The main branch of your upstream (#{upstream_branch}) and your " +
+        "fork/origin (#{origin_branch}) are not the same. You should go " +
+        "to https://#{@ghhost || 'github.com'}/#{@ghuser}/#{repo_name}/" +
+        'branches/ and rename the \'default\' branch to ' +
+        "'#{upstream_branch}'. It will then give you some commands to " +
+        'run to update this clone.',
+      )
     end
 
     def assert_in_repo
@@ -659,10 +659,11 @@ class SugarJar
       true
     end
 
-    def all_remote_branches(remote='origin')
-     branches = []
+    def all_remote_branches(remote = 'origin')
+      branches = []
       git('branch', '-r', '--format', '%(refname)').stdout.lines.each do |line|
         next unless line.start_with?("refs/remotes/#{remote}/")
+
         branches << branch_from_ref(line.strip, :remote)
       end
       branches
@@ -814,7 +815,7 @@ class SugarJar
       @remote
     end
 
-    def branch_from_ref(ref, type=:local)
+    def branch_from_ref(ref, type = :local)
       # local branches are refs/head/XXXX
       # remote branches are refs/remotes/<remote>/XXXX
       base = type == :local ? 2 : 3
