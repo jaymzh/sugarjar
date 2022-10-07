@@ -19,6 +19,8 @@ install_dir "#{default_root}/#{name}"
 build_version SugarJar::VERSION
 build_iteration 1
 
+# NOTE: el7 requires using 2.x, so we probably won't support it moving
+# forward. For 0.0.11, we specially made the el7 package with 2.7.6
 override 'ruby', :version => '3.1.1'
 
 dependency 'preparation'
