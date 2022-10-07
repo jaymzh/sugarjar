@@ -13,7 +13,7 @@ provisioner:
 platforms:
   - name: centos-7
     run_list: yum-epel::default
-  - name: centos-8
+  - name: centos-stream-8
     run_list: yum-epel::default
   - name: debian-8
     run_list: apt::default
@@ -26,6 +26,8 @@ platforms:
   - name: ubuntu-18.04
     run_list: apt::default
   - name: ubuntu-20.04
+    run_list: apt::default
+  - name: ubuntu-22.04
     run_list: apt::default
 
 suites:
