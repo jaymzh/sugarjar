@@ -23,7 +23,18 @@
 * Inside of each VM...
 
   ```shell
-  for d in ubuntu-2004 ubuntu-2204 debian-11 centos-stream-8; do
+  # ubuntu-2204 not done because there were vagrant+ssl+netssh issues that
+  # don't allow the box to come up, but 2004 packages are identical
+  #
+  # centos-7 requires building with older ruby (see config/projects/sugarjar.rb)
+  # so we did it for 0.0.11 but probably will drop it going forward
+  #
+  # centos-stream-9 doesn't yet have a bento box (see
+  # https://github.com/chef/bento/issues/1391)
+  #
+  # Fedora has official packages now, so we don't build for that.
+  distros="ubuntu-1804 ubuntu-2004 debian-11 centos-stream-8"
+  for d in $distros; do
     bundle exec kitchen converge default-$d && \
       bundle exec kitchen login default-$d && \
       bundle exec kitchen destroy default-$d
