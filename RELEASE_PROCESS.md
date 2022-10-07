@@ -56,6 +56,15 @@
 
   * Grab/rename the package out of sugarjar/omnibus/pkg
 
+* Build on a mac
+
+  ```shell
+  cd sugarjar/omnibus
+  bundle install --binstubs
+  # make /opt/sugarjar and chown it to your user
+  bin/omnibus build sugarjar && bin/omnibus clean sugarjar
+  ```
+
 ## Publish Fedora builds
 
 See `packaging/README.md`.

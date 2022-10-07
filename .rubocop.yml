@@ -9,6 +9,9 @@ AllCops:
 Layout/LineLength:
   Max: 80
 
+Naming/FileName:
+  Enabled: false
+
 Metrics/CyclomaticComplexity:
   Enabled: false
 
