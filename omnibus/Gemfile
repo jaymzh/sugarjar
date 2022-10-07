@@ -1,7 +1,10 @@
 source 'https://rubygems.org'
 
 # Install omnibus
-gem 'omnibus', '~> 8.0'
+# gem 'omnibus', '~> 8.0'
+# Until omnibus 9 gems are released, we need to pull straight from git,
+# since omnibus-software requires ~9 now.
+gem 'omnibus', :github => 'chef/omnibus'
 
 # Use Chef's software definitions. It is recommended that you write your own
 # software definitions, but you can clone/fork Chef's to get you started.
