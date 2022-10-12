@@ -279,8 +279,8 @@ log_level: debug
 github_user: jaymzh
 ```
 
-In addition, the environment variable `SUGARJAR_DEBUG` can be defined to set
-debug on. This is primarily used as a way to turn debug on earlier in order to
+In addition, the environment variable `SUGARJAR_LOGLEVEL` can be defined to set
+a log level. This is primarily used as a way to turn debug on earlier in order to
 troubleshoot configuration parsing.
 
 ## Repository Configuration

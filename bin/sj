@@ -29,7 +29,7 @@ parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'OPTIONS:'
 
-  opts.on('--[no-]fallthru', 'Fall-thru to git') do |fallthru|
+  opts.on('--[no-]fallthru', 'Fall-thru to git. [default: true]') do |fallthru|
     options['fallthru'] = fallthru
   end
 
@@ -37,7 +37,7 @@ parser = OptionParser.new do |opts|
     '--github-cli CLI',
     %w{gh cli},
     'Github CLI to use ("gh" or "hub"). Note that support for "gh" is ' +
-    'currently experimental. default: "hub"',
+    'currently experimental. [default: "hub"]',
   ) do |cli|
     options['github_cli'] = cli
   end
@@ -64,22 +64,24 @@ parser = OptionParser.new do |opts|
 
   opts.on(
     '--ignore-dirty',
-    'Tell command that check for a dirty repo to carry on anyway.',
+    'Tell command that check for a dirty repo to carry on anyway. ' +
+    '[default: false]',
   ) do
     options['ignore_dirty'] = true
   end
 
   opts.on(
     '--ignore-prerun-failure',
-    'Ignore preprun failure on *push commands.',
+    'Ignore preprun failure on *push commands. [default: false]',
   ) do
     options['ignore_prerun_failure'] = true
   end
 
   opts.on(
     '--log-level LEVEL',
-    'Set logging level (fatal, error, warning, info, debug, trace). Default: ' +
-    'info',
+    'Set logging level (fatal, error, warning, info, debug, trace). This can ' +
+    'also be set via the SUGARJAR_LOGLEVEL environment variable. [default: ' +
+    'info]',
   ) do |level|
     options['log_level'] = level
   end
