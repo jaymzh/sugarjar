@@ -248,7 +248,9 @@ else
   end
 end
 
-if ARGV.empty?
+subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
+
+if ARGV.empty? || !subcommand
   puts parser
   exit
 end
@@ -259,7 +261,6 @@ options = config.merge(options)
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 sj = SugarJar::Commands.new(options)
 
-subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
 is_valid_command = valid_commands.include?(subcommand.to_sym)
 argv_copy.delete(subcommand)
 SugarJar::Log.debug("subcommand is #{subcommand}")
