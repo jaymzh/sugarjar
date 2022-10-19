@@ -1,5 +1,15 @@
 # require 'spec_helper'
-require_relative '../lib/sugarjar/commands'
+# For Ruby packages, Debian autopkgtest runs in an environment where
+# gem2deb-test-runner removes the lib directory from the source tree, so
+# the specs have to be able to load the installed copy instead.
+#
+# add '../lib' to the front of the path, so that when requiring modules, the
+# ones in '../lib' are still going to be used if available, but we can fall
+# back to an installed module
+#
+# See https://wiki.debian.org/Teams/Ruby/Packaging/Tests#Case_eight:_autopkgtest_failure
+$LOAD_PATH.unshift File.expand_path('lib', __dir__)
+require 'sugarjar/commands'
 
 describe 'SugarJar::Commands' do
   context '#set_commit_template' do
