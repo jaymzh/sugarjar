@@ -20,7 +20,8 @@
 ## Publish omnibus builds
 
 * From omnibus directory, prep: `bundle install --binstubs`
-* Inside of each VM...
+
+Then from inside each VM:
 
   ```shell
   # ubuntu-2204 not done because there were vagrant+ssl+netssh issues that
@@ -41,8 +42,7 @@
   done
   ```
 
-  * Do a build...
-
+1. Do a build...
     (for fedora you'll need to `sudo dnf install rpm-build`)
 
     ```shell
@@ -54,7 +54,7 @@
       bin/omnibus clean sugarjar # required so next build works
     ```
 
-  * Grab/rename the package out of sugarjar/omnibus/pkg
+1. Grab/rename the package out of sugarjar/omnibus/pkg
 
 * Build on a mac
 
