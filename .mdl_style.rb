@@ -1,5 +1,5 @@
 all
-rule 'MD013', :code_blocks => false
+rule 'MD013', :ignore_code_blocks => true
 
 rule 'MD026', :punctuation => '.,:;'
 
