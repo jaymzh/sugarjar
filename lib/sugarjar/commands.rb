@@ -180,28 +180,34 @@ class SugarJar
 
       reponame = File.basename(repo, '.git')
       dir ||= reponame
+      org = extract_org(repo)
 
       SugarJar::Log.info("Cloning #{reponame}...")
 
       # GH's 'fork' command (with the --clone arg) will fork, if necessary,
       # then clone, and then setup the remotes with the appropriate names. So
       # we just let it do all the work for us and return.
-      if gh?
+      #
+      # Unless the repo is in our own org and cannot be forked, then it
+      # will fail.
+      if gh? && org != @ghuser
         ghcli('repo', 'fork', '--clone', canonicalize_repo(repo), dir, *args)
         SugarJar::Log.info('Remotes "origin" and "upstream" configured.')
         return
       end
 
-      # For 'hub', first we clone, using git, as 'hub' always needs a repo
-      # to operate on.
+      # For 'hub' first we clone, using git, as 'hub' always needs a repo to
+      # operate on.
+      #
+      # Or for 'gh' when we can't fork...
       git('clone', canonicalize_repo(repo), dir, *args)
 
       # Then we go into it and attempt to use the 'fork' capability
+      # or if not
       Dir.chdir dir do
         # Now that we have a repo, if we have a hub host set it.
         set_hub_host
 
-        org = extract_org(repo)
         SugarJar::Log.debug("Comparing org #{org} to ghuser #{@ghuser}")
         if org == @ghuser
           puts 'Cloned forked or self-owned repo. Not creating "upstream".'
