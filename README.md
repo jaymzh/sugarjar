@@ -27,6 +27,12 @@ list here, and if so, use your package manager (or `gem`) to install it:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg)](https://repology.org/project/sugarjar/versions)
 
+For Ubuntu users, Sugarjar will likely be available starting in the upcoming
+23.04 release. Until then, for supported LTS releases starting 20.04 (focal)
+and the latest non-LTS release, you can use [this PPA](
+https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) maintained by the
+Debian package maintainer.
+
 Another option is to use our [omnibus
 packages](https://github.com/jaymzh/sugarjar/releases). We keep Omnibus
 packages for most distros that do not package Sugarjar. Omnibus packages are
