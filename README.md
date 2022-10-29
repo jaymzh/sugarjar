@@ -300,7 +300,7 @@ how to handle repo-specific things. Currently there options are:
   per line. Takes precedence over `lint`. The command (and the resulting
   linters) will be run from the root of the repo.
 * `unit` - A list of scripts to run on `sj unit`. These should be unittest
-  runners like rspec or pyunit. Test will be run fro mthe root of the repo.
+  runners like rspec or pyunit. Test will be run from the root of the repo.
 * `unit_list_cmd` - A command to run which will print out the unit tests to
   run, one more line. Takes precedence over `unit`. The command (and the
   resulting unit tests) will be run from the root of the repo.
@@ -369,7 +369,7 @@ github_cli: gh
 
 Why the name SugarJar?
 
-It's mostly a backranym. Like jellyfish, I wanted two letters that were on home
+It's mostly a backronym. Like jellyfish, I wanted two letters that were on home
 row on different sides of the keyboard to make it easy to type. I looked at the
 possible options that where there and not taken and tried to find one I could
 make an appropriate name out of. Since this utility adds lots of sugar to git
