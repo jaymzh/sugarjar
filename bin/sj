@@ -188,6 +188,10 @@ COMMANDS:
   version
               Print the version of sugarjar, and then run 'hub version'
               to show the hub and git versions.
+
+Be sure to checkout Sapling (https://sapling-scm.com/)! This was written as
+a stop-gap to get Sapling features before it was open-sourced, and as such
+I may deprecate this in the future.
 COMMANDS
 
   # rubocop:enable Layout/HeredocIndentation

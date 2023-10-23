@@ -4,6 +4,14 @@
 [![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 
+> [!IMPORTANT]
+> You probably want to use [Sapling](https://sapling-scm.com/)
+> instead of this! This was written as a stop-gap to approximate some features
+> of the Facebook/Meta internal development tools before they were released.
+> Now that those tools have been open-sourced and work with GitHub, this is
+> likely to be deprecated at some point. Sapling is far more feature rich,
+> faster, and have more development resources behind them.
+
 Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
 the current default is [hub](https://hub.github.com/), but there is
 experimental support for [gh](https://cli.github.com/). So you will need one of
