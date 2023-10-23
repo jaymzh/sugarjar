@@ -384,8 +384,8 @@ When I originally wrote SugarJar, `gh` was in early development, and `hub` had
 many more features. In addition, I wrote SugarJar to be a wrapper for git/hub,
 and `hub` allows this but `gh` does not.
 
-When `gh` matured, we added experimental `gh` support in 0.11, and switched the
-default to prefer `gh` in 0.12.
+When `gh` matured, we added experimental `gh` support in 0.0.11, and switched the
+default to prefer `gh` in 1.0.0.
 
 **I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 
