@@ -34,7 +34,7 @@ Then from inside each VM:
   # https://github.com/chef/bento/issues/1391)
   #
   # Fedora has official packages now, so we don't build for that.
-  distros="ubuntu-1804 ubuntu-2004 debian-11 centos-stream-8"
+  distros="ubuntu-2004 ubuntu-2204 debian-11 debian-12 centos-stream-8"
   for d in $distros; do
     bundle exec kitchen converge default-$d && \
       bundle exec kitchen login default-$d && \
