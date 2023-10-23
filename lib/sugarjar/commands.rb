@@ -18,7 +18,6 @@ class SugarJar
       SugarJar::Log.debug("Commands.initialize options: #{options}")
       @ghuser = options['github_user']
       @ghhost = options['github_host']
-      @cli = options['github_cli']
       @ignore_dirty = options['ignore_dirty']
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
@@ -28,6 +27,10 @@ class SugarJar
       @main_branch = nil
       @main_remote_branches = {}
       return if options['no_change']
+
+      # technically this doesn't "change" things, but we won't have this
+      # option on the no_change call
+      @cli = determine_cli(options['github_cli'])
 
       set_hub_host
       set_commit_template if @repo_config['commit_template']
@@ -850,6 +853,29 @@ class SugarJar
         require 'pastel'
         Pastel.new
       end
+    end
+
+    def determine_cli(cli)
+      return cli if %w{gh hub}.include?(cli)
+
+      die("'github_cli' has unknown setting: #{cli}") unless cli == 'auto'
+
+      SugarJar::Log.debug('github_cli set to auto')
+
+      if which_nofail('gh')
+        SugarJar::Log.debug('Found "gh"')
+        return 'gh'
+      end
+      if which_nofail('hub')
+        SugarJar::Log.debug('Did not find "gh" but did find "hub"')
+        return 'hub'
+      end
+
+      die(
+        'Neither "gh" nor "hub" found in PATH, please ensure at least one ' +
+        'of these utilities is in the PATH. If both are available you can ' +
+        'specify which to use with --github-cli',
+      )
     end
 
     def hub?

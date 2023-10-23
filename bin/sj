@@ -40,8 +40,9 @@ parser = OptionParser.new do |opts|
   opts.on(
     '--github-cli CLI',
     %w{gh cli},
-    'Github CLI to use ("gh" or "hub"). Note that support for "gh" is ' +
-    'currently experimental. [default: "hub"]',
+    'Github CLI to use ("gh" or "hub" or "auto"). Auto (the default) will ' +
+    'prefer "gh" if it is available but will fall back to "hub." ' +
+    '[default: "auto"]',
   ) do |cli|
     options['github_cli'] = cli
   end

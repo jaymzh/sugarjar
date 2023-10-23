@@ -5,9 +5,7 @@
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 
 Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
-the current default is [hub](https://hub.github.com/), but there is
-experimental support for [gh](https://cli.github.com/). So you will need one of
-those two installed.
+either [gh](https://cli.github.com/) or the older [hub](https://hub.github.com/).
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
 its replacement at Facebook, JellyFish. Many of the features they provide for
@@ -355,19 +353,16 @@ sj clone jaymzh/sugarjar --github-host githuh.com
 We will add the `hub.host` to the `sugarjar` clone so that future `hub` or `sj`
 commands work without needing to specify..
 
-## Support for `gh`
+## Choosing a GitHub CLI
 
-As of version 0.11 there is experimental support for the `gh` CLI (instead of
-`hub`). If you would like to use `gh`, install it and then add the following
-to your configuration:
-
-```yaml
-github_cli: gh
-```
+SugarJar will use `gh` if it is available or otherwise fall back to `hub`. You
+can override this by specifying `--github-cli` on the command line or setting
+`github_cli` to either `gh` or `hub` (it defaults to `auto`) in your
+configuration.
 
 ## FAQ
 
-Why the name SugarJar?
+**Why the name SugarJar?**
 
 It's mostly a backronym. Like jellyfish, I wanted two letters that were on home
 row on different sides of the keyboard to make it easy to type. I looked at the
@@ -375,21 +370,23 @@ possible options that where there and not taken and tried to find one I could
 make an appropriate name out of. Since this utility adds lots of sugar to git
 and github, it seemed appropriate.
 
-Why did you use `hub` instead of the newer `gh` CLI?
+**Why did you originally use `hub` instead of the newer `gh` CLI?**
 
 When I originally wrote SugarJar, `gh` was in early development, and `hub` had
-many more features. Now that `gh` has matured, we have experimental support for
-`gh` and will switch it to the default at some point.
+many more features. In addition, I wrote SugarJar to be a wrapper for git/hub,
+and `hub` allows this but `gh` does not.
 
-In addition, I wanted SugarJar to be able to be a git wrapper, and so wrapping
-`hub` allows us to do that but wrapping `gh` does not.
+When `gh` matured, we added experimental `gh` support in 0.11, and switched the
+default to prefer `gh` in 0.12.
 
-I'd like to package SugarJar for my favorite distro/OS, is that OK?
+**I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 
 Of course! But I'd appreciate you emailing me to give me a heads up. Doing so
 will allow me to make sure it shows up in the Repology badge above as well as
 stop building Omnibus packages for whatever distro.
 
-Does it work on Windows/Mac?
+**What platforms does it work on?**
 
-It should! Though I will admit I don't regularly test on non-Linux OSes.
+Since it's Ruby, it should work across all platforms, however, it's developed
+and primarily tested on Linux as well as regularly used on Mac. I've not tested
+it on Windows, but I'll happily accept patches for Windows compatibility.
