@@ -23,6 +23,7 @@ class SugarJar
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
       @color = options['color']
+      @feature_prefix = options['feature_prefix']
       @checks = {}
       @main_branch = nil
       @main_remote_branches = {}
@@ -35,6 +36,7 @@ class SugarJar
     def feature(name, base = nil)
       assert_in_repo
       SugarJar::Log.debug("Feature: #{name}, #{base}")
+      name = fprefix(name)
       die("#{name} already exists!") if all_local_branches.include?(name)
       base ||= most_main
       base_pieces = base.split('/')
@@ -49,6 +51,7 @@ class SugarJar
     def bclean(name = nil)
       assert_in_repo
       name ||= current_branch
+      name = fprefix(name) unless all_local_branches.include?(name)
       if clean_branch(name)
         SugarJar::Log.info("#{name}: #{color('reaped', :green)}")
       else
@@ -344,6 +347,16 @@ class SugarJar
     alias ps pullsuggestions
 
     private
+
+    def fprefix(name)
+      return name unless @feature_prefix
+
+      newname = "#{@feature_prefix}#{name}"
+      SugarJar::Log.debug(
+        "Munging feature name: #{name} -> #{newname} due to feature prefix",
+      )
+      newname
+    end
 
     def _smartpush(remote, branch, force)
       unless remote && branch
@@ -692,7 +705,7 @@ class SugarJar
       ).stdout.lines.reject do |line|
         line.start_with?('-')
       end
-      if out.length.zero?
+      if out.empty?
         SugarJar::Log.debug(
           "cherry-pick shows branch #{branch} obviously safe to delete",
         )

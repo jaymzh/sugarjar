@@ -161,4 +161,18 @@ describe 'SugarJar::Commands' do
         to eq('git@github.com:org/repo.git')
     end
   end
+
+  context '#fprefix' do
+    it 'Adds prefixes when needed' do
+      sj = SugarJar::Commands.new(
+        { 'no_change' => true, 'feature_prefix' => 'someuser/' },
+      )
+      expect(sj.send(:fprefix, 'test')).to eq('someuser/test')
+    end
+
+    it 'Does not add prefixes when not needed' do
+      sj = SugarJar::Commands.new({ 'no_change' => true })
+      expect(sj.send(:fprefix, 'test')).to eq('test')
+    end
+  end
 end

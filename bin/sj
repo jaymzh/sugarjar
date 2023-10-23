@@ -33,6 +33,10 @@ parser = OptionParser.new do |opts|
     options['fallthru'] = fallthru
   end
 
+  opts.on('--feature-prefix', 'Prefix to use for feature branches') do |prefix|
+    options['feature_prefix'] = prefix
+  end
+
   opts.on(
     '--github-cli CLI',
     %w{gh cli},
@@ -128,6 +132,12 @@ COMMANDS:
               some form of 'master' instead of your current branch. In order
               of preference it will be upstream/master, origin/master, master,
               depending upon what remotes are available.
+
+              Note that you can specify "--feature-prefix" (or add
+              "feature_prefix" to your config) to have all features created
+              with a prefix. This is useful for branch-based workflows where
+              developers are expected to create branches names that, for
+              example, start with their username.
 
   forcepush, fpush
               The same as "smartpush", but uses "--force-with-lease". This is
