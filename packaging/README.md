@@ -20,6 +20,8 @@ If not already checked out, check out the dist-git:
 fedpkg co rubygem-sugarjar
 ```
 
+Make sure you start on the 'rawhide' branch.
+
 If already checked out, do `fedpkg pull` to get the latest.
 
 ## Do work
