@@ -1,5 +1,14 @@
 # SugarJar Changelog
 
+## 1.0.0 (2023-10-22)
+
+* Add new "feature prefix" feature
+* Implement `auto` setting for `github_cli`, default to `gh`
+* Point people to Sapling
+* Handle `sclone` of repos in personal orgs
+* Better error when a subcommand isn't specified
+* Various documentation fixes
+
 ## 0.0.11 (2022-10-06)
 
 * Properly handle slashes in branch names (closes #101)

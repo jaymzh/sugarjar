@@ -57,3 +57,5 @@ Gemfile.lock
 # .rubocop-https?--*
 packaging/.vagrant
 noarch
+
+.ruby-version
