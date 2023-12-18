@@ -5,14 +5,14 @@
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 
 > [!IMPORTANT]
-> If you are a _new_ user, I suggest looking
-> at [Sapling](https://sapling-scm.com/) instead of this. This was written as
-> a stop-gap to approximate some features of the Facebook/Meta internal
-> development tools before they were released.  Now that those tools have been
-> open-sourced and work with GitHub, this is likely to be deprecated at some
-> point. Sapling is far more feature rich, faster, and have more development
-> resources behind them. SugarJar is a smaller transition, and for the time
-> being I'm maintaining it for all existing users.
+> If you are a _new_ user, I suggest looking at [Sapling](https://sapling-scm.com/)
+> instead of this. This was written as a stop-gap to approximate some features
+> of the Facebook/Meta internal development tools before they were released.
+> Now that those tools have been open-sourced and work with GitHub, new users
+> will likely want to start there.  Sapling is far more feature rich, faster,
+> and have more development resources behind them. SugarJar is a smaller
+> transition, and for the time being I'm maintaining it for all existing users,
+> and for those who may not yet be ready for the transition to Sapling.
 
 Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
 either [gh](https://cli.github.com/) or the older [hub](https://hub.github.com/).
