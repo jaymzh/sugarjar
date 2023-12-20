@@ -21,6 +21,7 @@ class SugarJar
       @ignore_dirty = options['ignore_dirty']
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
+      SugarJar::Log.debug("Repoconfig: #{@repo_config}")
       @color = options['color']
       @feature_prefix = options['feature_prefix']
       @checks = {}
@@ -95,6 +96,15 @@ class SugarJar
 
     def co(*args)
       assert_in_repo
+      # Pop the last arguement, which is _probably_ a branch name
+      # and then add any featureprefix, and if _that_ is a branch
+      # name, replace the last arguement with that
+      name = args.last
+      bname = fprefix(name) unless all_local_branches.include?(name)
+      if all_local_branches.include?(bname)
+        SugarJar::Log.debug("Featurepefixing #{name} -> #{bname}")
+        args[-1] = bname
+      end
       s = git('checkout', *args)
       SugarJar::Log.info(s.stderr + s.stdout.chomp)
     end
@@ -296,7 +306,7 @@ class SugarJar
       end
       if gh?
         SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
-        system(which('gh'), 'pr', 'create', *args)
+        system(which('gh'), 'pr', 'create', '--fill', *args)
       else
         SugarJar::Log.trace("Running: hub pull-request #{args.join(' ')}")
         system(which('hub'), 'pull-request', *args)
@@ -553,7 +563,12 @@ class SugarJar
           SugarJar::Log.debug("Running #{type} #{check}")
 
           short = check.split.first
-          unless File.exist?(short)
+          if short.include?('/')
+            short = File.join(repo_root, short) unless short.start_with?('/')
+            unless File.exist?(short)
+              SugarJar::Log.error("Configured #{type} #{short} does not exist!")
+            end
+          elsif !which_nofail(short)
             SugarJar::Log.error("Configured #{type} #{short} does not exist!")
             return false
           end

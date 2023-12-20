@@ -224,6 +224,14 @@ $ sj feature dependent-feature test-branch
 Created feature branch dependent-feature based on test-branch
 ```
 
+Additionally you can specify a `feature_prefix` in your config which will cause
+`feature` to create branches prefixed with your `feature_prefix` and will also
+cause `co` to checkout branches with that prefix. This is useful when organizations
+use branch-based workflows and branches need to be prefixed with e.g. `$USER/`.
+
+For example, if your prefix was `user/`, then `sj feature foo` would create
+`user/foo`, and `sj co foo` would switch to `user/foo`.
+
 ## Smartlog
 
 Smartlog will show you a tree diagram of your branches! Simply run `sj
@@ -319,6 +327,12 @@ how to handle repo-specific things. Currently there options are:
 * `commit_template` - A path to a commit template to set in the `commit.template`
   git config for this repo. Should be either a fully-qualified path, or a path
   relative to the repo root.
+* `include_from` - This will read an additional repoconfig file and merge it
+  into the one being read. The value should be relative to the root of the
+  repo. This will not error if the file does not exist, it is intended for
+  organizations to allow users to optionally extend a default repo config.
+* `overwrite_from` - Same as `include_from`, but completely overwrites the
+  base configuration if the file is found.
 
 Example configuration:
 
