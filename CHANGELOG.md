@@ -1,5 +1,12 @@
 # SugarJar Changelog
 
+## 1.0.1 (2023-12-20)
+
+* `co` support for featureprefix
+* Add `include_from` and `overwrite_from` support to repoconfig
+* Support relative paths for lints/units
+* `smartpr` now uses `--fill`
+
 ## 1.0.0 (2023-10-22)
 
 * Add new "feature prefix" feature
