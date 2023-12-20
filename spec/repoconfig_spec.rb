@@ -16,6 +16,8 @@ describe 'SugarJar::RepoConfig' do
           'lint',
         ],
       }
+      allow(SugarJar::RepoConfig).to receive(:config_file?).
+        and_return(true)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
         and_return(expected)
       data = SugarJar::RepoConfig.config('whatever')
@@ -55,6 +57,8 @@ describe 'SugarJar::RepoConfig' do
         with('base').and_return('base')
       allow(SugarJar::RepoConfig).to receive(:repo_config_path).
         with('additional').and_return('additional')
+      allow(SugarJar::RepoConfig).to receive(:config_file?).
+        and_return(true)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
         with('base').and_return(base)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
@@ -75,10 +79,12 @@ describe 'SugarJar::RepoConfig' do
       additional = {
         'new' => ['thing'],
       }
-      allow(SugarJar::RepoConfig).to receive(:repo_config_path).
-        with('base').and_return('base')
-      allow(SugarJar::RepoConfig).to receive(:repo_config_path).
-        with('additional').and_return('additional')
+      %w{base additional}.each do |word|
+        allow(SugarJar::RepoConfig).to receive(:repo_config_path).
+          with(word).and_return(word)
+      end
+      allow(SugarJar::RepoConfig).to receive(:config_file?).
+        and_return(true)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
         with('base').and_return(base)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
@@ -88,7 +94,7 @@ describe 'SugarJar::RepoConfig' do
       expect(data).to eq(additional)
     end
 
-    it 'handles recurseive includes' do
+    it 'handles recursive includes' do
       base = {
         'include_from' => 'additional',
         'top1' => ['entryA'],
@@ -128,6 +134,8 @@ describe 'SugarJar::RepoConfig' do
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).
           with(word).and_return(word)
       end
+      allow(SugarJar::RepoConfig).to receive(:config_file?).
+        and_return(true)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
         with('base').and_return(base)
       allow(SugarJar::RepoConfig).to receive(:hash_from_file).
@@ -136,6 +144,34 @@ describe 'SugarJar::RepoConfig' do
         with('more').and_return(more)
       data = SugarJar::RepoConfig.config('base')
       expect(data).to eq(expected)
+    end
+
+    it "doesn't overwrite from non-existent files" do
+      base = {
+        'include_from' => 'additional',
+        'top1' => ['entryA'],
+        'top2' => {
+          'top2key1' => 'a',
+          'top2key2' => 'b',
+        },
+      }
+      additional = {
+        'something' => 'else',
+      }
+      %w{base additional}.each do |word|
+        allow(SugarJar::RepoConfig).to receive(:repo_config_path).
+          with(word).and_return(word)
+      end
+      allow(SugarJar::RepoConfig).to receive(:config_file?).
+        with('base').and_return(true)
+      allow(SugarJar::RepoConfig).to receive(:config_file?).
+        with('additional').and_return(true)
+      allow(SugarJar::RepoConfig).to receive(:hash_from_file).
+        with('base').and_return(base)
+      allow(SugarJar::RepoConfig).to receive(:hash_from_file).
+        with('additional').and_return(additional)
+      data = SugarJar::RepoConfig.config('base')
+      expect(data).to eq(data)
     end
   end
 end
