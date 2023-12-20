@@ -1,6 +1,7 @@
 require_relative 'util'
 require_relative 'log'
 require 'yaml'
+require 'deep_merge'
 
 class SugarJar
   # This parses SugarJar repoconfigs (not to be confused with configs).
@@ -10,23 +11,42 @@ class SugarJar
 
     CONFIG_NAME = '.sugarjar.yaml'.freeze
 
-    def self.repo_config
-      ::File.join(repo_root, CONFIG_NAME)
+    def self.repo_config_path(config)
+      ::File.join(repo_root, config)
     end
 
-    def self.config
-      unless in_repo
-        SugarJar::Log.debug('Not in repo, skipping repoconfig load')
-        return {}
-      end
-      config = repo_config
-      if File.exist?(config)
-        SugarJar::Log.debug("Loading repo config: #{config}")
-        YAML.safe_load(File.read(repo_config))
+    def self.hash_from_file(config_file)
+      if File.exist?(config_file)
+        SugarJar::Log.debug("Loading repo config: #{config_file}")
+        YAML.safe_load(File.read(config_file))
       else
-        SugarJar::Log.debug("No repo config (#{config}), returning empty hash")
+        SugarJar::Log.debug(
+          "Skipping repo config (#{config_file}), returning empty hash",
+        )
         {}
       end
+    end
+
+    def self.config(config = CONFIG_NAME)
+      data = {}
+      unless in_repo
+        SugarJar::Log.debug('Not in repo, skipping repoconfig load')
+        return data
+      end
+      config_file = repo_config_path(config)
+      data = hash_from_file(config_file)
+      if data['overwrite_from']
+        SugarJar::Log.debug(
+          "Attempting overwrite_from #{data['overwrite_from']}",
+        )
+        data = config(data['overwrite_from'])
+        data.delete('overwrite_from')
+      elsif data['include_from']
+        SugarJar::Log.debug("Attempting include_from #{data['include_from']}")
+        data.deep_merge!(config(data['include_from']))
+        data.delete('include_from')
+      end
+      data
     end
   end
 end
