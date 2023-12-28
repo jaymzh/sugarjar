@@ -35,19 +35,16 @@ list here, and if so, use your package manager (or `gem`) to install it:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg)](https://repology.org/project/sugarjar/versions)
 
-For Ubuntu users, Sugarjar will likely be available starting in the upcoming
-23.04 release. Until then, for supported LTS releases starting 20.04 (focal)
-and the latest non-LTS release, you can use [this PPA](
-https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) maintained by the
-Debian package maintainer.
+For MacOS users, you can use our Homebrew Tap:
 
-Another option is to use our [omnibus
-packages](https://github.com/jaymzh/sugarjar/releases). We keep Omnibus
-packages for most distros that do not package Sugarjar. Omnibus packages are
-distro packages (deb, rpm, etc.) that have all dependencies bundled up together
-(including Ruby), and install in `/opt/sugarjar` allowing you to manage the
-installation with your package manager, but with as a hermetically sealed app
-that doesn't depend on the rest of your distro.
+```shell
+homebrew tap jaymzh/sugarjar
+homebrew install sugarjar
+```
+
+You can also weigh in on [this
+PR](https://github.com/Homebrew/homebrew-core/pull/157910) and tell the
+Homebrew folks you'd like to see it in core.
 
 Finally, if none of those work for you, you can clone this repo and run it
 directly from there.
