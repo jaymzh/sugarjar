@@ -33,7 +33,7 @@ the old ones. First follow the directions in the spec file to build the tarball
 for the test files. Then wget the gem from the URL in the spec file. Then:
 
 ```shell
-fedpkg new-sources rubygem-sugarjar-<version>-specs.tar.gz sugarjar-<version>.gem
+fedpkg new-sources rubygem-sugarjar-<version>-specs.tar sugarjar-<version>.gem
 ```
 
 ## Testing

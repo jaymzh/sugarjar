@@ -1,5 +1,7 @@
 require_relative 'log'
 
+require 'mixlib/shellout'
+
 class SugarJar
   # Some common methods needed by other classes
   module Util
