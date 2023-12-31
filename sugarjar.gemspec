@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.email = ['phil@ipom.com']
   spec.license = 'Apache-2.0'
   spec.homepage = 'https://github.com/jaymzh/sugarjar'
-  spec.required_ruby_version = '>= 2.6.0'
+  spec.required_ruby_version = '>= 3.1'
   docs = %w{README.md LICENSE Gemfile sugarjar.gemspec}
   spec.extra_rdoc_files = docs
   spec.executables << 'sj'
@@ -23,5 +23,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pastel'
   spec.metadata = {
     'rubygems_mfa_required' => 'true',
+    'bug_tracker_uri' => 'https://github.com/jaymzh/sugarjar/issues',
+    'changelog_uri' =>
+      'https://github.com/jaymzh/sugarjar/blob/main/CHANGELOG.md',
+    'homepage_uri' => 'https://github.com/jaymzh/sugajar',
+    'source_code_uri' => 'https://github.com/jaymzh/sugarjar',
   }
 end
