@@ -17,7 +17,7 @@ class SugarJar
 
     def self.hash_from_file(config_file)
       SugarJar::Log.debug("Loading repo config: #{config_file}")
-      YAML.safe_load(File.read(config_file))
+      YAML.safe_load_file(config_file)
     end
 
     # wrapper for File.exist to make unittests easier

@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'appbundler'
 gem 'sugarjar', :path => '.'
 
 group :test do
