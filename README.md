@@ -403,8 +403,7 @@ default to prefer `gh` in 1.0.0.
 **I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 
 Of course! But I'd appreciate you emailing me to give me a heads up. Doing so
-will allow me to make sure it shows up in the Repology badge above as well as
-stop building Omnibus packages for whatever distro.
+will allow me to make sure it shows up in the Repology badge above.
 
 **What platforms does it work on?**
 

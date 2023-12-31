@@ -1,5 +1,11 @@
 # SugarJar Changelog
 
+## 1.1.0 (2023-12-31)
+
+* Fix include path for unittests for downstream packagers
+* Bump ruby min versions
+* Include Gemfile.lock for downstream packagers
+
 ## 1.0.1 (2023-12-20)
 
 * `co` support for featureprefix
