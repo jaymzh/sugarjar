@@ -35,16 +35,17 @@ list here, and if so, use your package manager (or `gem`) to install it:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg)](https://repology.org/project/sugarjar/versions)
 
-For MacOS users, you can use our Homebrew Tap:
+For MacOS users, we recommend using Homebrew - SugarJar is now in Homebrew Core.
+
+NOTE: If you previously used our custom Homebrew tap, you should remove and
+untap it:
 
 ```shell
-homebrew tap jaymzh/sugarjar
-homebrew install sugarjar
+homebrew uninstall sugarjar
+homebrew untap jaymzh/sugarjar
 ```
 
-You can also weigh in on [this
-PR](https://github.com/Homebrew/homebrew-core/pull/157910) and tell the
-Homebrew folks you'd like to see it in core.
+Then you can install the core version (`brew install sugarjar`).
 
 Finally, if none of those work for you, you can clone this repo and run it
 directly from there.

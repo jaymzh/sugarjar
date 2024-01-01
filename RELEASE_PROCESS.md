@@ -24,8 +24,13 @@
 
 ## Publish Fedora builds
 
-See `packaging/README.md`.
+See [packaging/README.md](packaging/README.md).
 
 ## Notify Debian/Ubuntu packager
 
 Ping Michel Lind
+
+## Update Homebrew
+
+Open a PR against the [Homebrew
+Formula](https://github.com/Homebrew/homebrew-core/blob/master/Formula/s/sugarjar.rb).
