@@ -33,7 +33,12 @@ If you don't, there's a ton of useful stuff for everyone!
 Sugarjar is packaged in a variety of Linux distributions - see if it's on the
 list here, and if so, use your package manager (or `gem`) to install it:
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg)](https://repology.org/project/sugarjar/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg?exclude_unsupported=1)](https://repology.org/project/sugarjar/versions)
+
+If you are using a Linux distribution version that is end-of-life'd, click the
+above image, it'll take you to a page that lists unsupported distro versions
+as well (they'll have older SugarJar, but they'll probably still have some
+version).
 
 For MacOS users, we recommend using Homebrew - SugarJar is now in Homebrew Core.
 
