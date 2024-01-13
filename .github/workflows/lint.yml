@@ -12,17 +12,14 @@ jobs:
   rubocop:
     strategy:
       fail-fast: false
-      matrix:
-        # don't really need to do linting on multiple versions of ruby
-        ruby: [3.1.1]
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby }}
+        ruby-version: '3.2'
     - name: install deps
       run: bundle install
     - name: Run rubocop
@@ -40,6 +37,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: MarkdownLint mdl Action
         uses: actionshub/markdownlint@1.2.0

@@ -8,7 +8,9 @@ Gem::Specification.new do |spec|
   spec.email = ['phil@ipom.com']
   spec.license = 'Apache-2.0'
   spec.homepage = 'https://github.com/jaymzh/sugarjar'
-  spec.required_ruby_version = '>= 3.1'
+  # We'll support 3.0 until 2024-03-31 when it goes EOL
+  # https://www.ruby-lang.org/en/downloads/branches/
+  spec.required_ruby_version = '>= 3.0'
   docs = %w{README.md LICENSE Gemfile sugarjar.gemspec}
   spec.extra_rdoc_files = docs
   spec.executables << 'sj'
