@@ -140,10 +140,15 @@ class SugarJar
       curr = current_branch
       result = gitup
       if result['so'].error?
+        backout = ''
+        if rebase_in_progress?
+          backout = ' You can get out of this with a `git rebase --abort`.'
+        end
+
         die(
           "#{color(curr, :red)}: Failed to rebase on " +
-          "#{result['base']}. Leaving the repo as-is. You can get out of " +
-          'this with a `git rebase --abort`. Output from failed rebase is: ' +
+          "#{result['base']}. Leaving the repo as-is.#{backout} " +
+          'Output from failed rebase is: ' +
           "\nSTDOUT:\n#{result['so'].stdout.lines.map { |x| "\t#{x}" }.join}" +
           "\nSTDERR:\n#{result['so'].stderr.lines.map { |x| "\t#{x}" }.join}",
         )
@@ -179,7 +184,7 @@ class SugarJar
             "#{color(branch, :red)} failed rebase. Reverting attempt and " +
             'moving to next branch. Try `sj up` manually on that branch.',
           )
-          git('rebase', '--abort')
+          git('rebase', '--abort') if rebase_in_progress?
         else
           SugarJar::Log.info(
             "#{color(branch, :green)} rebased on " +
@@ -805,6 +810,15 @@ class SugarJar
         'so' => s,
         'base' => base,
       }
+    end
+
+    def rebase_in_progress?
+      # for rebase without -i
+      rebase_file = git('rev-parse', '--git-path', 'rebase-apply').stdout.strip
+      # for rebase -i
+      rebase_merge_file = git('rev-parse', '--git-path', 'rebase-merge').
+                          stdout.strip
+      File.exist?(rebase_file) || File.exist?(rebase_merge_file)
     end
 
     def tracked_branch
