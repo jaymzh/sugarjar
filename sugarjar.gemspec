@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.files =
     Dir.glob('lib/sugarjar/*.rb') +
     Dir.glob('bin/*') +
-    docs
+    Dir.glob('extras/*')
 
   spec.add_dependency 'deep_merge'
   spec.add_dependency 'mixlib-log'
