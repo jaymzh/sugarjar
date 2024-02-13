@@ -420,3 +420,9 @@ will allow me to make sure it shows up in the Repology badge above.
 Since it's Ruby, it should work across all platforms, however, it's developed
 and primarily tested on Linux as well as regularly used on Mac. I've not tested
 it on Windows, but I'll happily accept patches for Windows compatibility.
+
+**How do I get tab-completion?**
+
+If the package for your OS/distro didn't set it up manually, you should find
+that `sugarjar_completion.bash` is included in the package, and you can simply
+source that in your dotfiles, assuming you are using bash.
