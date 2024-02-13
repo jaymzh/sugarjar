@@ -1,5 +1,12 @@
 # SugarJar Changelog
 
+## 1.1.1 (2024-02-12)
+
+* Relax ruby requirements to allow for easier packaging
+* Handle aborted rebases better
+* Add bash-completion script
+* Various doc updates
+
 ## 1.1.0 (2023-12-31)
 
 * Fix include path for unittests for downstream packagers
