@@ -112,10 +112,10 @@ COMMANDS:
               Same as "amend" but without changing the message. Alias for
               "git commit --amend --no-edit".
 
-  bclean
-              If safe, delete the current branch. Unlike "git branch -d",
-              bclean can handle squash-merged branches. Think of it as
-              a smarter "git branch -d".
+  bclean [<branch>]
+              If safe, delete the current branch (or the specified branch).
+              Unlike "git branch -d", bclean can handle squash-merged branches.
+              Think of it as a smarter "git branch -d".
 
   bcleanall
               Walk all branches, and try to delete them if it's safe. See
@@ -127,7 +127,7 @@ COMMANDS:
   br
               Verbose branch list. An alias for "git branch -v".
 
-  feature
+  feature, f <branch_name>
               Create a "feature" branch. It's morally equivalent to
               "git checkout -b" except it defaults to creating it based on
               some form of 'master' instead of your current branch. In order
@@ -177,11 +177,17 @@ COMMANDS:
               A smart wrapper to "git push" that runs whatever is defined in
               "on_push" in .sugarjar.yml, and only pushes if they succeed.
 
+  subfeature, sf <feature>
+              An alias for 'sj feature <feature> <current_branch>'
+
   unit
               Run any unitests configured in .sugarjar.yaml.
 
-  up
-              Rebase the current branch on upstream/master or origin/master.
+  up [<branch>]
+              Rebase the current branch (or specified branch) intelligently.
+              In most causes this will check for a main (or master) branch on
+              upstream, then origin. If a branch explicitly tracks something
+              else, then that will be used, instead.
 
   upall
               Same as "up", but for all branches.

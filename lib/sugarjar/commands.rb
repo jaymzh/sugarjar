@@ -43,14 +43,25 @@ class SugarJar
       name = fprefix(name)
       die("#{name} already exists!") if all_local_branches.include?(name)
       base ||= most_main
-      base_pieces = base.split('/')
-      git('fetch', base_pieces[0]) if base_pieces.length > 1
+      # If our base is a local branch, don't try to parse it for a remote name
+      unless all_local_branches.include?(base)
+        base_pieces = base.split('/')
+        git('fetch', base_pieces[0]) if base_pieces.length > 1
+      end
       git('checkout', '-b', name, base)
       SugarJar::Log.info(
         "Created feature branch #{color(name, :green)} based on " +
         color(base, :green),
       )
     end
+    alias f feature
+
+    def subfeature(name)
+      assert_in_repo
+      SugarJar::Log.debug("Subfature: #{name}")
+      feature(name, current_branch)
+    end
+    alias sf subfeature
 
     def bclean(name = nil)
       assert_in_repo
@@ -133,11 +144,14 @@ class SugarJar
 
     alias sl smartlog
 
-    def up
+    def up(branch = nil)
       assert_in_repo
+      branch ||= current_branch
+      branch = fprefix(branch)
       # get a copy of our current branch, if rebase fails, we won't
       # be able to determine it without backing out
       curr = current_branch
+      git('checkout', branch)
       result = gitup
       if result['so'].error?
         backout = ''
@@ -156,6 +170,8 @@ class SugarJar
         SugarJar::Log.info(
           "#{color(current_branch, :green)} rebased on #{result['base']}",
         )
+        # go back to where we were if we rebased a different branch
+        git('checkout', curr) if branch != curr
       end
     end
 
@@ -719,6 +735,10 @@ class SugarJar
       branches
     end
 
+    def all_remotes
+      git('remote').stdout.lines.map(&:strip)
+    end
+
     def safe_to_clean(branch)
       # cherry -v will output 1 line per commit on the target branch
       # prefixed by a - or + - anything with a - can be dropped, anything
@@ -795,13 +815,16 @@ class SugarJar
       fetch_upstream
       curr = current_branch
       base = tracked_branch
+      # If this is a subfeature based on a local branch which has since
+      # been deleted, 'tracked branch' will automatically return <most_main>
+      # so we don't need any special handling for that
       if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}"
         SugarJar::Log.warn(
           "This branch is tracking origin/#{curr}, which is probably your " +
           'downstream (where you push _to_) as opposed to your upstream ' +
           '(where you pull _from_). This means that "sj up" is probably ' +
           'rebasing on the wrong thing and doing nothing. You probably want ' +
-          'to do a "git branch -u upstream".',
+          "to do a 'git branch -u #{most_main}'.",
         )
       end
       SugarJar::Log.debug('Rebasing')
@@ -844,9 +867,7 @@ class SugarJar
     def upstream
       return @remote if @remote
 
-      s = git('remote')
-
-      remotes = s.stdout.lines.map(&:strip)
+      remotes = all_remotes
       SugarJar::Log.debug("remotes is #{remotes}")
       if remotes.empty?
         @remote = nil
