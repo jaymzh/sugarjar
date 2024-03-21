@@ -9,6 +9,7 @@ class SugarJar
       'github_cli' => 'auto',
       'github_user' => ENV.fetch('USER'),
       'fallthru' => true,
+      'pr_autofill' => true,
     }.freeze
 
     def self._find_ordered_files
