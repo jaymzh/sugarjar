@@ -23,6 +23,7 @@ class SugarJar
       @repo_config = SugarJar::RepoConfig.config
       SugarJar::Log.debug("Repoconfig: #{@repo_config}")
       @color = options['color']
+      @pr_autofill = options['pr_autofill']
       @feature_prefix = options['feature_prefix']
       @checks = {}
       @main_branch = nil
@@ -318,6 +319,7 @@ class SugarJar
     def smartpullrequest(*args)
       assert_in_repo
       assert_common_main_branch
+
       if dirty?
         SugarJar::Log.warn(
           'Your repo is dirty, so I am not going to create a pull request. ' +
@@ -325,9 +327,25 @@ class SugarJar
         )
         exit(1)
       end
+
       if gh?
+        if @pr_autofill
+          curr = current_branch
+          base = tracked_branch
+          num_commits = git(
+            'rev-list', '--count', curr, "^#{base}"
+          ).stdout.strip.to_i
+          if num_commits > 1
+            SugarJar::Log.debug(
+              "Not using --fill because there are #{num_commits} commits",
+            )
+          else
+            SugarJar::Log.info('Autofilling in PR from commit message')
+            args.unshift('--fill')
+          end
+        end
         SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
-        system(which('gh'), 'pr', 'create', '--fill', *args)
+        system(which('gh'), 'pr', 'create', *args)
       else
         SugarJar::Log.trace("Running: hub pull-request #{args.join(' ')}")
         system(which('hub'), 'pull-request', *args)

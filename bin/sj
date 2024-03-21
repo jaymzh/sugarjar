@@ -91,6 +91,14 @@ parser = OptionParser.new do |opts|
     options['log_level'] = level
   end
 
+  opts.on(
+    '--[no-]pr-autofill',
+    'When creating a PR, auto fill the title & description from the commit ' +
+    'if there is a single commit and if we are using "gh". [default: true]',
+  ) do |autofill|
+    options['pr_autofill'] = autofill
+  end
+
   opts.on('--[no-]use-color', 'Enable color. [default: true]') do |color|
     options['color'] = color
   end
