@@ -67,7 +67,7 @@ class SugarJar
     def bclean(name = nil)
       assert_in_repo
       name ||= current_branch
-      name = fprefix(name) unless all_local_branches.include?(name)
+      name = fprefix(name)
       if clean_branch(name)
         SugarJar::Log.info("#{name}: #{color('reaped', :green)}")
       else
@@ -112,7 +112,7 @@ class SugarJar
       # and then add any featureprefix, and if _that_ is a branch
       # name, replace the last arguement with that
       name = args.last
-      bname = fprefix(name) unless all_local_branches.include?(name)
+      bname = fprefix(name)
       if all_local_branches.include?(bname)
         SugarJar::Log.debug("Featurepefixing #{name} -> #{bname}")
         args[-1] = bname
@@ -402,6 +402,9 @@ class SugarJar
 
     def fprefix(name)
       return name unless @feature_prefix
+
+      return name if name.start_with?(@feature_prefix)
+      return name if all_local_branches.include?(name)
 
       newname = "#{@feature_prefix}#{name}"
       SugarJar::Log.debug(
