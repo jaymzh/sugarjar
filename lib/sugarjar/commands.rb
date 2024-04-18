@@ -50,6 +50,7 @@ class SugarJar
         git('fetch', base_pieces[0]) if base_pieces.length > 1
       end
       git('checkout', '-b', name, base)
+      git('branch', '-u', base)
       SugarJar::Log.info(
         "Created feature branch #{color(name, :green)} based on " +
         color(base, :green),
