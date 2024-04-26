@@ -166,6 +166,7 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new(
         { 'no_change' => true, 'feature_prefix' => 'someuser/' },
       )
+      expect(sj).to receive(:all_local_branches).and_return(['/nonexistent'])
       expect(sj.send(:fprefix, 'test')).to eq('someuser/test')
     end
 
