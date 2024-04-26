@@ -376,7 +376,7 @@ class SugarJar
 
       src = "origin/#{current_branch}"
       fetch('origin')
-      diff = git('diff', src).stdout
+      diff = git('diff', "..#{src}").stdout
       return unless diff && !diff.empty?
 
       puts "Will merge the following suggestions:\n\n#{diff}"
