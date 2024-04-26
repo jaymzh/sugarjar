@@ -1,5 +1,20 @@
 # SugarJar Changelog
 
+## 1.1.2 (2024-04-25)
+
+* Add support for 'subfeatures'
+* Add support for building stacked PRs based on 'subfeatures'
+* smartpullrequest: only autofill in the PR when a single commit exists between
+  the base and us
+* smartpullrequest: Add `--fill` option to let people opt-out of autofilling the
+  PR
+* smartpullrequest: State that we're autofilling the PR when we do
+* feature: Fix some corner cases where feature-prefixing didn't work
+* pullsuggestions: Print the diff in the correct order
+* feature/subfeature: set tracked branch for the user
+* subfeature: automatically update tracked branch when previous tracked branch
+  disappears
+
 ## 1.1.1 (2024-02-12)
 
 * Relax ruby requirements to allow for easier packaging
