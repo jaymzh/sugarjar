@@ -764,11 +764,11 @@ class SugarJar
     end
 
     def all_local_branches
-      branches = []
-      git('branch', '--format', '%(refname)').stdout.lines.each do |line|
-        branches << branch_from_ref(line.strip)
+      git(
+        'branch', '--format', '%(refname)'
+      ).stdout.lines.map do |line|
+        branch_from_ref(line.strip)
       end
-      branches
     end
 
     def all_remotes
