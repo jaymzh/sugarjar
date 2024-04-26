@@ -850,7 +850,18 @@ class SugarJar
       SugarJar::Log.debug('Fetching upstream')
       fetch_upstream
       curr = current_branch
-      base = tracked_branch
+      # this isn't a hash, it's a named param, silly rubocop
+      # rubocop:disable Style/HashSyntax
+      base = tracked_branch(fallback: false)
+      # rubocop:enable Style/HashSyntax
+      unless base
+        SugarJar::Log.info(
+          'The brach we were tracking is gone, resetting tracking to ' +
+          most_main,
+        )
+        git('branch', '-u', most_main)
+        base = most_main
+      end
       # If this is a subfeature based on a local branch which has since
       # been deleted, 'tracked branch' will automatically return <most_main>
       # so we don't need any special handling for that
@@ -886,12 +897,13 @@ class SugarJar
       File.exist?(rebase_file) || File.exist?(rebase_merge_file)
     end
 
-    def tracked_branch
+    def tracked_branch(fallback: true)
       s = git_nofail(
         'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'
       )
       if s.error?
-        most_main
+        fallback ? most_main : nil
+
       else
         s.stdout.strip
       end
