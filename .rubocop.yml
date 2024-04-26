@@ -9,6 +9,9 @@ AllCops:
 Layout/LineLength:
   Max: 80
 
+Metrics/BlockNesting:
+  Enabled: false
+
 Naming/FileName:
   Enabled: false
 
