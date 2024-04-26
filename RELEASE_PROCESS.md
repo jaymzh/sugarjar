@@ -22,9 +22,13 @@
 * Build a gem: `gem build sugarjar.gemspec`
 * Push the gem: `gem push sugarjar-${version?}.gem`
 
+## Publish GH Release
+
+Go to release, add new one.
+
 ## Publish Fedora builds
 
-See [packaging/README.md](packaging/README.md).
+See [packaging/README-fedora.md](packaging/README-fedora.md).
 
 ## Notify Debian/Ubuntu packager
 
@@ -32,5 +36,8 @@ Ping Michel Lind
 
 ## Update Homebrew
 
-Open a PR against the [Homebrew
-Formula](https://github.com/Homebrew/homebrew-core/blob/master/Formula/s/sugarjar.rb).
+See [packaging/README-brew.md](packaging/README-brew.md).
+
+## Notify AUR packager
+
+Ping Zeal Wierslee
