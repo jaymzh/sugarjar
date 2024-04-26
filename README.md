@@ -123,34 +123,142 @@ to `git clone` under the hood.
 ## Work with stacked branches more easily
 
 It's important to break changes into reviewable chunks, but working with
-stacked branches can be confusing. Enter `binfo` - it gives you a view of your
-current branch all the way up to master. In this example imagine we have a
-branch structure like:
+stacked branches can be confusing. SugarJar provides several tools to make this
+easier.
+
+First, and foremost, is `feature` and `subfeature`. Regardless of stacking, the
+way to create a new feature bracnh with sugarjar is with `sj feature` (or `sj
+f` for short):
+
+```shell
+$ sj feature mynewthing
+Created feature branch mynewthing based on origin/main
+```
+
+A "feature" in SugarJar parliance just means that the branch is always created
+from "most_main" - this is usually "upstream/main", but SJ will figure out
+which remote is the "upstream", even if it's "origin", and then will determine
+the primary branch ("main" or for older repos "master"). It's also smart enough
+to fetch that remote first to make sure you're working on the latest HEAD.
+
+When you want to create a stacked PR, you can create "subfeature", which, at
+its core is just a branch created from the current branch:
+
+```shell
+$ sj subfeature dependentnewthing
+Created feature branch dependentnewthing based on mynewthing
+```
+
+If you create branches like this then sugarjar can now make several things
+much easier:
+
+* `sj up` will rebase intelligently
+* After an `sj bclean` of a branch earlier in the tree, `sj up` will update
+  the tracked branch to "most_main"
+
+There are two commands that will show you the state of your stacked branches:
+
+* `sj binfo` - shows the current branch and its ancestors up to your primary branch
+* `sj smartlist` (aka `sj sl`) - shows you the whole tree.
+
+To continue with the example above, my `smartlist` might look like:
 
 ```text
-                      +- test2.1
-                     /
-master --- test --- test2 --- test3
+$ sj sl
+* 59c0522 (HEAD -> dependentnewthing) anothertest
+* 6ebaa28 (mynewthing) test
+o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
 ```
 
-This is what `binfo` on test3 looks like:
+This is simple. Now lets make a different feature stack:
 
-```shell
-$ sj binfo
-* e451865 (HEAD -> test3) test3
-* e545b41 (test2) test2
-* c808eae (test1) test1
-o 44cf9e2 (origin/master, origin/HEAD, master) Lint/gemspec cleanups
+```text
+$ sj feature anotherfeature
+Created feature branch anotherfeature based on origin/main
+# do stuff
+$ sj subfeature dependent2
+Created feature branch dependent2 based on anotherfeature
+# do stuff
 ```
 
-while `binfo` on test2.1 looks like:
+The `smartlist` will now show us this tree, and it's a bit more interesting:
 
-```shell
-$ sj binfo
-* 36d0136 (HEAD -> test2.1) test2.1
-* e545b41 (test2) test2
-* c808eae (test1) test1
-o 44cf9e2 (origin/master, origin/HEAD, master) Lint/gemspec cleanups
+```text
+$ sj sl
+* af6f143 (HEAD -> dependent2) morestuff
+* 028c7f4 (anotherfeature) stuff
+| * 59c0522 (dependentnewthing) anothertest
+| * 6ebaa28 (mynewthing) test
+|/
+o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
+```
+
+Now, what happens if I make a change to `mynewthing`?
+
+```text
+$ sj co mynewthing
+Switched to branch 'mynewthing'
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+$ echo 'randomchange' >> README.md
+$ git commit -a -m change
+[mynewthing d33e082] change
+ 1 file changed, 1 insertion(+)
+$ sj sl
+* d33e082 (HEAD -> mynewthing) change
+| * af6f143 (dependent2) morestuff
+| * 028c7f4 (anotherfeature) stuff
+| | * 59c0522 (dependentnewthing) anothertest
+| |/
+|/|
+* | 6ebaa28 test
+|/
+o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
+```
+
+We can see here now that `dependentnewthing`, is based off a commit that _used_
+to be `mynewthing`, but `mynewthing` has moved. But SugarJar will handle this
+all correctly when we ask it to update the branch:
+
+```text
+$ sj co dependentnewthing
+Switched to branch 'dependentnewthing'
+Your branch and 'mynewthing' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+$ sj up
+dependentnewthing rebased on mynewthing
+$ sj sl
+* 93ed585 (HEAD -> dependentnewthing) anothertest
+* d33e082 (mynewthing) change
+* 6ebaa28 test
+| * af6f143 (dependent2) morestuff
+| * 028c7f4 (anotherfeature) stuff
+|/
+o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
+```
+
+Now, lets say that `mynewthing` gets merged and we use `bclean` to clean it all
+up, what happens then?
+
+```text
+$ sj up
+The brach we were tracking is gone, resetting tracking to origin/main
+dependentnewthing rebased on origin/main
+```
+
+### Creating Stacked PRs with subfeatures
+
+When dependent branches are created with `subfeature`, when you create a PR,
+SugarJar will automatically set the 'base' of the PR to the parent branch. By
+default it'll prompt you about this, but you can set `pr_autostack` to `true`
+in your config to tell it to always do this (or `false` to never do this):
+
+```text
+$ sj spr
+Autofilling in PR from commit message
+It looks like this is a subfeature, would you like to base this PR on mynewthing? [y/n] y
+...
 ```
 
 ## Have a better lint/unittest experience!
