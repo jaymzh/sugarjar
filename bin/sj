@@ -99,6 +99,16 @@ parser = OptionParser.new do |opts|
     options['pr_autofill'] = autofill
   end
 
+  opts.on(
+    '--[no-]pr-autostack',
+    'When creating a PR, if this is a subfeature, should we make it a ' +
+    'PR on the PR for the parent feature. If not specified, we prompt ' +
+    'when this happens, when true always do this, when false never do ' +
+    'this. Only applicable when usiing "gh".',
+  ) do |autostack|
+    options['pr_autostack'] = autostack
+  end
+
   opts.on('--[no-]use-color', 'Enable color. [default: true]') do |color|
     options['color'] = color
   end

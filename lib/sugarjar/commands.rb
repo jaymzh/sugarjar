@@ -24,6 +24,7 @@ class SugarJar
       SugarJar::Log.debug("Repoconfig: #{@repo_config}")
       @color = options['color']
       @pr_autofill = options['pr_autofill']
+      @pr_autostack = options['pr_autostack']
       @feature_prefix = options['feature_prefix']
       @checks = {}
       @main_branch = nil
@@ -330,9 +331,9 @@ class SugarJar
       end
 
       if gh?
+        curr = current_branch
+        base = tracked_branch
         if @pr_autofill
-          curr = current_branch
-          base = tracked_branch
           num_commits = git(
             'rev-list', '--count', curr, "^#{base}"
           ).stdout.strip.to_i
@@ -343,6 +344,19 @@ class SugarJar
           else
             SugarJar::Log.info('Autofilling in PR from commit message')
             args.unshift('--fill')
+          end
+        end
+        if subfeature?(base)
+          # nil is prompt, true is always, false is never
+          if @pr_autostack.nil?
+            $stdout.print(
+              'It looks like this is a subfeature, would you like to base ' +
+              "this PR on #{base}? [y/n] ",
+            )
+            ans = $stdin.gets.strip
+            args += ['--base', base] if %w{Y y}.include?(ans)
+          elsif @pr_autostack
+            args += ['--base', base]
           end
         end
         SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
@@ -855,6 +869,12 @@ class SugarJar
         'so' => s,
         'base' => base,
       }
+    end
+
+    # determine if this branch is based on another local branch (i.e. is a
+    # subfeature). Used to figure out of we should stack the PR
+    def subfeature?(base)
+      all_local_branches.reject { |x| x == most_main }.include?(base)
     end
 
     def rebase_in_progress?
