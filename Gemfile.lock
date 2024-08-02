@@ -43,7 +43,8 @@ GEM
     racc (1.7.3)
     rainbow (3.1.1)
     regexp_parser (2.9.0)
-    rexml (3.2.6)
+    rexml (3.3.3)
+      strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -71,6 +72,7 @@ GEM
     rubocop-ast (1.31.2)
       parser (>= 3.3.0.4)
     ruby-progressbar (1.13.0)
+    strscan (3.1.0)
     tomlrb (2.0.3)
     tty-color (0.6.0)
     unicode-display_width (2.5.0)
