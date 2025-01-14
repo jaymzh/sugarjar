@@ -898,15 +898,21 @@ class SugarJar
     end
 
     def tracked_branch(fallback: true)
+      branch = nil
       s = git_nofail(
         'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'
       )
       if s.error?
-        fallback ? most_main : nil
-
+        branch = fallback ? most_main : nil
+        SugarJar::Log.debug("No specific tracked branch, using #{branch}")
       else
-        s.stdout.strip
+        branch = s.stdout.strip
+        SugarJar::Log.debug(
+          "Using explicit tracked branch: #{branch}, use " +
+          '`git branch -u` to change',
+        )
       end
+      branch
     end
 
     def most_main
