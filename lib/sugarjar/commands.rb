@@ -359,8 +359,24 @@ class SugarJar
             args += ['--base', base]
           end
         end
+        # Ideally we'd have gh not push and not prompt, and thus not fuck
+        # with the local branch. However, it has a bug:
+        # https://github.com/cli/cli/issues/10448
+        SugarJar::Log.info(
+          "Please choose #{color(push_target_friendly_name, :green)}, at the" +
+          " prompt from 'gh' below",
+        )
         SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
         system(which('gh'), 'pr', 'create', *args)
+        new_tracked = tracked_branch
+        # Until above bug is solved, make sure we fix what gh does
+        if base != new_tracked
+          SugarJar::Log.debug(
+            "Resetting tracked branch after 'gh' changed it from #{base} to " +
+            new_tracked,
+          )
+          git('branch', '-u', base)
+        end
       else
         SugarJar::Log.trace("Running: hub pull-request #{args.join(' ')}")
         system(which('hub'), 'pull-request', *args)
@@ -480,6 +496,10 @@ class SugarJar
         # assume they passed in a hub-friendly name
         repo.split('/').first
       end
+    end
+
+    def extract_repo(repo)
+      File.basename(repo, '.git')
     end
 
     def forked_repo(repo, username)
@@ -941,6 +961,11 @@ class SugarJar
         raise 'Could not determine "upstream" remote to use...'
       end
       @remote
+    end
+
+    def push_target_friendly_name
+      url = git('remote', 'get-url', 'origin').stdout.strip
+      "#{extract_org(url)}/#{extract_repo(url)}"
     end
 
     def branch_from_ref(ref, type = :local)
