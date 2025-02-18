@@ -354,29 +354,16 @@ class SugarJar
               "this PR on #{base}? [y/n] ",
             )
             ans = $stdin.gets.strip
-            args += ['--base', base] if %w{Y y}.include?(ans)
+            args.unshift('--base', base) if %w{Y y}.include?(ans)
           elsif @pr_autostack
-            args += ['--base', base]
+            args.unshift('--base', base)
           end
         end
-        # Ideally we'd have gh not push and not prompt, and thus not fuck
-        # with the local branch. However, it has a bug:
-        # https://github.com/cli/cli/issues/10448
-        SugarJar::Log.info(
-          "Please choose #{color(push_target_friendly_name, :green)}, at the" +
-          " prompt from 'gh' below",
-        )
+        # <org>:<branch> is the GH API syntax for:
+        #   look for a branch of name <branch>, from a fork in owner <org>
+        args.unshift('--head', "#{push_org}:#{curr}")
         SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
         system(which('gh'), 'pr', 'create', *args)
-        new_tracked = tracked_branch
-        # Until above bug is solved, make sure we fix what gh does
-        if base != new_tracked
-          SugarJar::Log.debug(
-            "Resetting tracked branch after 'gh' changed it from #{base} to " +
-            new_tracked,
-          )
-          git('branch', '-u', base)
-        end
       else
         SugarJar::Log.trace("Running: hub pull-request #{args.join(' ')}")
         system(which('hub'), 'pull-request', *args)
@@ -963,9 +950,10 @@ class SugarJar
       @remote
     end
 
-    def push_target_friendly_name
+    # Whatever org we push to, regardless of if this is a fork or not
+    def push_org
       url = git('remote', 'get-url', 'origin').stdout.strip
-      "#{extract_org(url)}/#{extract_repo(url)}"
+      extract_org(url)
     end
 
     def branch_from_ref(ref, type = :local)
