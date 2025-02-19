@@ -334,21 +334,27 @@ class SugarJar
         curr = current_branch
         base = tracked_branch
         if @pr_autofill
+          SugarJar::Log.info('Autofilling in PR from commit message')
           num_commits = git(
             'rev-list', '--count', curr, "^#{base}"
           ).stdout.strip.to_i
           if num_commits > 1
-            SugarJar::Log.debug(
-              "Not using --fill because there are #{num_commits} commits",
-            )
+            args.unshift('--fill-first')
           else
-            SugarJar::Log.info('Autofilling in PR from commit message')
             args.unshift('--fill')
           end
         end
         if subfeature?(base)
+          if upstream != push_org
+            SugarJar::Log.warn(
+              'Unfortunately you cannot based one PR on another PR when' +
+              " using fork-based PRs. We will base this on #{most_main}." +
+              ' This just means the PR "Changes" tab will show changes for' +
+              ' the full stack until those other PRs are merged and this PR' +
+              ' PR is rebased.',
+            )
           # nil is prompt, true is always, false is never
-          if @pr_autostack.nil?
+          elsif @pr_autostack.nil?
             $stdout.print(
               'It looks like this is a subfeature, would you like to base ' +
               "this PR on #{base}? [y/n] ",

@@ -93,8 +93,8 @@ parser = OptionParser.new do |opts|
 
   opts.on(
     '--[no-]pr-autofill',
-    'When creating a PR, auto fill the title & description from the commit ' +
-    'if there is a single commit and if we are using "gh". [default: true]',
+    'When creating a PR, auto fill the title & description from the top ' +
+    'commit if we are using "gh". [default: true]',
   ) do |autofill|
     options['pr_autofill'] = autofill
   end
@@ -104,7 +104,7 @@ parser = OptionParser.new do |opts|
     'When creating a PR, if this is a subfeature, should we make it a ' +
     'PR on the PR for the parent feature. If not specified, we prompt ' +
     'when this happens, when true always do this, when false never do ' +
-    'this. Only applicable when usiing "gh".',
+    'this. Only applicable when usiing "gh" and on branch-based PRs.',
   ) do |autostack|
     options['pr_autostack'] = autostack
   end
