@@ -1,5 +1,12 @@
 # SugarJar Changelog
 
+## 1.1.3 (2025-02-20)
+
+* smartpullrequest: When working with `gh`, bypass its attempt to push,
+  bypassing unnecessary prompts and branch track mangling
+* smartpullrequest: Better support for autofill
+* smartpullrequest: Don't attempt to stack when in forked repo
+
 ## 1.1.2 (2024-04-25)
 
 * Add support for 'subfeatures'
