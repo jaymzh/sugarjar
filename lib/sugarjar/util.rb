@@ -131,6 +131,11 @@ class SugarJar
       !s.error? && s.stdout.strip == 'true'
     end
 
+    def dirty?
+      s = git_nofail('diff', '--quiet')
+      s.error?
+    end
+
     def repo_root
       git('rev-parse', '--show-toplevel').stdout.strip
     end
