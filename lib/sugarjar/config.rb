@@ -11,6 +11,7 @@ class SugarJar
       'fallthru' => true,
       'pr_autofill' => true,
       'pr_autostack' => nil,
+      'color' => true,
     }.freeze
 
     def self._find_ordered_files

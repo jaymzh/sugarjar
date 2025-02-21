@@ -63,6 +63,9 @@ Style/PercentLiteralDelimiters:
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
 
+Style/Documentation:
+  Enabled: false
+
 Metrics/PerceivedComplexity:
   Enabled: false
 
