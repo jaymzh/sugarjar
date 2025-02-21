@@ -5,13 +5,9 @@
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 
 > [!IMPORTANT]
-> As this was meant to replace arc/jf, which has now been open-sourced as
-> [Sapling](https://sapling-scm.com/), I highly recommend taking a look at that!
 >
-> Sapling is a great tool and solves a variety of problems SugarJar will never
-> be able to. However, it is a bigger workflow change, so existing SJ users
-> may choose to stick with this. Similarly some workflows may not be suitable
-> for Sapling. I still plan to maintain and develop SugarJar for the time being.
+> Future versions of SugarJar will drop `hub` support. If you haven't already,
+> please start planning to move to `gh`.
 
 Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
 either [gh](https://cli.github.com/) or the older [hub](https://hub.github.com/).
@@ -45,16 +41,6 @@ PPA](https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) from our
 Ubuntu package maintainer.
 
 For MacOS users, we recommend using Homebrew - SugarJar is now in Homebrew Core.
-
-NOTE: If you previously used our custom Homebrew tap, you should remove and
-untap it:
-
-```shell
-homebrew uninstall sugarjar
-homebrew untap jaymzh/sugarjar
-```
-
-Then you can install the core version (`brew install sugarjar`).
 
 Finally, if none of those work for you, you can clone this repo and run it
 directly from there.
@@ -512,11 +498,11 @@ and github, it seemed appropriate.
 **Why did you originally use `hub` instead of the newer `gh` CLI?**
 
 When I originally wrote SugarJar, `gh` was in early development, and `hub` had
-many more features. In addition, I wrote SugarJar to be a wrapper for git/hub,
-and `hub` allows this but `gh` does not.
+many more features. In addition, I originally wrote SugarJar to be a wrapper
+for git/hub, and `hub` allows this but `gh` does not.
 
 When `gh` matured, we added experimental `gh` support in 0.0.11, and switched the
-default to prefer `gh` in 1.0.0.
+default to prefer `gh` in 1.0.0. We will drop `hub` support in 2.0.
 
 **I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 
@@ -534,3 +520,15 @@ it on Windows, but I'll happily accept patches for Windows compatibility.
 If the package for your OS/distro didn't set it up manually, you should find
 that `sugarjar_completion.bash` is included in the package, and you can simply
 source that in your dotfiles, assuming you are using bash.
+
+**What happens now that Sapling is released?**
+
+SugarJar isn't going anywhere anytime soon. This was meant to replace arc/jf,
+which has now been open-sourced as [Sapling](https://sapling-scm.com/), so I
+highly recommend taking a look at that!
+
+Sapling is a great tool and solves a variety of problems SugarJar will never be
+able to. However, it is a significant workflow change, that won't be
+appropriate for all users or use-cases. Similarly there are workflows and tools
+that Sapling breaks. So worry not, SugarJar will continue to be maintained and
+developed
