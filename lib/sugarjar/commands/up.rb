@@ -52,5 +52,52 @@ class SugarJar
         end
       end
     end
+
+    private
+
+    def rebase
+      SugarJar::Log.debug('Fetching upstream')
+      fetch_upstream
+      curr = current_branch
+      # this isn't a hash, it's a named param, silly rubocop
+      # rubocop:disable Style/HashSyntax
+      base = tracked_branch(fallback: false)
+      # rubocop:enable Style/HashSyntax
+      unless base
+        SugarJar::Log.info(
+          'The brach we were tracking is gone, resetting tracking to ' +
+          most_main,
+        )
+        git('branch', '-u', most_main)
+        base = most_main
+      end
+      # If this is a subfeature based on a local branch which has since
+      # been deleted, 'tracked branch' will automatically return <most_main>
+      # so we don't need any special handling for that
+      if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}"
+        SugarJar::Log.warn(
+          "This branch is tracking origin/#{curr}, which is probably your " +
+          'downstream (where you push _to_) as opposed to your upstream ' +
+          '(where you pull _from_). This means that "sj up" is probably ' +
+          'rebasing on the wrong thing and doing nothing. You probably want ' +
+          "to do a 'git branch -u #{most_main}'.",
+        )
+      end
+      SugarJar::Log.debug('Rebasing')
+      s = git_nofail('rebase', base)
+      {
+        'so' => s,
+        'base' => base,
+      }
+    end
+
+    def rebase_in_progress?
+      # for rebase without -i
+      rebase_file = git('rev-parse', '--git-path', 'rebase-apply').stdout.strip
+      # for rebase -i
+      rebase_merge_file = git('rev-parse', '--git-path', 'rebase-merge').
+                          stdout.strip
+      File.exist?(rebase_file) || File.exist?(rebase_merge_file)
+    end
   end
 end
