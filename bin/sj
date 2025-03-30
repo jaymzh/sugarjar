@@ -13,7 +13,7 @@ SugarJar::Log.level = Logger::INFO
 
 # Don't put defaults here, put them in SugarJar::Config - otherwise
 # these defaults overwrite whatever is in config files.
-options = { 'color' => true }
+options = {}
 
 # If ENV['SUGARJAR_DEBUG'] is set, it overrides the config file,
 # but not the command line options, so set that one here. Also
@@ -107,7 +107,7 @@ parser = OptionParser.new do |opts|
     options['pr_autostack'] = autostack
   end
 
-  opts.on('--[no-]use-color', 'Enable color. [default: true]') do |color|
+  opts.on('--[no-]color', 'Enable color. [default: true]') do |color|
     options['color'] = color
   end
 
@@ -219,9 +219,10 @@ end
 extra_opts = []
 argv_copy = ARGV.dup
 
-# We want to allow people to pass in extra args to be passed to
-# commands, but OptionParser doesn't easily allow this. So we
-# loop over it, catching exceptions.
+# We want to allow people to pass in extra args to be passed to commands (like
+# `amend`), but OptionParser doesn't easily allow this. So we loop over it,
+# catching exceptions.
+
 begin
   # HOWEVER, anytime it throws an exception, for some reason, it clears
   # out all of ARGV, or whatever you passed to as ARGV.
@@ -239,6 +240,9 @@ begin
   saved_argv = argv_copy.dup
   parser.parse!(argv_copy)
 rescue OptionParser::InvalidOption => e
+  SugarJar::Log.debug("Saving unknown argument #{e.args}")
+  extra_opts += e.args
+
   # e.args is an array, but it's only ever one arguement per exception
   saved_argv.delete(e.args.first)
   argv_copy = saved_argv.dup
@@ -256,7 +260,7 @@ if ARGV.empty? || !subcommand
 end
 
 options = SugarJar::Config.config.merge(options)
-
+SugarJar::Log.debug("Final config: #{options}")
 SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
 sj = SugarJar::Commands.new(options)

@@ -341,7 +341,7 @@ class SugarJar
     end
 
     def ghcli(*args)
-      s = gh_nofail(*args)
+      s = ghcli_nofail(*args)
       s.error!
       s
     end
