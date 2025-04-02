@@ -252,21 +252,25 @@ rescue OptionParser::InvalidOption => e
   retry
 end
 
-subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
+options = SugarJar::Config.config.merge(options)
+SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
+subcommand = argv_copy.reject { |x| x.start_with?('-') }.first
 if ARGV.empty? || !subcommand
   puts parser
   exit
 end
 
-options = SugarJar::Config.config.merge(options)
 SugarJar::Log.debug("Final config: #{options}")
-SugarJar::Log.level = options['log_level'].to_sym if options['log_level']
 
 sj = SugarJar::Commands.new(options)
 valid_commands = sj.public_methods - Object.public_methods
 is_valid_command = valid_commands.include?(subcommand.to_sym)
-argv_copy.delete(subcommand)
+# We can't do .delete(subcommand) because someone could, for example
+# have a branch called 'co' and then do 'sj co co' - which will then
+# remove _all_ instances of 'co'. So find the first instance and remove
+# that.
+argv_copy.delete_at(argv_copy.find_index(subcommand))
 SugarJar::Log.debug("subcommand is #{subcommand}")
 
 # Extra options we got, plus any left over arguements are what we
