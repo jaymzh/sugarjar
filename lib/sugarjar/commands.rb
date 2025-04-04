@@ -780,6 +780,8 @@ class SugarJar
       git(
         'branch', '--format', '%(refname)'
       ).stdout.lines.map do |line|
+        next if line.start_with?('(HEAD detached')
+
         branch_from_ref(line.strip)
       end
     end
