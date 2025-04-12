@@ -8,13 +8,13 @@ require_relative 'commands/amend'
 require_relative 'commands/bclean'
 require_relative 'commands/branch'
 require_relative 'commands/checks'
+require_relative 'commands/debuginfo'
 require_relative 'commands/feature'
 require_relative 'commands/pullsuggestions'
 require_relative 'commands/push'
 require_relative 'commands/smartclone'
 require_relative 'commands/smartpullrequest'
 require_relative 'commands/up'
-require_relative 'commands/version'
 
 class SugarJar
   # This is the workhorse of SugarJar. Short of #initialize, all other public
@@ -25,8 +25,6 @@ class SugarJar
 
     def initialize(options)
       SugarJar::Log.debug("Commands.initialize options: #{options}")
-      @ghuser = options['github_user']
-      @ghhost = options['github_host']
       @ignore_dirty = options['ignore_dirty']
       @ignore_prerun_failure = options['ignore_prerun_failure']
       @repo_config = SugarJar::RepoConfig.config
@@ -38,9 +36,15 @@ class SugarJar
       @checks = {}
       @main_branch = nil
       @main_remote_branches = {}
-      return if options['no_change']
+      @ghuser = @repo_config['github_user'] || options['github_user']
+      @ghhost = @repo_config['github_host'] || options['github_host']
 
       die("No 'gh' found, please install 'gh'") unless gh_avail?
+
+      # Tell the 'gh' cli where to talk to, if not github.com
+      ENV['GH_HOST'] = @ghhost if @ghhost
+
+      return if options['no_change']
 
       set_commit_template if @repo_config['commit_template']
     end

@@ -4,21 +4,8 @@
 [![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
 
-> [!IMPORTANT]
->
-> We have released a BETA of the upcoming 2.0 release - please help us test it!
->
-> In 2.0 we have dropped support for the deprecated `hub` tool, done a ton of
-> cleanups, and fixed several bugs. It's also a significant refactor the code
-> which should make contributing easier. Have a look at the [updated
-> README](https://github.com/jaymzh/sugarjar/blob/2.0-devel/README.md) or
-> install the
-> [prelease](https://rubygems.org/gems/sugarjar/versions/2.0.0.beta.1) gem with
-> `gem install --pre sugarjar`, and see the [release
-> notes](https://github.com/jaymzh/sugarjar/releases/tag/v2.0.0.beta.1)
-
-Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
-either [gh](https://cli.github.com/) or the older [hub](https://hub.github.com/).
+Welcome to SugarJar - a git/github helper. The only requirements are Ruby,
+`git`, and [gh](https://cli.github.com/).
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
 its replacement at Facebook, JellyFish. Many of the features they provide for
@@ -361,41 +348,6 @@ merge.
 
 See `sj help` for more commands!
 
-## Using SugarJar as a git wrapper
-
-SugarJar, by default, will pass any command it doesn't know straight to `hub`
-(which passes commands **it** doesn't know to `git`). If you have configured
-SugarJar to use `gh` instead of `hub`, then it will pass commands straight to
-`git` since `gh` doesn't act as a `git` wrapper.
-
-As such you can alias it to `git` and just have a super-git.
-
-```shell
-$ alias git=sj
-$ git config -l | grep color
-color.diff=auto
-color.status=auto
-color.branch=auto
-color.branch.current=yellow reverse
-color.branch.local=yellow
-color.branch.remote=green
-$ git br
-* dependent-feature 44cf9e2 Lint/gemspec cleanups
-  master            44cf9e2 Lint/gemspec cleanups
-  test-branch       44cf9e2 Lint/gemspec cleanups
-  test1             c808eae [ahead 1] test1
-  test2             e545b41 test2
-  test2.1           c1831b3 test2.1
-  test3             e451865 test3
-```
-
-It's for this reason that SugarJar doesn't have conflicting command names. You
-can turn off fallthru by setting `fallthru: false` in your config.
-
-The only command we "override" is `version`, in which case we not only print
-our version, but also call `hub version` which prints its version and calls
-`git version` too!
-
 ## Configuration
 
 Sugarjar will read in both a system-level config file
@@ -465,33 +417,27 @@ prone, so this setting will automatically set this up for each developer.
 
 ## Enterprise GitHub
 
-Like `hub`, SugarJar supports GitHub Enterprise. In fact, we provide extra
+Like `gh`, SugarJar supports GitHub Enterprise. In fact, we provide extra
 features just for it.
 
-We recommend the global or user config specify the `github_host`. However, most
-users will also have a few repos from upstream so always specifying a
-`github_host` is sub-optimal.
+You can set `github_host` in your global or user config, but since most
+users will also have a few opensource repos, you can override it in the
+Repository Config as well.
 
-So, when you overwrite the `github_host` on the command line, we go ahead and
-set the `hub.host` git config in that single repo so that it'll "just work"
-from there on out.
+So, for example you might have:
 
-In other words, assuming your global SJ config has `github_host:
-github.sample.com`, and the you clone sugarjar with:
-
-```shell
-sj clone jaymzh/sugarjar --github-host githuh.com
+```yaml
+github_host: gh.sample.com
 ```
 
-We will add the `hub.host` to the `sugarjar` clone so that future `hub` or `sj`
-commands work without needing to specify..
+In your `~/.config/sugarjar/config.yaml`, but if the `.sugarjar.yaml` in your
+repo has:
 
-## Choosing a GitHub CLI
+```yaml
+github_host: github.com
+```
 
-SugarJar will use `gh` if it is available or otherwise fall back to `hub`. You
-can override this by specifying `--github-cli` on the command line or setting
-`github_cli` to either `gh` or `hub` (it defaults to `auto`) in your
-configuration.
+Then we will configure `gh` to talk to github.com when in that repo.
 
 ## FAQ
 
@@ -502,15 +448,6 @@ row on different sides of the keyboard to make it easy to type. I looked at the
 possible options that where there and not taken and tried to find one I could
 make an appropriate name out of. Since this utility adds lots of sugar to git
 and github, it seemed appropriate.
-
-**Why did you originally use `hub` instead of the newer `gh` CLI?**
-
-When I originally wrote SugarJar, `gh` was in early development, and `hub` had
-many more features. In addition, I originally wrote SugarJar to be a wrapper
-for git/hub, and `hub` allows this but `gh` does not.
-
-When `gh` matured, we added experimental `gh` support in 0.0.11, and switched the
-default to prefer `gh` in 1.0.0. We will drop `hub` support in 2.0.
 
 **I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 

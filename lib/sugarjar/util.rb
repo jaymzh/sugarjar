@@ -330,6 +330,11 @@ class SugarJar
           'gh was run but no github token exists. Will run "gh auth login" ' +
           "to force\ngh to authenticate...",
         )
+        ENV['GITHUB_HOST'] = @ghhost if @ghhost
+        args = [
+          which('gh'), 'auth', 'login', '-p', 'ssh'
+        ]
+        args + ['--hostname', @ghhost] if @ghhost
         unless system(which('gh'), 'auth', 'login', '-p', 'ssh')
           SugarJar::Log.fatal(
             'That failed, I will bail out. Hub needs to get a github ' +
