@@ -1,10 +1,6 @@
 class SugarJar
   class Commands
     def smartclone(repo, dir = nil, *args)
-      # If the user has specified a hub host, set the environment variable
-      # since we don't have a repo to configure yet
-      ENV['GITHUB_HOST'] = @ghhost if @ghhost
-
       reponame = File.basename(repo, '.git')
       dir ||= reponame
       org = extract_org(repo)
@@ -21,6 +17,10 @@ class SugarJar
         git('clone', canonicalize_repo(repo), dir, *args)
       else
         ghcli('repo', 'fork', '--clone', canonicalize_repo(repo), dir, *args)
+        # make the main branch track upstream
+        Dir.chdir dir do
+          git('branch', '-u', "upstream/#{main_branch}")
+        end
       end
 
       SugarJar::Log.info('Remotes "origin" and "upstream" configured.')

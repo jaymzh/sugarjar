@@ -36,16 +36,6 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on(
-    '--github-cli CLI',
-    %w{gh cli},
-    'Github CLI to use ("gh" or "hub" or "auto"). Auto (the default) will ' +
-    'prefer "gh" if it is available but will fall back to "hub." ' +
-    '[default: "auto"]',
-  ) do |cli|
-    options['github_cli'] = cli
-  end
-
-  opts.on(
     '--github-host HOST',
     'The host for "hub". Note that we will set this in the local repo ' +
     'config so there is no need to have multiple config files for multiple ' +
@@ -143,6 +133,10 @@ COMMANDS:
   br
               Verbose branch list. An alias for "git branch -v".
 
+  debuginfo
+              Prints out a bunch of version and config information useful for
+              including in bug reports.
+
   feature, f <branch_name>
               Create a "feature" branch. It's morally equivalent to
               "git checkout -b" except it defaults to creating it based on
@@ -207,10 +201,6 @@ COMMANDS:
 
   upall
               Same as "up", but for all branches.
-
-  version
-              Print the version of sugarjar, and then run 'hub version'
-              to show the hub and git versions.
 COMMANDTEXT
 
   # rubocop:enable Layout/HeredocIndentation
@@ -283,7 +273,10 @@ if subcommand == 'help'
   exit
 end
 
-die("No such subcommand: #{subcommand}") unless is_valid_command
+unless is_valid_command
+  SugarJar::Log.fatal("No such subcommand: #{subcommand}")
+  exit 1
+end
 
 SugarJar::Log.debug(
   "running #{subcommand}; extra opts: #{extra_opts.join(', ')}",
