@@ -42,6 +42,9 @@ class SugarJar
 
       die("No 'gh' found, please install 'gh'") unless gh_avail?
 
+      # Tell the 'gh' cli where to talk to, if not github.com
+      ENV['GH_HOST'] = @ghhost if @ghhost
+
       set_commit_template if @repo_config['commit_template']
     end
 
