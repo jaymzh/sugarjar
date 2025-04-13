@@ -2,9 +2,9 @@ name: Unittests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 2.0-devel ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 2.0-devel ]
 
 jobs:
   rspec:

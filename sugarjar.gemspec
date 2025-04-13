@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
     'bug_tracker_uri' => 'https://github.com/jaymzh/sugarjar/issues',
     'changelog_uri' =>
       'https://github.com/jaymzh/sugarjar/blob/main/CHANGELOG.md',
-    'homepage_uri' => 'https://github.com/jaymzh/sugajar',
+    'homepage_uri' => 'https://github.com/jaymzh/sugarjar',
     'source_code_uri' => 'https://github.com/jaymzh/sugarjar',
   }
 end
