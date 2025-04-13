@@ -268,9 +268,12 @@ SugarJar::Log.debug("subcommand is #{subcommand}")
 extra_opts += argv_copy
 SugarJar::Log.debug("extra unknown options: #{extra_opts}")
 
-if subcommand == 'help'
+case subcommand
+when 'help'
   puts parser
   exit
+when 'debuginfo'
+  extra_opts = [options]
 end
 
 unless is_valid_command
