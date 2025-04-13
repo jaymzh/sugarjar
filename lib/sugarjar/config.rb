@@ -10,6 +10,7 @@ class SugarJar
       'pr_autofill' => true,
       'pr_autostack' => nil,
       'color' => true,
+      'ignore_deprecated_options' => [],
     }.freeze
 
     def self._find_ordered_files
@@ -33,20 +34,21 @@ class SugarJar
       c
     end
 
-    def self.warn_on_deprecated_configs(data, f)
+    def self.warn_on_deprecated_configs(data, fname)
       ignore_deprecated_options = data['ignore_deprecated_options'] || []
       %w{fallthru gh_cli}.each do |opt|
         next unless data.key?(opt)
 
         if ignore_deprecated_options.include?(opt)
           SugarJar::Log.debug(
-            "Not warning about deprecated option '#{opt}' in #{f} due to " +
+            "Not warning about deprecated option '#{opt}' in #{fname} due to " +
             '"ignore_deprecated_options" in that file.',
           )
           next
         end
         SugarJar::Log.warn(
-          "Config file #{f} contains deprecated option #{opt}",
+          "Config file #{fname} contains deprecated option #{opt}. You can " +
+          'suppress this warning with ignore_deprecated_options.',
         )
       end
     end
