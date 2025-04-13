@@ -1,5 +1,16 @@
 # SugarJar Changelog
 
+## 2.0.0.beta.1 (2025-04-13)
+
+* Drop support for `hub`, and thus also `fallthru` mode
+* Fix GHE handling for `gh`
+* Add GHE support into repoconfig
+* smartclone: set upstream for main branch to upstream remote when applicable
+* Replace `version` subcommand with `debuginfo` subcommand (`--version` still
+  exists)
+* Warn when deprecated options found in config file
+* Fix handling of `--color` in some cornercases
+
 ## 1.1.3 (2025-02-20)
 
 * smartpullrequest: When working with `gh`, bypass its attempt to push,
