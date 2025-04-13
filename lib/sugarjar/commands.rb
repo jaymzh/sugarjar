@@ -8,13 +8,13 @@ require_relative 'commands/amend'
 require_relative 'commands/bclean'
 require_relative 'commands/branch'
 require_relative 'commands/checks'
+require_relative 'commands/debuginfo'
 require_relative 'commands/feature'
 require_relative 'commands/pullsuggestions'
 require_relative 'commands/push'
 require_relative 'commands/smartclone'
 require_relative 'commands/smartpullrequest'
 require_relative 'commands/up'
-require_relative 'commands/version'
 
 class SugarJar
   # This is the workhorse of SugarJar. Short of #initialize, all other public
