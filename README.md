@@ -366,6 +366,15 @@ In addition, the environment variable `SUGARJAR_LOGLEVEL` can be defined to set
 a log level. This is primarily used as a way to turn debug on earlier in order to
 troubleshoot configuration parsing.
 
+Deprecated fields will cause a warning, but you can suppress that warning by
+defining `ignore_deprecated_options`, for example:
+
+```yaml
+old_option: foo
+ignore_deprecated_options:
+  - old_options
+```
+
 ## Repository Configuration
 
 Sugarjar looks for a `.sugarjar.yaml` in the root of the repository to tell it
