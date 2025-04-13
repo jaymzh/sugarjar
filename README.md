@@ -6,8 +6,16 @@
 
 > [!IMPORTANT]
 >
-> Future versions of SugarJar will drop `hub` support. If you haven't already,
-> please start planning to move to `gh`.
+> We have released a BETA of the upcoming 2.0 release - please help us test it!
+>
+> In 2.0 we have dropped support for the deprecated `hub` tool, done a ton of
+> cleanups, and fixed several bugs. It's also a significant refactor the code
+> which should make contributing easier. Have a look at the [updated
+> README](https://github.com/jaymzh/sugarjar/blob/2.0-devel/README.md) or
+> install the
+> [prelease](https://rubygems.org/gems/sugarjar/versions/2.0.0.beta.1) gem with
+> `gem install --pre sugarjar`, and see the [release
+> notes](https://github.com/jaymzh/sugarjar/releases/tag/v2.0.0.beta.1)
 
 Welcome to SugarJar - a git/github helper. It needs one of the GitHub CLI's:
 either [gh](https://cli.github.com/) or the older [hub](https://hub.github.com/).
