@@ -1,7 +1,7 @@
 class SugarJar
   class Commands
     def bclean(name = nil)
-      assert_in_repo
+      assert_in_repo!
       name ||= current_branch
       name = fprefix(name)
       if clean_branch(name)
@@ -15,7 +15,7 @@ class SugarJar
     end
 
     def bcleanall
-      assert_in_repo
+      assert_in_repo!
       curr = current_branch
       all_local_branches.each do |branch|
         if MAIN_BRANCHES.include?(branch)

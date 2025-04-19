@@ -1,7 +1,7 @@
 class SugarJar
   class Commands
     def pullsuggestions
-      assert_in_repo
+      assert_in_repo!
 
       if dirty?
         if @ignore_dirty

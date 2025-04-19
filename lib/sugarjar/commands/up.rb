@@ -1,7 +1,7 @@
 class SugarJar
   class Commands
     def up(branch = nil)
-      assert_in_repo
+      assert_in_repo!
       branch ||= current_branch
       branch = fprefix(branch)
       # get a copy of our current branch, if rebase fails, we won't
@@ -32,7 +32,7 @@ class SugarJar
     end
 
     def upall
-      assert_in_repo
+      assert_in_repo!
       all_local_branches.each do |branch|
         next if MAIN_BRANCHES.include?(branch)
 
