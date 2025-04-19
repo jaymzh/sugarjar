@@ -27,7 +27,7 @@ class SugarJar
 
     def self.config(config = CONFIG_NAME)
       data = {}
-      unless in_repo
+      unless in_repo?
         SugarJar::Log.debug('Not in repo, skipping repoconfig load')
         return data
       end
