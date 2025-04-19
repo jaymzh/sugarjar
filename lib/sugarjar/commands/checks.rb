@@ -1,12 +1,12 @@
 class SugarJar
   class Commands
     def lint
-      assert_in_repo
+      assert_in_repo!
       exit(1) unless run_check('lint')
     end
 
     def unit
-      assert_in_repo
+      assert_in_repo!
       exit(1) unless run_check('unit')
     end
 

@@ -1,7 +1,7 @@
 class SugarJar
   class Commands
     def feature(name, base = nil)
-      assert_in_repo
+      assert_in_repo!
       SugarJar::Log.debug("Feature: #{name}, #{base}")
       name = fprefix(name)
       die("#{name} already exists!") if all_local_branches.include?(name)
@@ -21,7 +21,7 @@ class SugarJar
     alias f feature
 
     def subfeature(name)
-      assert_in_repo
+      assert_in_repo!
       SugarJar::Log.debug("Subfature: #{name}")
       feature(name, current_branch)
     end

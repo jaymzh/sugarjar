@@ -104,11 +104,32 @@ describe 'SugarJar::Commands' do
       'http://github.com/org/repo.git',
       # https
       'https://github.com/org/repo.git',
-      # hub
+      # gh
       'org/repo',
     ].each do |url|
       it "detects the org from #{url}" do
         expect(sj.send(:extract_org, url)).to eq('org')
+      end
+    end
+  end
+
+  context '#extract_repo' do
+    let(:sj) do
+      SugarJar::Commands.new({ 'no_change' => true })
+    end
+
+    [
+      # ssh
+      'git@github.com:org/repo.git',
+      # http
+      'http://github.com/org/repo.git',
+      # https
+      'https://github.com/org/repo.git',
+      # gh
+      'org/repo',
+    ].each do |url|
+      it "detects the org from #{url}" do
+        expect(sj.send(:extract_org, url)).to eq('repo')
       end
     end
   end
@@ -153,7 +174,7 @@ describe 'SugarJar::Commands' do
       end
     end
 
-    # hub
+    # gh
     url = 'org/repo'
     it "canonicalizes short name #{url}" do
       expect(sj.send(:canonicalize_repo, url)).

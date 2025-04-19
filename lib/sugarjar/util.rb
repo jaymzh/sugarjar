@@ -42,7 +42,7 @@ class SugarJar
     end
 
     def set_commit_template
-      unless in_repo
+      unless in_repo?
         SugarJar::Log.debug('Skipping set_commit_template: not in repo')
         return
       end
@@ -98,7 +98,7 @@ class SugarJar
       exit(1)
     end
 
-    def assert_common_main_branch
+    def assert_common_main_branch!
       upstream_branch = main_remote_branch(upstream)
       unless main_branch == upstream_branch
         die(
@@ -126,8 +126,8 @@ class SugarJar
       )
     end
 
-    def assert_in_repo
-      die('sugarjar must be run from inside a git repo') unless in_repo
+    def assert_in_repo!
+      die('sugarjar must be run from inside a git repo') unless in_repo?
     end
 
     def determine_main_branch(branches)
@@ -353,7 +353,7 @@ class SugarJar
       s
     end
 
-    def in_repo
+    def in_repo?
       s = git_nofail('rev-parse', '--is-inside-work-tree')
       !s.error? && s.stdout.strip == 'true'
     end

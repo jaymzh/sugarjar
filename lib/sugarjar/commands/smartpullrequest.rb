@@ -1,8 +1,8 @@
 class SugarJar
   class Commands
     def smartpullrequest(*args)
-      assert_in_repo
-      assert_common_main_branch
+      assert_in_repo!
+      assert_common_main_branch!
 
       if dirty?
         SugarJar::Log.warn(
