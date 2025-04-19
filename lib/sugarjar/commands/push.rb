@@ -1,13 +1,13 @@
 class SugarJar
   class Commands
     def smartpush(remote = nil, branch = nil)
-      assert_in_repo
+      assert_in_repo!
       _smartpush(remote, branch, false)
     end
     alias spush smartpush
 
     def forcepush(remote = nil, branch = nil)
-      assert_in_repo
+      assert_in_repo!
       _smartpush(remote, branch, true)
     end
     alias fpush forcepush

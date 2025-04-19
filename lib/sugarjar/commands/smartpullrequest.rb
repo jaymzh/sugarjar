@@ -1,8 +1,8 @@
 class SugarJar
   class Commands
     def smartpullrequest(*args)
-      assert_in_repo
-      assert_common_main_branch
+      assert_in_repo!
+      assert_common_main_branch!
 
       if dirty?
         SugarJar::Log.warn(
@@ -26,7 +26,7 @@ class SugarJar
         end
       end
       if subfeature?(base)
-        if upstream != push_org
+        if upstream_org != push_org
           SugarJar::Log.warn(
             'Unfortunately you cannot based one PR on another PR when' +
             " using fork-based PRs. We will base this on #{most_main}." +
