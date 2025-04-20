@@ -2,6 +2,22 @@ class SugarJar
   class Commands
     def lint
       assert_in_repo!
+      if dirty?
+        if @ignore_dirty
+          SugarJar::Log.warn(
+            'Your repo is dirty, but --ignore-dirty was specified, so ' +
+            'carrying on anyway. If the linter autocorrects, the displayed ' +
+            'diff will be misleading',
+          )
+        else
+          SugarJar::Log.error(
+            'Your repo is dirty, but --ignore-dirty was not specified. ' +
+            'Refusing to run lint. This is to ensure that if the linter ' +
+            'autocorrects, we can show the correct diff.',
+          )
+          exit(1)
+        end
+      end
       exit(1) unless run_check('lint')
     end
 
