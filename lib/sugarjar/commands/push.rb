@@ -51,5 +51,16 @@ class SugarJar
       args << '--force-with-lease' if force
       puts git(*args).stderr
     end
+
+    def run_prepush
+      @repo_config['on_push']&.each do |item|
+        SugarJar::Log.debug("Running on_push check type #{item}")
+        unless run_check(item)
+          SugarJar::Log.info("[prepush]: #{item} #{color('failed', :red)}.")
+          return false
+        end
+      end
+      true
+    end
   end
 end

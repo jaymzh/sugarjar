@@ -5,7 +5,12 @@ class SugarJar
       SugarJar::Log.debug("Feature: #{name}, #{base}")
       name = fprefix(name)
       die("#{name} already exists!") if all_local_branches.include?(name)
-      base ||= most_main
+      if base
+        fbase = fprefix(base)
+        base = fbase if all_local_branches.include?(fbase)
+      else
+        base ||= most_main
+      end
       # If our base is a local branch, don't try to parse it for a remote name
       unless all_local_branches.include?(base)
         base_pieces = base.split('/')
