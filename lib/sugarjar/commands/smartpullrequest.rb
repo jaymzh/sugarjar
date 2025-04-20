@@ -55,5 +55,35 @@ class SugarJar
 
     alias spr smartpullrequest
     alias smartpr smartpullrequest
+
+    private
+
+    def assert_common_main_branch!
+      upstream_branch = main_remote_branch(upstream)
+      unless main_branch == upstream_branch
+        die(
+          "The local main branch is '#{main_branch}', but the main branch " +
+          "of the #{upstream} remote is '#{upstream_branch}'. You probably " +
+          "want to rename your local branch by doing:\n\t" +
+          "git branch -m #{main_branch} #{upstream_branch}\n\t" +
+          "git fetch #{upstream}\n\t" +
+          "git branch -u #{upstream}/#{upstream_branch} #{upstream_branch}\n" +
+          "\tgit remote set-head #{upstream} -a",
+        )
+      end
+      return if upstream_branch == 'origin'
+
+      origin_branch = main_remote_branch('origin')
+      return if origin_branch == upstream_branch
+
+      die(
+        "The main branch of your upstream (#{upstream_branch}) and your " +
+        "fork/origin (#{origin_branch}) are not the same. You should go " +
+        "to https://#{@ghhost || 'github.com'}/#{@ghuser}/#{repo_name}/" +
+        'branches/ and rename the \'default\' branch to ' +
+        "'#{upstream_branch}'. It will then give you some commands to " +
+        'run to update this clone.',
+      )
+    end
   end
 end
