@@ -109,12 +109,12 @@ describe 'SugarJar::Commands' do
   context '#run_check' do
     it 'amends diff if linter autocorrects and user says yes' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(sj).to receive(:repo_root).and_return('root')
+      expect(SugarJar::Util).to receive(:repo_root).and_return('root')
       expect(Dir).to receive(:chdir).with('root').and_yield
       expect(sj).to receive(:get_checks).with('lint').
         and_return(['lint_foo'])
-      expect(sj).to receive(:which_nofail).with('lint_foo').exactly(2).times.
-        and_return('lint_foo')
+      expect(SugarJar::Util).to receive(:which_nofail).with('lint_foo').
+        exactly(2).times.and_return('lint_foo')
       so = double({ :stdout => 'some lint output', :error? => false })
       expect(Mixlib::ShellOut).to receive(:new).exactly(2).time.
         with('lint_foo').and_return(so)
@@ -131,11 +131,11 @@ describe 'SugarJar::Commands' do
 
     it 'quits if linter autocorrects and user says no' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(sj).to receive(:repo_root).and_return('root')
+      expect(SugarJar::Util).to receive(:repo_root).and_return('root')
       expect(Dir).to receive(:chdir).with('root').and_yield
       expect(sj).to receive(:get_checks).with('lint').
         and_return(['lint_foo'])
-      expect(sj).to receive(:which_nofail).with('lint_foo').time.
+      expect(SugarJar::Util).to receive(:which_nofail).with('lint_foo').
         and_return('lint_foo')
       so = double({ :stdout => 'some lint output', :error? => false })
       expect(Mixlib::ShellOut).to receive(:new).with('lint_foo').
@@ -158,10 +158,11 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
       %w{lint unit}.each do |type|
         cmd = "#{type}_foo"
-        expect(sj).to receive(:repo_root).and_return('root')
+        expect(SugarJar::Util).to receive(:repo_root).and_return('root')
         expect(Dir).to receive(:chdir).with('root').and_yield
         expect(sj).to receive(:get_checks).with(type).and_return([cmd])
-        expect(sj).to receive(:which_nofail).with(cmd).time.and_return(cmd)
+        expect(SugarJar::Util).to receive(:which_nofail).with(cmd).
+          and_return(cmd)
         so = double(
           { :stdout => '', :error? => true, :format_for_exception => '' },
         )

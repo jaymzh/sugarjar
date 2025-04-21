@@ -7,12 +7,10 @@ class SugarJar
   # This parses SugarJar repoconfigs (not to be confused with configs).
   # This is lint/unit/on_push configs.
   class RepoConfig
-    extend SugarJar::Util
-
     CONFIG_NAME = '.sugarjar.yaml'.freeze
 
     def self.repo_config_path(config)
-      ::File.join(repo_root, config)
+      ::File.join(SugarJar::Util.repo_root, config)
     end
 
     def self.hash_from_file(config_file)
@@ -27,7 +25,7 @@ class SugarJar
 
     def self.config(config = CONFIG_NAME)
       data = {}
-      unless in_repo?
+      unless SugarJar::Util.in_repo?
         SugarJar::Log.debug('Not in repo, skipping repoconfig load')
         return data
       end

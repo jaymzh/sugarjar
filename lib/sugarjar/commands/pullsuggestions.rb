@@ -1,3 +1,5 @@
+require_relative '../util'
+
 class SugarJar
   class Commands
     def pullsuggestions
@@ -30,7 +32,8 @@ class SugarJar
         ans = $stdin.gets.strip
         case ans
         when /^[Yy]$/
-          system(which('git'), 'merge', '--ff', "origin/#{current_branch}")
+          git = SugarJar::Util.which('git')
+          system(git, 'merge', '--ff', "origin/#{current_branch}")
           break
         when /^[Nn]$/, /^[Qq](uit)?/
           puts 'Not merging at user request...'

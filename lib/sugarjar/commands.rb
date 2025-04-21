@@ -21,7 +21,6 @@ class SugarJar
   # methods are "commands". Anything in private is internal implementation
   # details.
   class Commands
-    include SugarJar::Util
     MAIN_BRANCHES = %w{master main}.freeze
 
     def initialize(options)
@@ -74,7 +73,7 @@ class SugarJar
     end
 
     def set_commit_template
-      unless in_repo?
+      unless SugarJar::Util.in_repo?
         SugarJar::Log.debug('Skipping set_commit_template: not in repo')
         return
       end
@@ -82,7 +81,7 @@ class SugarJar
       realpath = if @repo_config['commit_template'].start_with?('/')
                    @repo_config['commit_template']
                  else
-                   "#{repo_root}/#{@repo_config['commit_template']}"
+                   "#{Util.repo_root}/#{@repo_config['commit_template']}"
                  end
       unless File.exist?(realpath)
         die(
@@ -115,7 +114,9 @@ class SugarJar
     end
 
     def assert_in_repo!
-      die('sugarjar must be run from inside a git repo') unless in_repo?
+      return if SugarJar::Util.in_repo?
+
+      die('sugarjar must be run from inside a git repo')
     end
 
     def determine_main_branch(branches)
@@ -261,7 +262,7 @@ class SugarJar
     end
 
     def gh_avail?
-      !!which_nofail('gh')
+      !!SugarJar::Util.which_nofail('gh')
     end
 
     def fprefix(name)
@@ -283,7 +284,7 @@ class SugarJar
     end
 
     def repo_name
-      repo_root.split('/').last
+      SugarJar::Util.repo_root.split('/').last
     end
 
     def extract_org(repo)
@@ -311,6 +312,22 @@ class SugarJar
       # remote branches are refs/remotes/<remote>/XXXX
       base = type == :local ? 2 : 3
       ref.split('/')[base..].join('/')
+    end
+
+    def git(*args)
+      SugarJar::Util.git(*args, :color => @color)
+    end
+
+    def git_nofail(*args)
+      SugarJar::Util.git_nofail(*args, :color => @color)
+    end
+
+    def ghcli(*args)
+      SugarJar::Util.ghcli(*args)
+    end
+
+    def ghcli_nofail(*args)
+      SugarJar::Util.ghcli_nofail(*args)
     end
   end
 end

@@ -1,3 +1,5 @@
+require_relative '../util'
+
 class SugarJar
   class Commands
     def smartpullrequest(*args)
@@ -12,6 +14,8 @@ class SugarJar
         exit(1)
       end
 
+      user_specified_base = args.include?('-B') || args.include?('--base')
+
       curr = current_branch
       base = tracked_branch
       if @pr_autofill
@@ -25,32 +29,40 @@ class SugarJar
           args.unshift('--fill')
         end
       end
-      if subfeature?(base)
-        if upstream_org != push_org
-          SugarJar::Log.warn(
-            'Unfortunately you cannot based one PR on another PR when' +
-            " using fork-based PRs. We will base this on #{most_main}." +
-            ' This just means the PR "Changes" tab will show changes for' +
-            ' the full stack until those other PRs are merged and this PR' +
-            ' PR is rebased.',
-          )
-        # nil is prompt, true is always, false is never
-        elsif @pr_autostack.nil?
-          $stdout.print(
-            'It looks like this is a subfeature, would you like to base ' +
-            "this PR on #{base}? [y/n] ",
-          )
-          ans = $stdin.gets.strip
-          args.unshift('--base', base) if %w{Y y}.include?(ans)
-        elsif @pr_autostack
-          args.unshift('--base', base)
+      unless user_specified_base
+        if subfeature?(base)
+          if upstream_org != push_org
+            SugarJar::Log.warn(
+              'Unfortunately you cannot based one PR on another PR when' +
+              " using fork-based PRs. We will base this on #{most_main}." +
+              ' This just means the PR "Changes" tab will show changes for' +
+              ' the full stack until those other PRs are merged and this PR' +
+              ' PR is rebased.',
+            )
+          # nil is prompt, true is always, false is never
+          elsif @pr_autostack.nil?
+            $stdout.print(
+              'It looks like this is a subfeature, would you like to base ' +
+              "this PR on #{base}? [y/n] ",
+            )
+            ans = $stdin.gets.strip
+            args.unshift('--base', base) if %w{Y y}.include?(ans)
+          elsif @pr_autostack
+            args.unshift('--base', base)
+          end
+        elsif base.include?('/') && base != most_main
+          # If our base is a remote branch, then use that as the
+          # base branch of the PR
+          args.unshift('--base', base.split('/').last)
         end
       end
+
       # <org>:<branch> is the GH API syntax for:
       #   look for a branch of name <branch>, from a fork in owner <org>
       args.unshift('--head', "#{push_org}:#{curr}")
       SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
-      system(which('gh'), 'pr', 'create', *args)
+      gh = SugarJar::Util.which('gh')
+      system(gh, 'pr', 'create', *args)
     end
 
     alias spr smartpullrequest

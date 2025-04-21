@@ -1,3 +1,5 @@
+require_relative '../util'
+
 class SugarJar
   class Commands
     def lint
@@ -68,6 +70,7 @@ class SugarJar
     end
 
     def run_check(type)
+      repo_root = SugarJar::Util.repo_root
       Dir.chdir repo_root do
         checks = get_checks(type)
         # if we failed to determine the checks, the the checks have effectively
@@ -83,7 +86,7 @@ class SugarJar
             unless File.exist?(short)
               SugarJar::Log.error("Configured #{type} #{short} does not exist!")
             end
-          elsif !which_nofail(short)
+          elsif !SugarJar::Util.which_nofail(short)
             SugarJar::Log.error("Configured #{type} #{short} does not exist!")
             return false
           end
