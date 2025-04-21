@@ -1,3 +1,5 @@
+require_relative '../util'
+
 class SugarJar
   class Commands
     def smartpullrequest(*args)
@@ -50,7 +52,8 @@ class SugarJar
       #   look for a branch of name <branch>, from a fork in owner <org>
       args.unshift('--head', "#{push_org}:#{curr}")
       SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
-      system(which('gh'), 'pr', 'create', *args)
+      gh = SugarJar::Util.which('gh')
+      system(gh, 'pr', 'create', *args)
     end
 
     alias spr smartpullrequest
