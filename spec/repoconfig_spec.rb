@@ -1,5 +1,4 @@
-$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-require 'sugarjar/repoconfig'
+require_relative '../lib/sugarjar/repoconfig'
 
 describe 'SugarJar::RepoConfig' do
   context '#config' do
