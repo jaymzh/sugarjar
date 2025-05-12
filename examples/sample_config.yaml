@@ -1,0 +1,24 @@
+# This is a sample SugarJar config
+#
+# SugarJar will look for this config in:
+#
+# - /etc/sugarjar/config.yaml
+# - ~/.config/sugarjar/config.yaml
+#
+# The latter will overwrite anything in the former.
+#
+
+# NOTE: This file does NOT document ALL options since any command-line option
+# to SugarJar is a valid configuration in this file, so see `sj help` for full
+# details.
+
+# Autofill in my PRs from my commit message (default: true)
+pr_autofile: true
+
+# Auto stack PRs when subfeatures are detected (default is `nil`, which prompts,
+# but use `true` or `false` to force an option without prompting)
+pr_autostack: true
+
+# Don't warn about deprecated config file options if they are in this
+# list
+ignore_deprecated_options: [ 'gh_cli' ]

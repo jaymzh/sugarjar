@@ -1,6 +1,6 @@
 class SugarJar
   class Commands
-    def smartclone(repo, dir = nil, *args)
+    def smartclone(repo, dir = nil, *)
       reponame = File.basename(repo, '.git')
       dir ||= reponame
       org = extract_org(repo)
@@ -14,9 +14,9 @@ class SugarJar
       # Unless the repo is in our own org and cannot be forked, then it
       # will fail.
       if org == @ghuser
-        git('clone', canonicalize_repo(repo), dir, *args)
+        git('clone', canonicalize_repo(repo), dir, *)
       else
-        ghcli('repo', 'fork', '--clone', canonicalize_repo(repo), dir, *args)
+        ghcli('repo', 'fork', '--clone', canonicalize_repo(repo), dir, *)
         # make the main branch track upstream
         Dir.chdir dir do
           git('branch', '-u', "upstream/#{main_branch}")
