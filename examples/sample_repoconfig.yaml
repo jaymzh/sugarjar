@@ -11,14 +11,14 @@
 # specific configurations for themselves. If the file does not exist, this
 # configuration is ignored.
 
-include_from: '.sugarjar_local.yaml`
+include_from: .sugarjar_local.yaml
 
 # `overwrite_from` is a meta config which works much like `include_from`,
 # except that if the file is found, everything else in this configuration file
 # will be ignored and the configuration will be entirely read from the
 # referenced file.  If the file does not exist, this configuration is ignored.
 
-overwrite_from: '.sugarjar_local_overwrite.yaml'
+overwrite_from: .sugarjar_local_overwrite.yaml
 
 # `lint` is a list of scripts to run when `sj lint` is executed (or, if
 # configured, to run on `sj spush`/`sj fpush` - see `on_push` below).

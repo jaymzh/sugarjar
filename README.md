@@ -127,7 +127,10 @@ To continue with the example above, my `smartlog` might look like:
 
 ![subfeature-smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-smartlog.png)
 
-This is simple. Now lets make a different feature stack:
+As you can see, `mynewthing` is derived from `main`, and `dependentnewthing` is
+derived from `mynewthing`.
+
+Now lets make a different feature stack:
 
 ![subfeature-part2 screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2.png)
 
@@ -135,20 +138,35 @@ The `smartlog` will now show us this tree, and it's a bit more interesting:
 
 ![subfeature-part2-smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2-smartlog.png)
 
-Now, what happens if I make a change to `mynewthing`?
+Here we can see from `main`, we have two branches: one going to `mynewthing`
+and one going to `anotherfeature`. Each of those has their own dependent branch
+on top.
+
+Now, what happens if I make a change to `mynewthing` (the bottom of the first stack)?
 
 ![subfeature-part3 screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3.png)
 
 We can see here now that `dependentnewthing`, is based off a commit that _used_
-to be `mynewthing`, but `mynewthing` has moved. But SugarJar will handle this
-all correctly when we ask it to update the branch:
+to be `mynewthing` (`5086ee`), but `mynewthing` has moved. Both `mynewthing`
+and `dependentnewthing` are derived from `5086ee` (the old `mynewthing`), but
+`dependentnewthing` isn't (yet) based on the current `mynewthing`. But SugarJar
+will handle this all correctly when we ask it to update the branch:
 
 ![subfeature-part3-rebase screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3-rebase.png)
+
+Here we see that SugarJar knew that `dependentnewthing` should be rebased onto
+`mynewthing`, and it did the right thing - from main there's still the
+`50806ee` _and_ the new additional change which are now both part of the
+`mynewthing` branch, and `dependentnewthing` is based on that branch, this
+including all 3 commits in the right order.
 
 Now, lets say that `mynewthing` gets merged and we use `bclean` to clean it all
 up, what happens then?
 
 ![subfeature-detect-missing-base screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-detect-missing-base.png)
+
+SugarJar detects that branch is gone and thus this branch should now be based
+on the upstream main branch!
 
 ### Creating Stacked PRs with subfeatures
 
@@ -169,7 +187,7 @@ It looks like this is a subfeature, would you like to base this PR on mynewthing
 Ever made a PR, only to find out later that it failed tests because of some
 small lint issue? Not anymore! SJ can be configured to run things before
 pushing. For example,in the SugarJar repo, we have it run Rubocop (ruby lint)
-and Markdownlint "on_push". If those fail, it lets you know and doesn't push.
+and Markdownlint `on_push`. If those fail, it lets you know and doesn't push.
 
 You can configure SugarJar to tell it how to run both lints and unittests for
 a given repo and if one or both should be run prior to pushing.
@@ -393,4 +411,4 @@ Sapling is a great tool and solves a variety of problems SugarJar will never be
 able to. However, it is a significant workflow change, that won't be
 appropriate for all users or use-cases. Similarly there are workflows and tools
 that Sapling breaks. So worry not, SugarJar will continue to be maintained and
-developed
+developed.
