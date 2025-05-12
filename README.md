@@ -18,29 +18,30 @@ If you miss Mondrian or Phabricator - this is the tool for you!
 
 If you don't, there's a ton of useful stuff for everyone!
 
-## Installation
+Jump to what you're most interested in:
 
-Sugarjar is packaged in a variety of Linux distributions - see if it's on the
-list here, and if so, use your package manager (or `gem`) to install it:
+* [Common Use-cases](#common-use-cases)
+   * [Auto Cleanup Squash-merged branches](#auto-cleanup-squash-merged-branches)
+   * [Smarter clones and remotes](#smarter-clones-and-remotes)
+   * [Work with stacked branches more easily](#work-with-stacked-branches-more-easily)
+   * [Creating Stacked PRs with subfeatures](#creating-stacked-prs-with-subfeatures)
+   * [Have a better lint/unittest experience!](#have-a-better-lintunittest-experience)
+   * [Better push defaults](#better-push-defaults)
+   * [Cleaning up your own history](#cleaning-up-your-own-history)
+   * [Better feature branches](#better-feature-branches)
+   * [Smartlog](#smartlog)
+   * [Pulling in suggestions from the web](#pulling-in-suggestions-from-the-web)
+   * [And more!](#and-more)
+* [Installation](#installation)
+* [Configuration](#configuration)
+* [Repository Configuration](#repository-configuration)
+   * [Commit Templates](#commit-templates)
+* [Enterprise GitHub](#enterprise-github)
+* [FAQ](#faq)
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg?exclude_unsupported=1)](https://repology.org/project/sugarjar/versions)
+## Common Use-cases
 
-If you are using a Linux distribution version that is end-of-life'd, click the
-above image, it'll take you to a page that lists unsupported distro versions
-as well (they'll have older SugarJar, but they'll probably still have some
-version).
-
-Ubuntu users, Ubuntu versions prior to 24.x cannot be updated, so if you're on
-an older Ubuntu please use [this
-PPA](https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) from our
-Ubuntu package maintainer.
-
-For MacOS users, we recommend using Homebrew - SugarJar is now in Homebrew Core.
-
-Finally, if none of those work for you, you can clone this repo and run it
-directly from there.
-
-## Auto cleanup squash-merged branches
+### Auto cleanup squash-merged branches
 
 It is common for a PR to go back and forth with a variety of nits, lint fixes,
 typos, etc. that can muddy history. So many projects will "squash and merge"
@@ -52,9 +53,7 @@ forces the deletion.
 Enter `sj bclean` - it determines if the contents of your branch has been merge
 and safely deletes if so.
 
-``` shell
-sj bclean
-```
+![bclean screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/bclean.png)
 
 Will delete a branch, if it has been merged, **even if it was squash-merged**.
 
@@ -64,44 +63,32 @@ You can pass it a branch if you'd like (it defaults to the branch you're on):
 But it gets better! You can use `sj bcleanall` to remove all branches that have
 been merged:
 
-```shell
-$ git branch
-* argparse
-  master
-  feature
-  hubhost
-$ git bcleanall
-Skipping branch argparse - there are unmerged commits
-Reaped branch feature
-Reaped branch hubhost
-```
+![bcleanall screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/bcleanall.png)
 
-## Smarter clones and remotes
+### Smarter clones and remotes
 
 There's a pattern to every new repo we want to contribute to. First we fork,
 then we clone the fork, then we add a remote of the upstream repo. It's
 monotonous. SugarJar does this for you:
 
-```shell
-sj smartclone jaymzh/sugarjar
-```
+![smartclone screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/sclone.png)
 
-(also `sj sclone`)
+`sj` accepts both `smartclone` and `sclone` for this command.
 
 This will:
 
-* Make a fork of the repo, if you don't already have one
+* Fork the repo to your personal org (if you don't already have a fork)
 * Clone your fork
 * Add the original as an 'upstream' remote
 
 Note that it takes short names for repos. No need to specify a full URL,
 just a $org/$repo.
 
-Like `git clone`, `sj sclone` will accept an additional argument as the
+Like `git clone`, `sj smartclone` will accept an additional argument as the
 destination directory to clone to. It will also pass any other unknown options
 to `git clone` under the hood.
 
-## Work with stacked branches more easily
+### Work with stacked branches more easily
 
 It's important to break changes into reviewable chunks, but working with
 stacked branches can be confusing. SugarJar provides several tools to make this
@@ -111,122 +98,57 @@ First, and foremost, is `feature` and `subfeature`. Regardless of stacking, the
 way to create a new feature bracnh with sugarjar is with `sj feature` (or `sj
 f` for short):
 
-```shell
-$ sj feature mynewthing
-Created feature branch mynewthing based on origin/main
-```
+![feature screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/feature.png)
 
-A "feature" in SugarJar parliance just means that the branch is always created
-from "most_main" - this is usually "upstream/main", but SJ will figure out
-which remote is the "upstream", even if it's "origin", and then will determine
-the primary branch ("main" or for older repos "master"). It's also smart enough
+A "feature" in SugarJar parlance just means that the branch is always created
+from "most main" - this is usually `upstream/main`, but SJ will figure out
+which remote is the "upstream", even if it's `origin`, and then will determine
+the primary branch (`main` or for older repos `master`). It's also smart enough
 to fetch that remote first to make sure you're working on the latest HEAD.
 
-When you want to create a stacked PR, you can create "subfeature", which, at
+When you want to create a stacked PR, you can create `subfeature`, which, at
 its core is just a branch created from the current branch:
 
-```shell
-$ sj subfeature dependentnewthing
-Created feature branch dependentnewthing based on mynewthing
-```
+![subfeature screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature.png)
 
 If you create branches like this then sugarjar can now make several things
 much easier:
 
 * `sj up` will rebase intelligently
 * After an `sj bclean` of a branch earlier in the tree, `sj up` will update
-  the tracked branch to "most_main"
+  the tracked branch to "most main"
 
 There are two commands that will show you the state of your stacked branches:
 
 * `sj binfo` - shows the current branch and its ancestors up to your primary branch
-* `sj smartlist` (aka `sj sl`) - shows you the whole tree.
+* `sj smartlog` (aka `sj sl`) - shows you the whole tree.
 
-To continue with the example above, my `smartlist` might look like:
+To continue with the example above, my `smartlog` might look like:
 
-```text
-$ sj sl
-* 59c0522 (HEAD -> dependentnewthing) anothertest
-* 6ebaa28 (mynewthing) test
-o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
-```
+![subfeature-smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-smartlog.png)
 
 This is simple. Now lets make a different feature stack:
 
-```text
-$ sj feature anotherfeature
-Created feature branch anotherfeature based on origin/main
-# do stuff
-$ sj subfeature dependent2
-Created feature branch dependent2 based on anotherfeature
-# do stuff
-```
+![subfeature-part2 screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2.png)
 
-The `smartlist` will now show us this tree, and it's a bit more interesting:
+The `smartlog` will now show us this tree, and it's a bit more interesting:
 
-```text
-$ sj sl
-* af6f143 (HEAD -> dependent2) morestuff
-* 028c7f4 (anotherfeature) stuff
-| * 59c0522 (dependentnewthing) anothertest
-| * 6ebaa28 (mynewthing) test
-|/
-o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
-```
+![subfeature-part2-smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2-smartlog.png)
 
 Now, what happens if I make a change to `mynewthing`?
 
-```text
-$ sj co mynewthing
-Switched to branch 'mynewthing'
-Your branch is ahead of 'origin/main' by 1 commit.
-  (use "git push" to publish your local commits)
-$ echo 'randomchange' >> README.md
-$ git commit -a -m change
-[mynewthing d33e082] change
- 1 file changed, 1 insertion(+)
-$ sj sl
-* d33e082 (HEAD -> mynewthing) change
-| * af6f143 (dependent2) morestuff
-| * 028c7f4 (anotherfeature) stuff
-| | * 59c0522 (dependentnewthing) anothertest
-| |/
-|/|
-* | 6ebaa28 test
-|/
-o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
-```
+![subfeature-part3 screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3.png)
 
 We can see here now that `dependentnewthing`, is based off a commit that _used_
 to be `mynewthing`, but `mynewthing` has moved. But SugarJar will handle this
 all correctly when we ask it to update the branch:
 
-```text
-$ sj co dependentnewthing
-Switched to branch 'dependentnewthing'
-Your branch and 'mynewthing' have diverged,
-and have 1 and 1 different commits each, respectively.
-  (use "git pull" if you want to integrate the remote branch with yours)
-$ sj up
-dependentnewthing rebased on mynewthing
-$ sj sl
-* 93ed585 (HEAD -> dependentnewthing) anothertest
-* d33e082 (mynewthing) change
-* 6ebaa28 test
-| * af6f143 (dependent2) morestuff
-| * 028c7f4 (anotherfeature) stuff
-|/
-o 7a0ffd0 (tag: v1.1.2, origin/main, origin/HEAD, main) Version bump (#160)
-```
+![subfeature-part3-rebase screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3-rebase.png)
 
 Now, lets say that `mynewthing` gets merged and we use `bclean` to clean it all
 up, what happens then?
 
-```text
-$ sj up
-The brach we were tracking is gone, resetting tracking to origin/main
-dependentnewthing rebased on origin/main
-```
+![subfeature-detect-missing-base screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-detect-missing-base.png)
 
 ### Creating Stacked PRs with subfeatures
 
@@ -242,7 +164,7 @@ It looks like this is a subfeature, would you like to base this PR on mynewthing
 ...
 ```
 
-## Have a better lint/unittest experience!
+### Have a better lint/unittest experience!
 
 Ever made a PR, only to find out later that it failed tests because of some
 small lint issue? Not anymore! SJ can be configured to run things before
@@ -255,31 +177,31 @@ a given repo and if one or both should be run prior to pushing.
 The details on the config file format is below, but we provide three commands:
 
 ```shell
-git lint
+sj lint
 ```
 
 Run all linters.
 
 ```shell
-git unit
+sj unit
 ```
 
 Run all unittests.
 
 ```shell
-git smartpush # or spush
+sj smartpush # or spush
 ```
 
 Run configured push-time actions (nothing, lint, unit, both), and do not
 push if any of them fail.
 
-## Better push defaults
+### Better push defaults
 
 In addition to running pre-push tests for you `smartpush` also picks smart
 defaults for push. So if you `sj spush` with no arguments, it uses the
 `origin` remote and the same branch name you're on as the remote branch.
 
-## Cleaning up your own history
+### Cleaning up your own history
 
 Perhaps you contribute to a project that prefers to use merge commits, so you
 like to clean up your own history. This is often difficult to get right - a
@@ -299,7 +221,7 @@ command is a mouthful! Enter `sj fpush`. It has all the smarts of `sj
 smartpush` (runs configured pre-push actions), but adds `--force-with-lease` to
 the command!
 
-## Better feature branches
+### Better feature branches
 
 When you want to start a new feature, you want to start developing against
 latest. That's why `sj feature` defaults to creating a branch against what we
@@ -328,14 +250,14 @@ use branch-based workflows and branches need to be prefixed with e.g. `$USER/`.
 For example, if your prefix was `user/`, then `sj feature foo` would create
 `user/foo`, and `sj co foo` would switch to `user/foo`.
 
-## Smartlog
+### Smartlog
 
 Smartlog will show you a tree diagram of your branches! Simply run `sj
 smartlog` or `sj sl` for short.
 
-![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/smartlog.png)
+![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/smartlog.png)
 
-## Pulling in suggestions from the web
+### Pulling in suggestions from the web
 
 When someone 'suggests' a change in the GitHub WebUI, once you choose to commit
 them, your origin and local branches are no longer in-sync. The
@@ -344,9 +266,31 @@ local branch. This command will show a diff and ask for confirmation before
 attempting the merge and  - if allowed to continue - will use a fast-forward
 merge.
 
-## And more!
+### And more!
 
 See `sj help` for more commands!
+
+## Installation
+
+Sugarjar is packaged in a variety of Linux distributions - see if it's on the
+list here, and if so, use your package manager (or `gem`) to install it:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg?exclude_unsupported=1)](https://repology.org/project/sugarjar/versions)
+
+If you are using a Linux distribution version that is end-of-life'd, click the
+above image, it'll take you to a page that lists unsupported distro versions
+as well (they'll have older SugarJar, but they'll probably still have some
+version).
+
+Ubuntu users, Ubuntu versions prior to 24.x cannot be updated, so if you're on
+an older Ubuntu please use [this
+PPA](https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) from our
+Ubuntu package maintainer.
+
+For MacOS users, we recommend using Homebrew - SugarJar is now in Homebrew Core.
+
+Finally, if none of those work for you, you can clone this repo and run it
+directly from there.
 
 ## Configuration
 
@@ -354,13 +298,10 @@ Sugarjar will read in both a system-level config file
 (`/etc/sugarjar/config.yaml`) and a user-level config file
 `~/.config/sugarjar/config.yaml`, if they exist. Anything in the user config
 will override the system config, and command-line options override both. The
-yaml file is a straight key-value pair of options without their '--'. For
-example:
+yaml file is a straight key-value pair of options without their '--'.
 
-```yaml
-log_level: debug
-github_user: jaymzh
-```
+See [examples/sample_config.yaml](examples/sample_config.yaml) for an example
+configuration file.
 
 In addition, the environment variable `SUGARJAR_LOGLEVEL` can be defined to set
 a log level. This is primarily used as a way to turn debug on earlier in order to
@@ -378,43 +319,10 @@ ignore_deprecated_options:
 ## Repository Configuration
 
 Sugarjar looks for a `.sugarjar.yaml` in the root of the repository to tell it
-how to handle repo-specific things. Currently there options are:
-
-* `lint` - A list of scripts to run on `sj lint`. These should be linters like
-  rubocop or pyflake. Linters will be run from the root of the repo.
-* `lint_list_cmd` - A command to run which will print out linters to run, one
-  per line. Takes precedence over `lint`. The command (and the resulting
-  linters) will be run from the root of the repo.
-* `unit` - A list of scripts to run on `sj unit`. These should be unittest
-  runners like rspec or pyunit. Test will be run from the root of the repo.
-* `unit_list_cmd` - A command to run which will print out the unit tests to
-  run, one more line. Takes precedence over `unit`. The command (and the
-  resulting unit tests) will be run from the root of the repo.
-* `on_push` - A list of types (`lint`, `unit`) of checks to run before pushing.
-  It is highly recommended this is only `lint`. The goal here is to allow for
-  the user to get quick stylistic feedback before pushing their branch to avoid
-  the push-fix-push-fix loop.
-* `commit_template` - A path to a commit template to set in the `commit.template`
-  git config for this repo. Should be either a fully-qualified path, or a path
-  relative to the repo root.
-* `include_from` - This will read an additional repoconfig file and merge it
-  into the one being read. The value should be relative to the root of the
-  repo. This will not error if the file does not exist, it is intended for
-  organizations to allow users to optionally extend a default repo config.
-* `overwrite_from` - Same as `include_from`, but completely overwrites the
-  base configuration if the file is found.
-
-Example configuration:
-
-```yaml
-lint:
-  - scripts/lint
-unit:
-  - scripts/unit
-on_push:
-  - lint
-commit_template: .commit-template.txt
-```
+how to handle repo-specific things. See
+[examples/sample_repoconfig.yaml](examples/sample_repoconfig.yaml) for an
+example configuration that walks through all valid repo configurations in
+detail.
 
 ### Commit Templates
 

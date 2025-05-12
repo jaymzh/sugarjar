@@ -314,20 +314,20 @@ class SugarJar
       ref.split('/')[base..].join('/')
     end
 
-    def git(*args)
-      SugarJar::Util.git(*args, :color => @color)
+    def git(*)
+      SugarJar::Util.git(*, :color => @color)
     end
 
-    def git_nofail(*args)
-      SugarJar::Util.git_nofail(*args, :color => @color)
+    def git_nofail(*)
+      SugarJar::Util.git_nofail(*, :color => @color)
     end
 
-    def ghcli(*args)
-      SugarJar::Util.ghcli(*args)
+    def ghcli(*)
+      SugarJar::Util.ghcli(*)
     end
 
-    def ghcli_nofail(*args)
-      SugarJar::Util.ghcli_nofail(*args)
+    def ghcli_nofail(*)
+      SugarJar::Util.ghcli_nofail(*)
     end
   end
 end

@@ -40,8 +40,8 @@ class SugarJar
       Mixlib::ShellOut.new([which('git')] + args).run_command
     end
 
-    def self.git(*args, color: true)
-      s = git_nofail(*args, :color => color)
+    def self.git(*, color: true)
+      s = git_nofail(*, :color => color)
       s.error!
       s
     end
@@ -67,8 +67,8 @@ class SugarJar
       s
     end
 
-    def self.ghcli(*args)
-      s = ghcli_nofail(*args)
+    def self.ghcli(*)
+      s = ghcli_nofail(*)
       s.error!
       s
     end

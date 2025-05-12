@@ -1,9 +1,7 @@
 AllCops:
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
   NewCops: enable
   Exclude:
-    - 'omnibus/bin/**/*'
-    - 'omnibus/local/**/*'
     - 'rubygem-sugarjar.spec'
 
 Layout/LineLength:

@@ -1,0 +1,77 @@
+# This is a sample `repoconfig` for SugarJar
+#
+# Configs should be named `.sugarjar.yaml` and placed in the root
+# of your repository.
+#
+
+# `include_from` is a meta config wich will read from an additional
+# configuration file and merge anything from the file onto whatever is in the
+# primary file. This is helpful to have a repo configuration that applies to
+# all/most developers, but allow individual developers to add to over overwrite
+# specific configurations for themselves. If the file does not exist, this
+# configuration is ignored.
+
+include_from: '.sugarjar_local.yaml`
+
+# `overwrite_from` is a meta config which works much like `include_from`,
+# except that if the file is found, everything else in this configuration file
+# will be ignored and the configuration will be entirely read from the
+# referenced file.  If the file does not exist, this configuration is ignored.
+
+overwrite_from: '.sugarjar_local_overwrite.yaml'
+
+# `lint` is a list of scripts to run when `sj lint` is executed (or, if
+# configured, to run on `sj spush`/`sj fpush` - see `on_push` below).
+# Regardless of where `sj` is run from, these scripts will be run from the root
+# of the repo. If a slash is detected in the first 'word' of the command, it
+# is assumed it is a relative path and `sj` will check that the file exists.
+
+lint:
+  - scripts/run_rubocop.sh
+  - scripts/run_mdl.sh
+
+# `unit` is a list of scripts to run when `sj unit` is executed (or, if
+# configured to run on `sj spush`/`sj fpush`- see `on_push` below).  Regardless
+# of where `sj` is run from, these scripts will be run from the root of the
+# repo. If a slash is detected in the first 'word' of the command, it is
+# assumed it is a relative path and `sj` will check that the file exists.
+
+unit:
+  - bundle exec rspec
+  - scripts/run_tests.sh
+
+# `lint_list_cmd` is like `lint`, except it's a command to run which will
+# determine the proper lints to run and return them, one per line. This is
+# useful, for example, when you want to only run lints relevant to the changed
+# files.
+
+lint_list_cmd: scripts/determine_linters.sh
+
+# `unit_list_cmd` is like `unit`, except it's a command to run which will
+# determine the proper units to run and return them, one per line. This is
+# useful, for example, when you want to only run tests relevant to the changed
+# files.
+
+unit_list_cmd: scripts/determine_tests.sh
+
+# `on_push` determines what checks should be run when pushing a repo. Valid
+# options are `lint` and/or `unit` (or nothing, of course).
+
+on_push: [lint] # or [lint, unit]
+
+# `commit_template` points to a file to set the git `commit.template` config
+# to. This is really useful for ensuring that everyone has the same
+# template configured.
+
+commit_template: .git_commit_template.txt
+
+# `github_user` is the user to use when talking to GitHub. Overrides any such
+# setting in the regular SugarJar config. Most useful when in the
+# `include_from` file.
+
+github_user: myuser
+
+# `github_host` is the GitHub host to use when talking to GitHub (for hosted
+# GHE). See `github_user`.
+
+github_host: github.sample.com
