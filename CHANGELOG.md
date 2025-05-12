@@ -1,15 +1,24 @@
 # SugarJar Changelog
 
-## 2.0.0.beta.1 (2025-04-13)
+## 2.0.0 (2025-05-11)
 
+* Fix smartlog when on detached head
 * Drop support for `hub`, and thus also `fallthru` mode
-* Fix GHE handling for `gh`
-* Add GHE support into repoconfig
-* smartclone: set upstream for main branch to upstream remote when applicable
+* Fix GHE handling when using `gh`
+* Support `github_host` and `github_user` in repoconfig
 * Replace `version` subcommand with `debuginfo` subcommand (`--version` still
   exists)
+* `smartclone`: set upstream for main branch to upstream remote when applicable
 * Warn when deprecated options found in config file
 * Fix handling of `--color` in some cornercases
+* `subfeature` PRs: Fix bug where we would incorrectly deterine base branch
+* Checks: Fix bug where we would lint even if repo was dirty causing confusing
+  output
+* `feature` prefixes: Fix bug where we didn't look for the prefix on the base
+  branch when specified
+* Better handle creating PRs to branches other than "main"
+* Significantly improve unittest coverage
+* Bump required Ruby to 3.2
 
 ## 1.1.3 (2025-02-20)
 
