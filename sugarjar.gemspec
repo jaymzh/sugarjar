@@ -14,11 +14,14 @@ Gem::Specification.new do |spec|
     LICENSE
     Gemfile
     sugarjar.gemspec
+    CONTRIBUTING.md
+    CHANGELOG.md
   } + Dir.glob('examples/*')
   spec.extra_rdoc_files = docs
   spec.executables << 'sj'
   spec.files =
     Dir.glob('lib/sugarjar/*.rb') +
+    Dir.glob('lib/sugarjar/commands/*.rb') +
     Dir.glob('bin/*') +
     Dir.glob('extras/*')
 
