@@ -15,10 +15,12 @@ describe 'SugarJar::RepoConfig' do
           'lint',
         ],
       }
-      allow(SugarJar::RepoConfig).to receive(:config_file?).
+      expect(SugarJar::Util).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::RepoConfig).to receive(:repo_config_path).
+        and_return('some_path')
+      expect(SugarJar::RepoConfig).to receive(:config_file?).with('some_path').
         and_return(true)
-      allow(SugarJar::RepoConfig).to receive(:hash_from_file).
-        and_return(expected)
+      expect(YAML).to receive(:safe_load_file).and_return(expected)
       data = SugarJar::RepoConfig.config('whatever')
       # we gave it expected, this test basically makes sure we don't
       # break the data along the way
@@ -52,6 +54,8 @@ describe 'SugarJar::RepoConfig' do
           'top2key3' => 'c',
         },
       }
+      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+        and_return(true)
       allow(SugarJar::RepoConfig).to receive(:repo_config_path).
         with('base').and_return('base')
       allow(SugarJar::RepoConfig).to receive(:repo_config_path).
@@ -78,6 +82,8 @@ describe 'SugarJar::RepoConfig' do
       additional = {
         'new' => ['thing'],
       }
+      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+        and_return(true)
       %w{base additional}.each do |word|
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).
           with(word).and_return(word)
@@ -129,6 +135,8 @@ describe 'SugarJar::RepoConfig' do
           'things' => 'stuff',
         },
       }
+      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+        and_return(true)
       %w{base additional more}.each do |word|
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).
           with(word).and_return(word)
@@ -157,6 +165,8 @@ describe 'SugarJar::RepoConfig' do
       additional = {
         'something' => 'else',
       }
+      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+        and_return(true)
       %w{base additional}.each do |word|
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).
           with(word).and_return(word)
