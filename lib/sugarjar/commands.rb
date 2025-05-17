@@ -307,6 +307,30 @@ class SugarJar
       exit(1)
     end
 
+    def worktree_branches
+      worktrees.values.map do |wt|
+        branch_from_ref(wt['branch'])
+      end
+    end
+
+    def worktrees
+      root = SugarJar::Util.repo_root
+      s = git('worktree', 'list', '--porcelain')
+      s.error!
+      worktrees = {}
+      # each entry is separated by a double newline
+      s.stdout.split("\n\n").each do |entry|
+        # then each key/val is split by a new line with the key and
+        # the value themselves split by a whitespace
+        tree = entry.split("\n").to_h(&:split)
+        # Skip the one
+        next if tree['worktree'] == root
+
+        worktrees[tree['worktree']] = tree
+      end
+      worktrees
+    end
+
     def branch_from_ref(ref, type = :local)
       # local branches are refs/head/XXXX
       # remote branches are refs/remotes/<remote>/XXXX
