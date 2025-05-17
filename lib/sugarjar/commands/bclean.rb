@@ -4,6 +4,14 @@ class SugarJar
       assert_in_repo!
       name ||= current_branch
       name = fprefix(name)
+
+      wt_branches = worktree_branches
+
+      if wt_branches.include?(name)
+        SugarJar::Log.warn("#{name}: #{color('skipped', :yellow)} (worktree)")
+        return
+      end
+
       if clean_branch(name)
         SugarJar::Log.info("#{name}: #{color('reaped', :green)}")
       else
@@ -17,9 +25,16 @@ class SugarJar
     def bcleanall
       assert_in_repo!
       curr = current_branch
+      wt_branches = worktree_branches
       all_local_branches.each do |branch|
         if MAIN_BRANCHES.include?(branch)
           SugarJar::Log.debug("Skipping #{branch}")
+          next
+        end
+        if wt_branches.include?(branch)
+          SugarJar::Log.info(
+            "#{branch}: #{color('skipped', :yellow)} (worktree)",
+          )
           next
         end
 
