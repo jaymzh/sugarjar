@@ -8,6 +8,7 @@ describe 'SugarJar::Commands' do
   context '#feature' do
     it 'creates a branch based on remote-most-main-branch with no args' do
       branch = 'foo'
+      expect(sj).to receive(:assert_in_repo!).and_return(true)
       expect(sj).to receive(:fprefix).with(branch).and_return(branch)
       expect(sj).to receive(:all_local_branches).at_least(1).times.
         and_return(['main'])
@@ -23,6 +24,7 @@ describe 'SugarJar::Commands' do
     it 'creates a branch based on requested local branch with args' do
       branch = 'foo'
       base = 'bar'
+      expect(sj).to receive(:assert_in_repo!).and_return(true)
       expect(sj).to receive(:fprefix).with(branch).and_return(branch)
       expect(sj).to receive(:fprefix).with(base).and_return(base)
       expect(sj).to receive(:all_local_branches).at_least(1).times.
@@ -35,6 +37,7 @@ describe 'SugarJar::Commands' do
     it 'creates a branch based on requested remote branch with args' do
       branch = 'foo'
       base = 'upstream/bar'
+      expect(sj).to receive(:assert_in_repo!).and_return(true)
       expect(sj).to receive(:fprefix).with(branch).and_return(branch)
       expect(sj).to receive(:fprefix).with(base).and_return(base)
       expect(sj).to receive(:all_local_branches).at_least(1).times.
