@@ -314,7 +314,7 @@ directly from there.
 
 Sugarjar will read in both a system-level config file
 (`/etc/sugarjar/config.yaml`) and a user-level config file
-`~/.config/sugarjar/config.yaml`, if they exist. Anything in the user config
+(`~/.config/sugarjar/config.yaml`), if they exist. Anything in the user config
 will override the system config, and command-line options override both. The
 yaml file is a straight key-value pair of options without their '--'.
 
@@ -397,9 +397,9 @@ it on Windows, but I'll happily accept patches for Windows compatibility.
 
 **How do I get tab-completion?**
 
-If the package for your OS/distro didn't set it up manually, you should find
-that `sugarjar_completion.bash` is included in the package, and you can simply
-source that in your dotfiles, assuming you are using bash.
+If the package for your OS/distro didn't set it up automatically, you should
+find that `sugarjar_completion.bash` is included in the package, and you can
+simply source that in your dotfiles, assuming you are using bash.
 
 **What happens now that Sapling is released?**
 
