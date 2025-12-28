@@ -150,8 +150,10 @@ class SugarJar
       git(
         'branch', '--format', '%(refname)'
       ).stdout.lines.map do |line|
-        next if line.start_with?('(HEAD detached')
-
+        if line.start_with?('(')
+          SugarJar::Log.debug("Skipping meta-branch: #{line.strip}")
+          next
+        end
         branch_from_ref(line.strip)
       end
     end
