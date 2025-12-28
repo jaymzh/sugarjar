@@ -207,11 +207,13 @@ class SugarJar
       all_local_branches.reject { |x| x == most_main }.include?(base)
     end
 
-    def tracked_branch(fallback: true)
-      branch = nil
+    def tracked_branch(branch = nil, fallback: true)
+      curr = current_branch
+      git('checkout', branch) if branch && branch != curr
       s = git_nofail(
         'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'
       )
+      git('checkout', curr) if branch && branch != curr
       if s.error?
         branch = fallback ? most_main : nil
         SugarJar::Log.debug("No specific tracked branch, using #{branch}")
@@ -355,6 +357,12 @@ class SugarJar
       # remote branches are refs/remotes/<remote>/XXXX
       base = type == :local ? 2 : 3
       ref.split('/')[base..].join('/')
+    end
+
+    def remote_from_ref(ref)
+      return nil unless ref.start_with?('refs/remotes/')
+
+      ref.split('/')[2]
     end
 
     def git(*)
