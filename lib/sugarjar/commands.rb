@@ -119,6 +119,23 @@ class SugarJar
       die('sugarjar must be run from inside a git repo')
     end
 
+    def dirty_check!
+      return unless dirty?
+
+      if @ignore_dirty
+        SugarJar::Log.warn(
+          'Your repo is dirty, but --ignore-dirty was specified, so ' +
+          'carrying on anyway.',
+        )
+      else
+        SugarJar::Log.error(
+          'Your repo is dirty, so I am refusing to continue. Please commit ' +
+          'or amend first (or use --ignore-dirty to override).',
+        )
+        exit(1)
+      end
+    end
+
     def determine_main_branch(branches)
       branches.include?('main') ? 'main' : 'master'
     end

@@ -4,24 +4,11 @@ class SugarJar
   class Commands
     def pullsuggestions
       assert_in_repo!
-
-      if dirty?
-        if @ignore_dirty
-          SugarJar::Log.warn(
-            'Your repo is dirty, but --ignore-dirty was specified, so ' +
-            'carrying on anyway.',
-          )
-        else
-          SugarJar::Log.error(
-            'Your repo is dirty, so I am not going to push. Please commit ' +
-            'or amend first.',
-          )
-          exit(1)
-        end
-      end
+      dirty_check!
 
       src = "origin/#{current_branch}"
       fetch('origin')
+
       diff = git('diff', "..#{src}").stdout
       return unless diff && !diff.empty?
 

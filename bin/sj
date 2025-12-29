@@ -190,6 +190,20 @@ COMMANDS:
   subfeature, sf <feature>
               An alias for 'sj feature <feature> <current_branch>'
 
+  sync
+              Similar to `up`, except instead of rebasing on a tracked branch
+              (usually `upstream` remote), rebases to wherever our remote push
+              target is (usually `origin` remote). Useful for syncing work
+              across different machines.
+
+              For example, if you do some work on feature `foo` on machine1 and
+              push to `origin/foo` (intending to eventually merge to
+              `upstream/foo`), then on machine2, you pull that branch, do more
+              work, which you also push to `origin/foo`, then on machine1, you
+              can do `sj sync` to pull down the changes from `origin/foo`. If
+              you have local changes, that are not already on `origin/foo`,
+              those will be rebased on top of the changes from `origin/foo`.
+
   unit
               Run any unitests configured in .sugarjar.yaml.
 

@@ -53,15 +53,35 @@ class SugarJar
       end
     end
 
+    def sync
+      assert_in_repo!
+      dirty_check!
+
+      src = "origin/#{current_branch}"
+      fetch('origin')
+      s = git_nofail('merge-base', '--is-ancestor', 'HEAD', src)
+      if s.error?
+        SugarJar::Log.debug(
+          "Choosing rebase sync since this isn't a direct ancestor",
+        )
+        rebase(src)
+      else
+        SugarJar::Log.debug('Choosing reset sync since this is an ancestor')
+        git('reset', '--hard', src)
+      end
+      SugarJar::Log.info("Synced to #{src}.")
+    end
+
     private
 
-    def rebase
+    def rebase(base = nil)
+      skip_base_warning = !base.nil?
       SugarJar::Log.debug('Fetching upstream')
       fetch_upstream
       curr = current_branch
       # this isn't a hash, it's a named param, silly rubocop
       # rubocop:disable Style/HashSyntax
-      base = tracked_branch(fallback: false)
+      base ||= tracked_branch(fallback: false)
       # rubocop:enable Style/HashSyntax
       unless base
         SugarJar::Log.info(
@@ -74,7 +94,8 @@ class SugarJar
       # If this is a subfeature based on a local branch which has since
       # been deleted, 'tracked branch' will automatically return <most_main>
       # so we don't need any special handling for that
-      if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}"
+      if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}" &&
+         !skip_base_warning
         SugarJar::Log.warn(
           "This branch is tracking origin/#{curr}, which is probably your " +
           'downstream (where you push _to_) as opposed to your upstream ' +

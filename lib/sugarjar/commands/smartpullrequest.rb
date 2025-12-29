@@ -6,6 +6,7 @@ class SugarJar
       assert_in_repo!
       assert_common_main_branch!
 
+      # does not use `dirty_check!` because we don't allow overriding here
       if dirty?
         SugarJar::Log.warn(
           'Your repo is dirty, so I am not going to create a pull request. ' +
