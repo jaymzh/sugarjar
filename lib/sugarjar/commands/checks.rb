@@ -4,6 +4,8 @@ class SugarJar
   class Commands
     def lint
       assert_in_repo!
+
+      # does not use dirty_check! as we want a custom message
       if dirty?
         if @ignore_dirty
           SugarJar::Log.warn(

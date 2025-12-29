@@ -20,20 +20,7 @@ class SugarJar
         branch ||= current_branch
       end
 
-      if dirty?
-        if @ignore_dirty
-          SugarJar::Log.warn(
-            'Your repo is dirty, but --ignore-dirty was specified, so ' +
-            'carrying on anyway.',
-          )
-        else
-          SugarJar::Log.error(
-            'Your repo is dirty, so I am not going to push. Please commit ' +
-            'or amend first.',
-          )
-          exit(1)
-        end
-      end
+      dirty_check!
 
       unless run_prepush
         if @ignore_prerun_failure
