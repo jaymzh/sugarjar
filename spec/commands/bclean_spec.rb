@@ -7,7 +7,8 @@ describe 'SugarJar::Commands' do
 
   context '#safe_to_clean' do
     it 'Allows cleanup when cherry -v shows no delta' do
-      expect(sj).to receive(:tracked_branch).and_return('origin/main')
+      expect(sj).to receive(:tracked_branch).with('foo').
+        and_return('origin/main')
       so = double({ 'stdout' => '' })
       expect(sj).to receive(:git).with('cherry', '-v', 'origin/main', 'foo').
         and_return(so)
@@ -15,7 +16,8 @@ describe 'SugarJar::Commands' do
     end
 
     it 'Allows cleanup when cherry -v shows no important delta' do
-      expect(sj).to receive(:tracked_branch).and_return('origin/main')
+      expect(sj).to receive(:tracked_branch).with('foo').
+        and_return('origin/main')
       so = double({ 'stdout' => "- aabbcc0 something\n-bbccdd1 another\n" })
       expect(sj).to receive(:git).with('cherry', '-v', 'origin/main', 'foo').
         and_return(so)
@@ -27,8 +29,7 @@ describe 'SugarJar::Commands' do
       tracked_branch = 'origin/main'
       tmp_branch = '_sugar_jar.123'
 
-      expect(sj).to receive(:tracked_branch).at_least(2).times.
-        and_return(tracked_branch)
+      expect(sj).to receive(:tracked_branch).and_return(tracked_branch)
       so = double({ 'stdout' => "+ aabbcc0 something\n" })
       expect(sj).to receive(:git).with('cherry', '-v', tracked_branch, branch).
         and_return(so)
@@ -39,7 +40,8 @@ describe 'SugarJar::Commands' do
       so2 = double({ 'error?' => true })
       expect(sj).to receive(:git_nofail).with('merge', '--squash', branch).
         and_return(so2)
-      expect(sj).to receive(:cleanup_tmp_branch).with(tmp_branch, branch)
+      expect(sj).to receive(:cleanup_tmp_branch).
+        with(tmp_branch, branch, tracked_branch)
       expect(sj.send(:safe_to_clean, branch)).to eq(false)
     end
 
@@ -48,8 +50,7 @@ describe 'SugarJar::Commands' do
       tracked_branch = 'origin/main'
       tmp_branch = '_sugar_jar.123'
 
-      expect(sj).to receive(:tracked_branch).at_least(2).times.
-        and_return(tracked_branch)
+      expect(sj).to receive(:tracked_branch).and_return(tracked_branch)
       so = double({ 'stdout' => "+ aabbcc0 something\n" })
       expect(sj).to receive(:git).with('cherry', '-v', tracked_branch, branch).
         and_return(so)
@@ -62,7 +63,8 @@ describe 'SugarJar::Commands' do
         and_return(so2)
       so3 = double({ 'stdout' => 'here is output' })
       expect(sj).to receive(:git).with('diff', '--staged').and_return(so3)
-      expect(sj).to receive(:cleanup_tmp_branch).with(tmp_branch, branch)
+      expect(sj).to receive(:cleanup_tmp_branch).
+        with(tmp_branch, branch, tracked_branch)
       expect(sj.send(:safe_to_clean, branch)).to eq(false)
     end
 
@@ -71,8 +73,7 @@ describe 'SugarJar::Commands' do
       tracked_branch = 'origin/main'
       tmp_branch = '_sugar_jar.123'
 
-      expect(sj).to receive(:tracked_branch).at_least(2).times.
-        and_return(tracked_branch)
+      expect(sj).to receive(:tracked_branch).and_return(tracked_branch)
       so = double({ 'stdout' => "+ aabbcc0 something\n" })
       expect(sj).to receive(:git).with('cherry', '-v', tracked_branch, branch).
         and_return(so)
@@ -86,8 +87,19 @@ describe 'SugarJar::Commands' do
 
       so3 = double({ 'stdout' => '' })
       expect(sj).to receive(:git).with('diff', '--staged').and_return(so3)
-      expect(sj).to receive(:cleanup_tmp_branch).with(tmp_branch, branch)
+      expect(sj).to receive(:cleanup_tmp_branch).
+        with(tmp_branch, branch, tracked_branch)
       expect(sj.send(:safe_to_clean, branch)).to eq(true)
+    end
+
+    it 'Uses the correct base for detecting delta' do
+      expect(sj).to receive(:tracked_branch).with('feature/foo').
+        and_return('origin/develop')
+      so = double({ 'stdout' => '' })
+      expect(sj).to receive(:git).
+        with('cherry', '-v', 'origin/develop', 'feature/foo').
+        and_return(so)
+      expect(sj.send(:safe_to_clean, 'feature/foo')).to eq(true)
     end
   end
 end

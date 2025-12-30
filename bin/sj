@@ -118,14 +118,40 @@ COMMANDS:
               Same as "amend" but without changing the message. Alias for
               "git commit --amend --no-edit".
 
-  bclean [<branch>]
+  branchclean, bclean [<branch>]
               If safe, delete the current branch (or the specified branch).
               Unlike "git branch -d", bclean can handle squash-merged branches.
               Think of it as a smarter "git branch -d".
 
-  bcleanall
+  remoteclean, rclean [<branch>] [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+              Similar to bclean, except safely cleans up remote branches.
+              Unlike many git commands, <remote> comes after <branch> so
+              that you can specify a branch and the remote defaults to 'origin'.
+              This means you can do "sj rclean" to clean the remote branch with
+              the same name as the local one. Note that you probably want
+              "sclean", which will do both local and remote cleaning in one
+              command.
+
+  superclean, sclean [<branch>] [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+              Super-clean: combination of "bclean" and "rclean". Cleans up
+              both local and remote branches safely. See those commands for
+              details.
+
+  branchcleanall, bcleanall
               Walk all branches, and try to delete them if it's safe. See
               "bclean" for details.
+
+  remotecleanall, rcleanall [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+              Walk all remote branches, and try to delete them if it's safe. See
+              "rclean" for details.
+
+  supercleanall, scleanall [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+              Super-clean. Safely clean all branches, both local and remote.
+              See "sclean" for details.
 
   binfo
               Verbose information about the current branch.
