@@ -118,15 +118,6 @@ COMMANDS:
               Same as "amend" but without changing the message. Alias for
               "git commit --amend --no-edit".
 
-  bclean [<branch>]
-              If safe, delete the current branch (or the specified branch).
-              Unlike "git branch -d", bclean can handle squash-merged branches.
-              Think of it as a smarter "git branch -d".
-
-  bcleanall
-              Walk all branches, and try to delete them if it's safe. See
-              "bclean" for details.
-
   binfo
               Verbose information about the current branch.
 
@@ -157,13 +148,61 @@ COMMANDS:
               branches. Very convenient for keeping the branch behind a pull-
               request clean.
 
+  globalbranchclean, gbclean [<branch>] [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+
+              Combination of "lbclean" and "rbclean". Cleans up
+              both local and remote branches safely. See those commands for
+              details.
+
+  globalbranchcleanall, gbcleanall [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+
+              Safely clean all branches, both local and remote.  See "gbclean"
+              for details.
+
   lint
               Run any linters configured in .sugarjar.yaml.
+
+  localbranchclean, lbclean [<branch>]
+              If safe, delete the current branch (or the specified branch).
+              Unlike "git branch -d", lbclean can handle squash-merged branches.
+              Think of it as a smarter "git branch -d".
+
+              Aliased to 'bclean' for backwards compatibility.
+
+  localbranchcleanall, lbcleanall
+              Walk all branches, and try to delete them if it's safe. See
+              "lbclean" for details.
+
+              Aliased to 'bcleanall' for backwards compatibility.
 
   pullsuggestions, ps
               Pull any suggestions *that have been committed* in the GitHub UI.
               This will show the diff and prompt for confirmation before
               merging. Note that a fast-forward merge will be used.
+
+  remotebranchclean, rbclean [<branch>] [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+
+              Similar to lbclean, except safely cleans up remote branches.
+              Unlike many git commands, <remote> comes after <branch> so
+              that you can specify a branch and the remote defaults to 'origin'.
+              This means you can do "sj rclean" to clean the remote branch with
+              the same name as the local one. Note that you probably want
+              "sclean", which will do both local and remote cleaning in one
+              command.
+
+              WARNING: This command cannot differentiate release branches
+              that are fully merged but still need to be kept around for future
+              work. So if main contains everything that 2.0-devel and 3.0-devel
+              has, then those branches will be deleted. Use with caution.
+
+  remotebranchcleanall, rbcleanall [<remote>]
+              WARNING: EXPERIMENTAL COMMAND.
+
+              Walk all remote branches, and try to delete them if it's safe. See
+              "rbclean" for details.
 
   smartclone, sclone
               A smart wrapper to "git clone" that handles forking and managing
