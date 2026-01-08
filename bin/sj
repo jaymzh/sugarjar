@@ -237,7 +237,7 @@ COMMANDS:
 
               For example, if you do some work on feature `foo` on machine1 and
               push to `origin/foo` (intending to eventually merge to
-              `upstream/foo`), then on machine2, you pull that branch, do more
+              `upstream/main`), then on machine2, you pull that branch, do more
               work, which you also push to `origin/foo`, then on machine1, you
               can do `sj sync` to pull down the changes from `origin/foo`. If
               you have local changes, that are not already on `origin/foo`,
