@@ -2,6 +2,7 @@
 
 ## Prep PR
 
+* Get latest brew sources, `brew update`
 * Edit
   `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/s/sugarjar.rb`
   modifying the version and the sha. See [previous
