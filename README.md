@@ -30,6 +30,7 @@ Jump to what you're most interested in:
    * [Cleaning up your own history](#cleaning-up-your-own-history)
    * [Better feature branches](#better-feature-branches)
    * [Smartlog](#smartlog)
+   * [Sync work across workstations](#sync-work-across-workstations)
    * [Pulling in suggestions from the web](#pulling-in-suggestions-from-the-web)
    * [And more!](#and-more)
 * [Installation](#installation)
@@ -50,8 +51,10 @@ doesn't work. Git will tell you the branch isn't fully merged. You can, of
 course `git branch -D <branch>`, but that does no safety checks at all, it
 forces the deletion.
 
-Enter `sj bclean` - it determines if the contents of your branch has been merge
-and safely deletes if so.
+Enter `sj lbclean` - it determines if the contents of your branch has been merge
+and safely deletes if so. (Note: `lbclean` stands for "local branch clean", and
+is aliased to `bclean` for both backwards-compatibility and also since it's the
+most common branch-cleanup command).
 
 ![bclean screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/bclean.png)
 
@@ -64,6 +67,17 @@ But it gets better! You can use `sj bcleanall` to remove all branches that have
 been merged:
 
 ![bcleanall screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/bcleanall.png)
+
+There is also `sj rbclean` ("remote branch clean") (and `sj rbcleanall`) for
+cleanup of remote branches. *Note*: This cannot differentiate between
+PR/feature branches which have been merged and long-lived release branches that
+have been merged (e.g.  if '2.0-release' is a branch and has no commits not in
+main, it will be deleted).
+
+There is even `sj gbclean` ("global branch clean") (and `sj gbcleanall`) which will
+do both the local and remote cleaning.
+
+*NOTE*: Remote branch cleaning is still experimental, use with caution!
 
 ### Smarter clones and remotes
 
@@ -274,6 +288,21 @@ Smartlog will show you a tree diagram of your branches! Simply run `sj
 smartlog` or `sj sl` for short.
 
 ![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/smartlog.png)
+
+### Sync work across workstations
+
+If you work on multiple workstations, keeping your branches in-sync can be a
+pain. SugarJar provides `sync` to help with this.
+
+For example, if you do some work on feature `foo` on machine1 and push to
+`origin/foo` (intending to eventually merge to `upstream/main`), then on
+machine2, you pull that branch, do more work, which you also push to
+`origin/foo`, then on machine1, you can do `sj sync` to pull down the changes
+from `origin/foo`. If you have local changes, that are not already on
+`origin/foo`, those will be rebased on top of the changes from `origin/foo`.
+
+It's very similar to `sj up`, but instead of rebasing on top of the tracking
+branch, it rebases on top of the push target branch.
 
 ### Pulling in suggestions from the web
 

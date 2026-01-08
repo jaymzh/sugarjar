@@ -1,5 +1,25 @@
 # SugarJar Changelog
 
+## 2.0.2 (2026-01-08)
+
+* Fix `branchclean` logic to properly compare with the target branch
+  (might have refused to clean branches that could be cleaned)
+* Add new commands to handle remote branch cleanup as well as rename
+  `bclean` (keeping backwards compatible aliases):
+   * `localbranchclean` / `lbclean` - local branch clean. aliased as
+     `bclean` for back-comat
+   * `localbranchcleanall` / `lbcleanall` - local all branch clean aliased
+     as `bcleanall` for back-compat
+   * `remotebranchclean` / `rbclean` - remote branch clean
+   * `remotebranchcleanall` / `rbcleanall` - remote all branch clean
+   * `globalbranchclean` / `gbclean` - local+remote branch clean
+   * `globalbranchcleanall` / `gbcleanall` - local+remote all branch clean
+* Added new `sync` command to aid syncing branches across multiple workstations,
+  see help for details.
+* Fix meta-ref handling which fixes crashes when using `smartlog` during rebases
+* Handle worktress gracefully when doing branch cleans
+* Make unittests work properly outside of git repos
+
 ## 2.0.1 (2025-05-12)
 
 * Fix gemspec to include new library files

@@ -5,14 +5,14 @@ describe 'SugarJar::Commands' do
     SugarJar::Commands.new({ 'no_change' => true })
   end
 
-  context '#safe_to_clean' do
+  context '#safe_to_clean?' do
     it 'Allows cleanup when cherry -v shows no delta' do
       expect(sj).to receive(:tracked_branch).with('foo').
         and_return('origin/main')
       so = double({ 'stdout' => '' })
       expect(sj).to receive(:git).with('cherry', '-v', 'origin/main', 'foo').
         and_return(so)
-      expect(sj.send(:safe_to_clean, 'foo')).to eq(true)
+      expect(sj.send(:safe_to_clean?, 'foo')).to eq(true)
     end
 
     it 'Allows cleanup when cherry -v shows no important delta' do
@@ -21,7 +21,7 @@ describe 'SugarJar::Commands' do
       so = double({ 'stdout' => "- aabbcc0 something\n-bbccdd1 another\n" })
       expect(sj).to receive(:git).with('cherry', '-v', 'origin/main', 'foo').
         and_return(so)
-      expect(sj.send(:safe_to_clean, 'foo')).to eq(true)
+      expect(sj.send(:safe_to_clean?, 'foo')).to eq(true)
     end
 
     it 'Does not allow cleanup when we fail to build our merge test branch' do
@@ -42,7 +42,7 @@ describe 'SugarJar::Commands' do
         and_return(so2)
       expect(sj).to receive(:cleanup_tmp_branch).
         with(tmp_branch, branch, tracked_branch)
-      expect(sj.send(:safe_to_clean, branch)).to eq(false)
+      expect(sj.send(:safe_to_clean?, branch)).to eq(false)
     end
 
     it 'Does not allow cleanup when merge test branch shows delta' do
@@ -65,7 +65,7 @@ describe 'SugarJar::Commands' do
       expect(sj).to receive(:git).with('diff', '--staged').and_return(so3)
       expect(sj).to receive(:cleanup_tmp_branch).
         with(tmp_branch, branch, tracked_branch)
-      expect(sj.send(:safe_to_clean, branch)).to eq(false)
+      expect(sj.send(:safe_to_clean?, branch)).to eq(false)
     end
 
     it 'Does allows cleanup when merge test branch shows no delta' do
@@ -89,7 +89,7 @@ describe 'SugarJar::Commands' do
       expect(sj).to receive(:git).with('diff', '--staged').and_return(so3)
       expect(sj).to receive(:cleanup_tmp_branch).
         with(tmp_branch, branch, tracked_branch)
-      expect(sj.send(:safe_to_clean, branch)).to eq(true)
+      expect(sj.send(:safe_to_clean?, branch)).to eq(true)
     end
 
     it 'Uses the correct base for detecting delta' do
@@ -99,7 +99,7 @@ describe 'SugarJar::Commands' do
       expect(sj).to receive(:git).
         with('cherry', '-v', 'origin/develop', 'feature/foo').
         and_return(so)
-      expect(sj.send(:safe_to_clean, 'feature/foo')).to eq(true)
+      expect(sj.send(:safe_to_clean?, 'feature/foo')).to eq(true)
     end
   end
 end

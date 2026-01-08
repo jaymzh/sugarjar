@@ -136,6 +136,7 @@ class SugarJar
 
     private
 
+    # rubocop:disable Naming/PredicateMethod
     def clean_branch(name, type = :local)
       undeleteable = MAIN_BRANCHES.dup
       undeleteable << 'HEAD' if type == :remote
@@ -143,7 +144,7 @@ class SugarJar
       SugarJar::Log.debug('Fetch relevant remote...')
       fetch_upstream
       fetch(remote_from_ref(name)) if type == :remote
-      return false unless safe_to_clean(name)
+      return false unless safe_to_clean?(name)
 
       SugarJar::Log.debug('branch deemed safe to delete...')
       if type == :remote
@@ -157,8 +158,9 @@ class SugarJar
       end
       true
     end
+    # rubocop:enable Naming/PredicateMethod
 
-    def safe_to_clean(branch)
+    def safe_to_clean?(branch)
       # cherry -v will output 1 line per commit on the target branch
       # prefixed by a - or + - anything with a - can be dropped, anything
       # else cannot.
