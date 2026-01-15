@@ -329,12 +329,13 @@ above image, it'll take you to a page that lists unsupported distro versions
 as well (they'll have older SugarJar, but they'll probably still have some
 version).
 
-Ubuntu users, Ubuntu versions prior to 24.x cannot be updated, so if you're on
-an older Ubuntu please use [this
-PPA](https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) from our
+**Ubuntu users**: You can use [this
+PPA](https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) to get newer
+versions for all supported Ubuntu releases (as well as some older versions).
 Ubuntu package maintainer.
 
-For MacOS users, we recommend using Homebrew - SugarJar is now in Homebrew Core.
+**MacOS users**: We recommend using Homebrew - we keep SugarJar updated in
+Homebrew Core.
 
 Finally, if none of those work for you, you can clone this repo and run it
 directly from there.
