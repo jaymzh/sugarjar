@@ -12,16 +12,7 @@ Some links and refs useful to keep handy
 
 ## Prep
 
-Start the vagrant machine, ssh to it (`vagrant up; vagrant ssh`)
-
-*NOTE*: When provisioning the node you have to do:
-
-```shell
-SSH_AUTH_SOCK= vagrant up
-```
-
-Since part of provisioning uses an RSA key that agents will refuse to use
-to sign data.
+Use fedora distrobox.
 
 If not already checked out, check out the dist-git:
 
