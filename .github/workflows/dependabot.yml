@@ -1,0 +1,6 @@
+version: 2
+updates:
+  - package-ecosystem: "gem"
+    directory: "/"
+    schedule:
+      interval: "weekly"

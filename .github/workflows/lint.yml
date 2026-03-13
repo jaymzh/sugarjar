@@ -6,14 +6,19 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions: {}
+
 jobs:
   rubocop:
+    permissions:
+      contents: read
+      pull-requests: read
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -23,6 +28,9 @@ jobs:
     - name: Run rubocop
       run: bundle exec rubocop --display-cop-names
   markdownlint:
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -30,6 +38,9 @@ jobs:
       - name: MarkdownLint mdl Action
         uses: actionshub/markdownlint@1.2.0
   linelint:
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     name: Check if all files end in newline
     steps:
