@@ -11,4 +11,9 @@ jobs:
       checks: read
       contents: read
     steps:
-      - uses: wechuli/allcheckspassed@v1
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
+        with:
+          egress-policy: audit
+
+      - uses: wechuli/allcheckspassed@e22f45a4f25f4cf821d1273705ac233355400db1 # v1.2.0

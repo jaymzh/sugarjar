@@ -17,10 +17,15 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
+      with:
+        egress-policy: audit
+
     - name: checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - name: Setup ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@4eb9f110bac952a8b68ecf92e3b5c7a987594ba6 # v1.292.0
       with:
         ruby-version: '3.2'
     - name: install deps
@@ -33,10 +38,15 @@ jobs:
       pull-requests: read
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
+        with:
+          egress-policy: audit
+
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: MarkdownLint mdl Action
-        uses: actionshub/markdownlint@1.2.0
+        uses: actionshub/markdownlint@2601ac85428122bc70b8d1ec4d539d1cfe17c0b3 # 1.2.0
   linelint:
     permissions:
       contents: read
@@ -44,8 +54,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Check if all files end in newline
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
+        with:
+          egress-policy: audit
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Linelint
-        uses: fernandrone/linelint@master
+        uses: fernandrone/linelint@7907a5dca0c28ea7dd05c6d8d8cacded713aca11 # master
         id: linelint
