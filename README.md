@@ -3,6 +3,7 @@
 [![Lint](https://github.com/jaymzh/sugarjar/workflows/Lint/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3ALint)
 [![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
 [![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
+[![CodeQL](https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml/badge.svg)](https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml)
 
 Welcome to SugarJar - a git/github helper. The only requirements are Ruby,
 `git`, and [gh](https://cli.github.com/).
