@@ -197,6 +197,24 @@ It looks like this is a subfeature, would you like to base this PR on mynewthing
 ...
 ```
 
+### Smart release branch handling
+
+You can tell sugar what release branches exist, and it will intelligently
+handle them. So of you specify, in your repoconfig:
+
+```yaml
+release_branches: ['v1-branch', 'v2-branch']
+```
+
+Then:
+
+* `sj feature v1-backport-foo v2-branch` will automatically base this
+  branch on `upstream/v2-branch` (or `origin/v2-branch` as appropriate)
+* `sj feature v2-branch` will checkout `v2-branch` with the upstream set
+  to `upstream/v2-branch` (or `origin/v2-branch` as appropriate)
+* `sj lbclean`/`sj lbcleanall` (of all varieties) will never reap release
+  branches
+
 ### Have a better lint/unittest experience!
 
 Ever made a PR, only to find out later that it failed tests because of some

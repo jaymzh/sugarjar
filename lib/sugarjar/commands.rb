@@ -328,6 +328,10 @@ class SugarJar
       exit(1)
     end
 
+    def release_branches
+      @repo_config['release_branches'] || []
+    end
+
     def worktree_branches
       worktrees.values.map do |wt|
         branch_from_ref(wt['branch'])
