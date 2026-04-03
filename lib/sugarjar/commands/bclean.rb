@@ -6,9 +6,17 @@ class SugarJar
       name = fprefix(name)
 
       wt_branches = worktree_branches
+      rel_branches = release_branches
 
       if wt_branches.include?(name)
         SugarJar::Log.warn("#{name}: #{color('skipped', :yellow)} (worktree)")
+        return
+      end
+
+      if rel_branches.include?(name)
+        SugarJar::Log.warn(
+          "#{name}: #{color('skipped', :yellow)} (release branch)",
+        )
         return
       end
 
