@@ -126,7 +126,7 @@ describe 'SugarJar::Commands' do
       expect($stdin).to receive(:gets).and_return("a\n")
       expect(sj).to receive(:qamend).with('-a')
       expect(sj).to receive(:dirty?).and_return(false)
-      sj.run_check('lint')
+      sj.run_check('lint', true)
     end
 
     it 'quits if linter autocorrects and user says no' do
@@ -150,7 +150,7 @@ describe 'SugarJar::Commands' do
         raise SystemExit, 1
       end
       expect do
-        sj.run_check('lint')
+        sj.run_check('lint', true)
       end.to raise_error(SystemExit)
     end
 
@@ -169,7 +169,7 @@ describe 'SugarJar::Commands' do
         expect(Mixlib::ShellOut).to receive(:new).with(cmd).and_return(so)
         expect(so).to receive(:run_command).and_return(so)
         expect(sj).to receive(:dirty?).and_return(false) if type == 'lint'
-        expect(sj.run_check(type)).to eq(false)
+        expect(sj.run_check(type, true)).to eq(false)
       end
     end
   end

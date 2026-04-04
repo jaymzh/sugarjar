@@ -22,12 +22,12 @@ class SugarJar
           exit(1)
         end
       end
-      exit(1) unless run_check('lint')
+      exit(1) unless run_check('lint', false)
     end
 
     def unit
       assert_in_repo!
-      exit(1) unless run_check('unit')
+      exit(1) unless run_check('unit', false)
     end
 
     def get_checks_from_command(type)
@@ -71,7 +71,13 @@ class SugarJar
       @checks[type]
     end
 
-    def run_check(type)
+    # autorun is true when we're running from push, and false when someone
+    # ran 'lint' or 'unit' directly
+    #
+    # In the case of a autorun, if a linter changes the code, we require
+    # either the user amend, or bail out. If it's a manual run, then we
+    # allow them to just go on.
+    def run_check(type, autorun)
       repo_root = SugarJar::Util.repo_root
       Dir.chdir repo_root do
         checks = get_checks(type)
@@ -81,6 +87,7 @@ class SugarJar
 
         checks.each do |check|
           SugarJar::Log.debug("Running #{type} #{check}")
+          skip_redo = false
 
           short = check.split.first
           if short.include?('/')
@@ -104,10 +111,15 @@ class SugarJar
             )
             puts git('diff').stdout
             loop do
-              $stdout.print(
-                "\nWould you like to\n\t[q]uit and inspect\n\t[a]mend the " +
-                "changes to the current commit and re-run\n  > ",
-              )
+              options = [
+                '[q]uit and inspect',
+                '[a]mend the changes to the current commit and re-run',
+              ]
+              options << '[i]gnore the changes and keep going' unless autorun
+
+              msg = "\nWould you like to\n\t" + options.join("\n\t") + "\n  > "
+
+              $stdout.print(msg)
               ans = $stdin.gets.strip
               case ans
               when /^q/
@@ -118,9 +130,14 @@ class SugarJar
                 # break here, if we get out of this loop we 'redo', assuming
                 # the user chose this option
                 break
+              when /^i/
+                unless autorun
+                  skip_redo = true
+                  break
+                end
               end
             end
-            redo
+            redo unless skip_redo
           end
 
           if s.error?
