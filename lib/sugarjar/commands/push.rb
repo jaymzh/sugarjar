@@ -43,7 +43,7 @@ class SugarJar
     def run_prepush
       @repo_config['on_push']&.each do |item|
         SugarJar::Log.debug("Running on_push check type #{item}")
-        unless run_check(item)
+        unless run_check(item, true)
           SugarJar::Log.info("[prepush]: #{item} #{color('failed', :red)}.")
           return false
         end
