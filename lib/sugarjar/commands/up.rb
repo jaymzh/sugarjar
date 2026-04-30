@@ -53,21 +53,53 @@ class SugarJar
       end
     end
 
-    def sync
+    def fsync
+      sync(:force => true)
+    end
+    alias forcesync fsync
+
+    def sync(force: false)
       assert_in_repo!
       dirty_check!
 
       src = "origin/#{current_branch}"
       fetch('origin')
-      s = git_nofail('merge-base', '--is-ancestor', 'HEAD', src)
-      if s.error?
-        SugarJar::Log.debug(
-          "Choosing rebase sync since this isn't a direct ancestor",
-        )
-        rebase(src)
-      else
-        SugarJar::Log.debug('Choosing reset sync since this is an ancestor')
+      want_reset = false
+      if force
+        SugarJar::Log.debug('Forcing reset instead of rebase at user request')
+        want_reset = true
+      end
+
+      unless force
+        s = git_nofail('merge-base', '--is-ancestor', 'HEAD', src)
+        # if this IS an ancestor, we can just force reset.
+        #
+        # otherwise, we attempt a rebase to not lose anything (unless
+        # force is set)
+        if s.error?
+          SugarJar::Log.debug(
+            "Choosing rebase sync since this isn't a direct ancestor",
+          )
+        else
+          SugarJar::Log.debug('Choosing reset sync since this is an ancestor')
+          want_reset = true
+        end
+      end
+
+      if want_reset
         git('reset', '--hard', src)
+      else
+        rebase(src)
+        s = git_nofail('rev-parse', '--verify', 'REBASE_HEAD')
+        unless s.error?
+          SugarJar::Log.info(
+            'Rebase required input. You may continue the rebase from' +
+            ' here normally, or you may abort (`git rebase --abort`)' +
+            ' and instead to `sj fsync` to skip a rebase and force' +
+            ' reset to the remote branch.',
+          )
+          return
+        end
       end
       SugarJar::Log.info("Synced to #{src}.")
     end

@@ -148,6 +148,10 @@ COMMANDS:
               branches. Very convenient for keeping the branch behind a pull-
               request clean.
 
+  forcesync, fsync
+              See 'sync' below, but never tries to rebase, always does a
+              hard reset.
+
   globalbranchclean, gbclean [<branch>] [<remote>]
               WARNING: EXPERIMENTAL COMMAND.
 
