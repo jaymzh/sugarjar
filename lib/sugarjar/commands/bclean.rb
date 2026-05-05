@@ -5,18 +5,11 @@ class SugarJar
       name ||= current_branch
       name = fprefix(name)
 
-      wt_branches = worktree_branches
-      rel_branches = release_branches
-
-      if wt_branches.include?(name)
-        SugarJar::Log.warn("#{name}: #{color('skipped', :yellow)} (worktree)")
-        return
-      end
-
-      if rel_branches.include?(name)
-        SugarJar::Log.warn(
-          "#{name}: #{color('skipped', :yellow)} (release branch)",
-        )
+      should_skip, why = skip_branch_info(name)
+      if should_skip
+        msg = "#{name}: #{color('skipped', :yellow)}"
+        msg << " (#{why})" if why
+        SugarJar::Log.warn(msg)
         return
       end
 
@@ -69,16 +62,17 @@ class SugarJar
     def lbcleanall
       assert_in_repo!
       curr = current_branch
-      wt_branches = worktree_branches
+      worktree_branches
       all_local_branches.each do |branch|
-        if MAIN_BRANCHES.include?(branch)
-          SugarJar::Log.debug("Skipping #{branch}")
-          next
-        end
-        if wt_branches.include?(branch)
-          SugarJar::Log.info(
-            "#{branch}: #{color('skipped', :yellow)} (worktree)",
-          )
+        # skip_branch info will check for MAIN_BRANCHES, but we
+        # quietly skip them.
+        next if MAIN_BRANCHES.include?(branch)
+
+        should_skip, why = skip_branch_info(branch)
+        if should_skip
+          msg = "#{branch}: #{color('skipped', :yellow)}"
+          msg << " (#{why})" if why
+          SugarJar::Log.info(msg)
           next
         end
 
@@ -236,6 +230,19 @@ class SugarJar
       git('checkout', backto)
       # delete our temp branch
       git('branch', '-D', tmp)
+    end
+
+    def skip_branch_info(name)
+      return true, 'main branch' if MAIN_BRANCHES.include?(name)
+
+      wt_branches = worktree_branches
+      rel_branches = release_branches
+
+      return true, 'worktree' if wt_branches.include?(name)
+
+      return true, 'release branch' if rel_branches.include?(name)
+
+      [false, nil]
     end
   end
 end
