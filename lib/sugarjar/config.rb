@@ -7,6 +7,7 @@ class SugarJar
   class Config
     DEFAULTS = {
       'github_user' => ENV.fetch('USER'),
+      'gitlab_user' => ENV.fetch('USER'),
       'pr_autofill' => true,
       'pr_autostack' => nil,
       'color' => true,

@@ -7,8 +7,12 @@ This is mostly notes to myself.
 Some links and refs useful to keep handy
 
 * [Sugar Jar dist-git](https://src.fedoraproject.org/rpms/rubygem-sugarjar)
-* [Package Maintenance Guide](https://docs.fedoraproject.org/en-US/package-maintainers/Package_Maintenance_Guide/)
-* [Machines you can use](https://fedoraproject.org/wiki/Test_Machine_Resources_For_Package_Maintainers)
+* [Package Maintenance Guide](
+  https://docs.fedoraproject.org/en-US/package-maintainers/Package_Maintenance_Guide/
+  )
+* [Machines you can use](
+  https://fedoraproject.org/wiki/Test_Machine_Resources_For_Package_Maintainers
+  )
 
 ## Prep
 

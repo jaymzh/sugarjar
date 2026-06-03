@@ -4,7 +4,7 @@ class SugarJar
   class Commands
     def debuginfo(*args)
       puts "sugarjar version #{SugarJar::VERSION}"
-      puts ghcli('version').stdout
+      puts forge('version').stdout
       puts git('version').stdout
 
       puts "Config: #{JSON.pretty_generate(args[0])}"

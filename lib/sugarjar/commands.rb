@@ -36,13 +36,27 @@ class SugarJar
       @checks = {}
       @main_branch = nil
       @main_remote_branches = {}
-      @ghuser = @repo_config['github_user'] || options['github_user']
-      @ghhost = @repo_config['github_host'] || options['github_host']
+      # This is CONFIGURED host, which may be null, as opposed
+      # to the method forge_host which will always return something
+      @_forge_host = @repo_config['forge_host'] || options['forge_host']
+      @repo_forge = @repo_config['forge_type'] || options['forge_type'] ||
+                    _determine_forge_type
 
-      die("No 'gh' found, please install 'gh'") unless gh_avail?
+      unless @repo_forge.nil?
+        cmd = _forge_cmd
+        unless SugarJar::Util.which_nofail(cmd)
+          die("No '#{cmd}' found, please install it'")
+        end
+      end
 
-      # Tell the 'gh' cli where to talk to, if not github.com
-      ENV['GH_HOST'] = @ghhost if @ghhost
+      user_option = "#{@repo_forge}_user"
+      @forge_user = @repo_config[user_option] || options[user_option]
+
+      # Tell the cli where to talk to, if not default
+      if @_forge_host
+        ENV['GH_HOST'] = @_forge_host
+        ENV['GL_HOST'] = @_forge_host
+      end
 
       return if options['no_change']
 
@@ -52,12 +66,8 @@ class SugarJar
     private
 
     def forked_repo(repo, username)
-      repo = if repo.start_with?('http', 'git@')
-               File.basename(repo)
-             else
-               "#{File.basename(repo)}.git"
-             end
-      "git@#{@ghhost || 'github.com'}:#{username}/#{repo}"
+      repo = extract_repo(repo)
+      "git@#{forge_host}:#{username}/#{repo}.git"
     end
 
     # gh utils will default to https, but we should always default to SSH
@@ -66,10 +76,39 @@ class SugarJar
       # if they fully-qualified it, we're good
       return repo if repo.start_with?('http', 'git@')
 
-      # otherwise, ti's a shortname
-      cr = "git@#{@ghhost || 'github.com'}:#{repo}.git"
+      # otherwise, it's a shortname
+      cr = "git@#{forge_host}:#{repo}.git"
       SugarJar::Log.debug("canonicalized #{repo} to #{cr}")
       cr
+    end
+
+    def forge_host
+      # if one is specifically configured, use that
+      return @_forge_host if @_forge_host
+
+      # otherwise, if we're in a repo, use the hostname of the remote
+      if SugarJar::Util.in_repo?
+        extract_host(remote_url_map['origin'])
+      else
+        @repo_forge == 'gitlab' ? 'gitlab.com' : 'github.com'
+      end
+    end
+
+    def repo_shortname(repo)
+      # if it's already a shortname, return
+      return repo unless repo.start_with?('http', 'git@')
+
+      # otherwise, parse it
+      if repo.start_with?('http')
+        bits = repo.split('/')
+      elsif repo.start_with?('git@')
+        relevant = repo.split(':').last
+        bits = relevant.split('/')
+      end
+      repo = bits[-1].gsub('.git', '')
+      org = bits[-2]
+
+      "#{org}/#{repo}"
     end
 
     def set_commit_template
@@ -137,7 +176,11 @@ class SugarJar
     end
 
     def determine_main_branch(branches)
-      branches.include?('main') ? 'main' : 'master'
+      if branches.include?('main')
+        'main'
+      elsif branches.include?('master')
+        'master'
+      end
     end
 
     def main_branch
@@ -263,7 +306,7 @@ class SugarJar
 
     # Whatever org we push to, regardless of if this is a fork or not
     def push_org
-      url = git('remote', 'get-url', 'origin').stdout.strip
+      url = remote_url_map['origin']
       extract_org(url)
     end
 
@@ -282,8 +325,8 @@ class SugarJar
       end
     end
 
-    def gh_avail?
-      !!SugarJar::Util.which_nofail('gh')
+    def forge_cli_avail?
+      !!SugarJar::Util.which_nofail(_forge_cmd)
     end
 
     def fprefix(name)
@@ -321,6 +364,14 @@ class SugarJar
 
     def extract_repo(repo)
       File.basename(repo, '.git')
+    end
+
+    def extract_host(repo)
+      if repo.start_with?('git@')
+        repo.split(':').first.split('@').last
+      elsif repo.start_with?('http')
+        repo.split('/')[2]
+      end
     end
 
     def die(msg)
@@ -377,12 +428,36 @@ class SugarJar
       SugarJar::Util.git_nofail(*, :color => @color)
     end
 
-    def ghcli(*)
-      SugarJar::Util.ghcli(*)
+    def _determine_forge_type
+      return nil unless SugarJar::Util.in_repo?
+
+      if remote_url_map.values.any? do |x|
+        x.include?('gitlab')
+      end
+        'gitlab'
+      else
+        'github'
+      end
     end
 
-    def ghcli_nofail(*)
-      SugarJar::Util.ghcli_nofail(*)
+    def _forge_cmd
+      @repo_forge == 'gitlab' ? 'glab' : 'gh'
+    end
+
+    def forge(*)
+      if @repo_forge == 'gitlab'
+        SugarJar::Util.glcli(*)
+      else
+        SugarJar::Util.ghcli(*)
+      end
+    end
+
+    def forge_nofail(*)
+      if @repo_forge == 'gitlab'
+        SugarJar::Util.glcli_nofail(*)
+      else
+        SugarJar::Util.ghcli_nofail(*)
+      end
     end
   end
 end
