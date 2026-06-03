@@ -110,7 +110,7 @@ describe 'SugarJar::Commands' do
       'http://github.com/org/repo.git',
       # https
       'https://github.com/org/repo.git',
-      # gh
+      # shortname
       'org/repo',
     ].each do |url|
       it "extracts the org from #{url}" do
@@ -127,7 +127,7 @@ describe 'SugarJar::Commands' do
       'http://github.com/org/repo.git',
       # https
       'https://github.com/org/repo.git',
-      # gh
+      # shortname
       'org/repo',
     ].each do |url|
       it "extracts the repo from #{url}" do
@@ -144,12 +144,26 @@ describe 'SugarJar::Commands' do
       'http://github.com/org/repo.git',
       # https
       'https://github.com/org/repo.git',
-      # hub
-      'org/repo',
     ].each do |url|
       it "generates correct URL from #{url}" do
         expect(sj.send(:forked_repo, url, 'test')).
           to eq('git@github.com:test/repo.git')
+      end
+    end
+
+    context 'given short names' do
+      # shortname
+      url = 'org/repo'
+      it 'generates correct URL from shortnames on GH' do
+        expect(sj).to receive(:forge_host).and_return('github.com')
+        expect(sj.send(:forked_repo, url, 'test')).
+          to eq('git@github.com:test/repo.git')
+      end
+
+      it 'generates correct URL from shortnames on GL' do
+        expect(sj).to receive(:forge_host).and_return('gitlab.com')
+        expect(sj.send(:forked_repo, url, 'test')).
+          to eq('git@gitlab.com:test/repo.git')
       end
     end
   end
@@ -168,11 +182,20 @@ describe 'SugarJar::Commands' do
       end
     end
 
-    # gh
-    url = 'org/repo'
-    it "canonicalizes short name #{url}" do
-      expect(sj.send(:canonicalize_repo, url)).
-        to eq('git@github.com:org/repo.git')
+    context 'given short names' do
+      # shortname
+      url = 'org/repo'
+      it "canonicalizes short name #{url} on GH" do
+        expect(sj).to receive(:forge_host).and_return('github.com')
+        expect(sj.send(:canonicalize_repo, url)).
+          to eq('git@github.com:org/repo.git')
+      end
+
+      it "canonicalizes short name #{url} on GH" do
+        expect(sj).to receive(:forge_host).and_return('gitlab.com')
+        expect(sj.send(:canonicalize_repo, url)).
+          to eq('git@gitlab.com:org/repo.git')
+      end
     end
   end
 end

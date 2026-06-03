@@ -1,12 +1,21 @@
 # SugarJar
 
-[![Lint](https://github.com/jaymzh/sugarjar/workflows/Lint/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3ALint)
-[![Unittest](https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
-[![DCO](https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
-[![CodeQL](https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml/badge.svg)](https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml)
+[![Lint](
+https://github.com/jaymzh/sugarjar/workflows/Lint/badge.svg
+)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3ALint)
+[![Unittest](
+https://github.com/jaymzh/sugarjar/workflows/Unittests/badge.svg
+)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3AUnittests)
+[![DCO](
+https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg
+)](https://github.com/jaymzh/sugarjar/actions?query=workflow%3A%22DCO+Check%22)
+[![CodeQL](
+https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml/badge.svg
+)](https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml)
 
-Welcome to SugarJar - a git/github helper. The only requirements are Ruby,
-`git`, and [gh](https://cli.github.com/).
+Welcome to SugarJar - a git + github/gitlab helper. The only requirements are
+Ruby, `git`, and either [gh](https://cli.github.com/) or
+[glab](https://docs.gitlab.com/cli/), depending on which forge you are using.
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
 its replacement at Facebook, JellyFish. Many of the features they provide for
@@ -24,9 +33,12 @@ Jump to what you're most interested in:
 * [Common Use-cases](#common-use-cases)
    * [Auto Cleanup Squash-merged branches](#auto-cleanup-squash-merged-branches)
    * [Smarter clones and remotes](#smarter-clones-and-remotes)
-   * [Work with stacked branches more easily](#work-with-stacked-branches-more-easily)
-   * [Creating Stacked PRs with subfeatures](#creating-stacked-prs-with-subfeatures)
-   * [Have a better lint/unittest experience!](#have-a-better-lintunittest-experience)
+   * [Work with stacked branches more easily](
+     #work-with-stacked-branches-more-easily)
+   * [Creating Stacked PRs with subfeatures](
+     #creating-stacked-prs-with-subfeatures)
+   * [Have a better lint/unittest experience!](
+     #have-a-better-lintunittest-experience)
    * [Better push defaults](#better-push-defaults)
    * [Cleaning up your own history](#cleaning-up-your-own-history)
    * [Better feature branches](#better-feature-branches)
@@ -57,7 +69,9 @@ and safely deletes if so. (Note: `lbclean` stands for "local branch clean", and
 is aliased to `bclean` for both backwards-compatibility and also since it's the
 most common branch-cleanup command).
 
-![bclean screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/bclean.png)
+![bclean screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/bclean.png
+)
 
 Will delete a branch, if it has been merged, **even if it was squash-merged**.
 
@@ -67,7 +81,9 @@ You can pass it a branch if you'd like (it defaults to the branch you're on):
 But it gets better! You can use `sj bcleanall` to remove all branches that have
 been merged:
 
-![bcleanall screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/bcleanall.png)
+![bcleanall screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/bcleanall.png
+)
 
 There is also `sj rbclean` ("remote branch clean") (and `sj rbcleanall`) for
 cleanup of remote branches. *Note*: This cannot differentiate between
@@ -75,8 +91,8 @@ PR/feature branches which have been merged and long-lived release branches that
 have been merged (e.g.  if '2.0-release' is a branch and has no commits not in
 main, it will be deleted).
 
-There is even `sj gbclean` ("global branch clean") (and `sj gbcleanall`) which will
-do both the local and remote cleaning.
+There is even `sj gbclean` ("global branch clean") (and `sj gbcleanall`) which
+will do both the local and remote cleaning.
 
 *NOTE*: Remote branch cleaning is still experimental, use with caution!
 
@@ -86,7 +102,9 @@ There's a pattern to every new repo we want to contribute to. First we fork,
 then we clone the fork, then we add a remote of the upstream repo. It's
 monotonous. SugarJar does this for you:
 
-![smartclone screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/sclone.png)
+![smartclone screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/sclone.png
+)
 
 `sj` accepts both `smartclone` and `sclone` for this command.
 
@@ -113,7 +131,9 @@ First, and foremost, is `feature` and `subfeature`. Regardless of stacking, the
 way to create a new feature bracnh with sugarjar is with `sj feature` (or `sj
 f` for short):
 
-![feature screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/feature.png)
+![feature screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/feature.png
+)
 
 A "feature" in SugarJar parlance just means that the branch is always created
 from "most main" - this is usually `upstream/main`, but SJ will figure out
@@ -124,7 +144,9 @@ to fetch that remote first to make sure you're working on the latest HEAD.
 When you want to create a stacked PR, you can create `subfeature`, which, at
 its core is just a branch created from the current branch:
 
-![subfeature screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature.png)
+![subfeature screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature.png
+)
 
 If you create branches like this then sugarjar can now make several things
 much easier:
@@ -135,31 +157,41 @@ much easier:
 
 There are two commands that will show you the state of your stacked branches:
 
-* `sj binfo` - shows the current branch and its ancestors up to your primary branch
+* `sj binfo` - shows the current branch and its ancestors up to your primary
+  branch
 * `sj smartlog` (aka `sj sl`) - shows you the whole tree.
 
 To continue with the example above, my `smartlog` might look like:
 
-![subfeature-smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-smartlog.png)
+![subfeature-smartlog screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-smartlog.png
+)
 
 As you can see, `mynewthing` is derived from `main`, and `dependentnewthing` is
 derived from `mynewthing`.
 
 Now lets make a different feature stack:
 
-![subfeature-part2 screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2.png)
+![subfeature-part2 screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2.png
+)
 
 The `smartlog` will now show us this tree, and it's a bit more interesting:
 
-![subfeature-part2-smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2-smartlog.png)
+![subfeature-part2-smartlog screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part2-smartlog.png
+)
 
 Here we can see from `main`, we have two branches: one going to `mynewthing`
 and one going to `anotherfeature`. Each of those has their own dependent branch
 on top.
 
-Now, what happens if I make a change to `mynewthing` (the bottom of the first stack)?
+Now, what happens if I make a change to `mynewthing` (the bottom of the first
+stack)?
 
-![subfeature-part3 screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3.png)
+![subfeature-part3 screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3.png
+)
 
 We can see here now that `dependentnewthing`, is based off a commit that _used_
 to be `mynewthing` (`5086ee`), but `mynewthing` has moved. Both `mynewthing`
@@ -167,7 +199,9 @@ and `dependentnewthing` are derived from `5086ee` (the old `mynewthing`), but
 `dependentnewthing` isn't (yet) based on the current `mynewthing`. But SugarJar
 will handle this all correctly when we ask it to update the branch:
 
-![subfeature-part3-rebase screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3-rebase.png)
+![subfeature-part3-rebase screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-part3-rebase.png
+)
 
 Here we see that SugarJar knew that `dependentnewthing` should be rebased onto
 `mynewthing`, and it did the right thing - from main there's still the
@@ -178,7 +212,9 @@ including all 3 commits in the right order.
 Now, lets say that `mynewthing` gets merged and we use `bclean` to clean it all
 up, what happens then?
 
-![subfeature-detect-missing-base screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-detect-missing-base.png)
+![subfeature-detect-missing-base screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-detect-missing-base.png
+)
 
 SugarJar detects that branch is gone and thus this branch should now be based
 on the upstream main branch!
@@ -295,8 +331,9 @@ Created feature branch dependent-feature based on test-branch
 
 Additionally you can specify a `feature_prefix` in your config which will cause
 `feature` to create branches prefixed with your `feature_prefix` and will also
-cause `co` to checkout branches with that prefix. This is useful when organizations
-use branch-based workflows and branches need to be prefixed with e.g. `$USER/`.
+cause `co` to checkout branches with that prefix. This is useful when
+organizations use branch-based workflows and branches need to be prefixed with
+e.g. `$USER/`.
 
 For example, if your prefix was `user/`, then `sj feature foo` would create
 `user/foo`, and `sj co foo` would switch to `user/foo`.
@@ -306,7 +343,9 @@ For example, if your prefix was `user/`, then `sj feature foo` would create
 Smartlog will show you a tree diagram of your branches! Simply run `sj
 smartlog` or `sj sl` for short.
 
-![smartlog screenshot](https://github.com/jaymzh/sugarjar/blob/main/images/smartlog.png)
+![smartlog screenshot](
+https://github.com/jaymzh/sugarjar/blob/main/images/smartlog.png
+)
 
 ### Sync work across workstations
 
@@ -341,15 +380,17 @@ See `sj help` for more commands!
 Sugarjar is packaged in a variety of Linux distributions - see if it's on the
 list here, and if so, use your package manager (or `gem`) to install it:
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/sugarjar.svg?exclude_unsupported=1)](https://repology.org/project/sugarjar/versions)
+[![Packaging status](
+https://repology.org/badge/vertical-allrepos/sugarjar.svg?exclude_unsupported=1
+)](https://repology.org/project/sugarjar/versions)
 
 If you are using a Linux distribution version that is end-of-life'd, click the
 above image, it'll take you to a page that lists unsupported distro versions
 as well (they'll have older SugarJar, but they'll probably still have some
 version).
 
-**Ubuntu users**: You can use [this
-PPA](https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) to get newer
+**Ubuntu users**: You can use [this PPA](
+https://launchpad.net/~michel-slm/+archive/ubuntu/sugarjar) to get newer
 versions for all supported Ubuntu releases (as well as some older versions).
 Ubuntu package maintainer.
 
@@ -371,8 +412,8 @@ See [examples/sample_config.yaml](examples/sample_config.yaml) for an example
 configuration file.
 
 In addition, the environment variable `SUGARJAR_LOGLEVEL` can be defined to set
-a log level. This is primarily used as a way to turn debug on earlier in order to
-troubleshoot configuration parsing.
+a log level. This is primarily used as a way to turn debug on earlier in order
+to troubleshoot configuration parsing.
 
 Deprecated fields will cause a warning, but you can suppress that warning by
 defining `ignore_deprecated_options`, for example:
@@ -399,29 +440,30 @@ commit template by dropping a file in the repo. Users must do something like:
 `git config commit.template <file>`. Making each developer do this is error
 prone, so this setting will automatically set this up for each developer.
 
-## Enterprise GitHub
+## Enterprise GitHub/GitLab
 
-Like `gh`, SugarJar supports GitHub Enterprise. In fact, we provide extra
-features just for it.
+Like `gh` and `glab`, SugarJar supports Enterprise versions of GitHub and
+GitLab. In fact, we provide extra features just for it.
 
-You can set `github_host` in your global or user config, but since most
+In most cases, when using `sj smartclone`, pass in `--forge-host`, and
+that's about all you need, everything else should be handlded automagically.
+
+However, you can set `forge_host` in your global or user config, but since most
 users will also have a few opensource repos, you can override it in the
 Repository Config as well.
 
 So, for example you might have:
 
 ```yaml
-github_host: gh.sample.com
+forge_host: gh.sample.com
 ```
 
 In your `~/.config/sugarjar/config.yaml`, but if the `.sugarjar.yaml` in your
 repo has:
 
 ```yaml
-github_host: github.com
+forge_host: github.com
 ```
-
-Then we will configure `gh` to talk to github.com when in that repo.
 
 ## FAQ
 
@@ -452,12 +494,12 @@ simply source that in your dotfiles, assuming you are using bash.
 
 **What happens now that Sapling is released?**
 
-SugarJar isn't going anywhere anytime soon. This was meant to replace arc/jf,
-which has now been open-sourced as [Sapling](https://sapling-scm.com/), so I
-highly recommend taking a look at that!
+SugarJar isn't going anywhere. This was meant to replace arc/jf, which has now
+been open-sourced as [Sapling](https://sapling-scm.com/), so I highly recommend
+taking a look at that!
 
 Sapling is a great tool and solves a variety of problems SugarJar will never be
-able to. However, it is a significant workflow change, that won't be
-appropriate for all users or use-cases. Similarly there are workflows and tools
-that Sapling breaks. So worry not, SugarJar will continue to be maintained and
-developed.
+able to. However, it is a significant workflow change that won't be appropriate
+for all users or use-cases. Similarly there are workflows and tools that
+Sapling breaks. Further, we support some things Sapling does not. So worry not,
+SugarJar will continue to be maintained and developed.

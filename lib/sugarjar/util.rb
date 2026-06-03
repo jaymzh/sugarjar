@@ -46,16 +46,36 @@ class SugarJar
       s
     end
 
-    def self.ghcli_nofail(*args)
-      SugarJar::Log.trace("Running: gh #{args.join(' ')}")
-      gh = which('gh')
-      s = Mixlib::ShellOut.new([gh] + args).run_command
-      if s.error? && s.stderr.include?('gh auth')
+    def self.ghcli_nofail(*)
+      forge_nofail('gh', *)
+    end
+
+    def self.ghcli(*)
+      s = ghcli_nofail(*)
+      s.error!
+      s
+    end
+
+    def self.glcli_nofail(*)
+      forge_nofail('glab', *)
+    end
+
+    def self.glcli(*)
+      s = glcli_nofail(*)
+      s.error!
+      s
+    end
+
+    def self.forge_nofail(cli, *args)
+      SugarJar::Log.trace("Running: #{cli} #{args.join(' ')}")
+      bin = which(cli)
+      s = Mixlib::ShellOut.new([bin] + args).run_command
+      if s.error? && s.stderr.include?("#{cli} auth")
         SugarJar::Log.info(
-          'gh was run but no github token exists. Will run "gh auth login" ' +
-          "to force\ngh to authenticate...",
+          'glab was run but no gitlab token exists. Will run ' +
+          '"glab auth login" to force\ngh to authenticate...',
         )
-        unless system(gh, 'auth', 'login', '-p', 'ssh')
+        unless system(bin, 'auth', 'login', '-p', 'ssh')
           SugarJar::Log.fatal(
             'That failed, I will bail out. Hub needs to get a github ' +
             'token. Try running "gh auth login" (will list info about ' +
@@ -64,12 +84,6 @@ class SugarJar
           exit(1)
         end
       end
-      s
-    end
-
-    def self.ghcli(*)
-      s = ghcli_nofail(*)
-      s.error!
       s
     end
 

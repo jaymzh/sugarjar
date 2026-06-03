@@ -71,7 +71,13 @@ commit_template: .git_commit_template.txt
 
 github_user: myuser
 
-# `github_host` is the GitHub host to use when talking to GitHub (for hosted
-# GHE). See `github_user`.
+# `gitlab_user` is the user to use when talking to GitLab. Overrides any such
+# setting in the regular SugarJar config. Most useful when in the
+# `include_from` file.
 
-github_host: github.sample.com
+gitlab_user: myuser
+
+# `forge_host` is the GitHub/GitLab host to use when talking to hosted versions
+# of these services.
+
+forge_host: github.sample.com

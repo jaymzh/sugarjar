@@ -60,16 +60,35 @@ class SugarJar
 
       # <org>:<branch> is the GH API syntax for:
       #   look for a branch of name <branch>, from a fork in owner <org>
-      args.unshift('--head', "#{push_org}:#{curr}")
-      SugarJar::Log.trace("Running: gh pr create #{args.join(' ')}")
-      gh = SugarJar::Util.which('gh')
-      system(gh, 'pr', 'create', *args)
+      if @repo_forge == 'github'
+        # On GitHub, the head is the org and the *BRANCH* name to use as
+        # the head branch...
+        args.unshift('--head', "#{push_org}:#{curr}")
+      else
+        # On GitLab, the head is the repo (org/repo) to use as the head
+        # _repo_, and then branch is configured seperately (with -s), but
+        # we don't need that since it defaults to the local branch name.
+        #
+        # Then we need --yes for it to not prompt us
+        args.unshift('--head', "#{push_org}/#{reponame}", '--yes')
+      end
+
+      bin = SugarJar::Util.which(_forge_cmd)
+      subcmd = _pr_cmd
+      SugarJar::Log.trace(
+        "Running: #{bin} #{subcmd} create #{args.join(' ')}",
+      )
+      system(bin, subcmd, 'create', *args)
     end
 
     alias spr smartpullrequest
     alias smartpr smartpullrequest
 
     private
+
+    def _pr_cmd
+      @repo_forge == 'gitlab' ? 'mr' : 'pr'
+    end
 
     def assert_common_main_branch!
       upstream_branch = main_remote_branch(upstream)
@@ -87,7 +106,9 @@ class SugarJar
       return if upstream_branch == 'origin'
 
       origin_branch = main_remote_branch('origin')
-      return if origin_branch == upstream_branch
+      # NOTE: that on GL, forks don't fork any branches by default, even
+      # a main one, so if it's 'nil', then ignore.
+      return if origin_branch.nil? || origin_branch == upstream_branch
 
       die(
         "The main branch of your upstream (#{upstream_branch}) and your " +
