@@ -11,7 +11,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
-    chef-utils (18.8.54)
+    chef-utils (19.3.15)
       concurrent-ruby
     concurrent-ruby (1.3.6)
     deep_merge (1.2.2)
@@ -21,14 +21,14 @@ GEM
     ffi (1.17.3-x86_64-darwin)
     ffi (1.17.3-x86_64-linux-gnu)
     json (2.19.2)
-    kramdown (2.5.1)
-      rexml (>= 3.3.9)
+    kramdown (2.5.2)
+      rexml (>= 3.4.4)
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
-    mdl (0.15.0)
-      kramdown (~> 2.3)
+    mdl (0.17.0)
+      kramdown (~> 2.5)
       kramdown-parser-gfm (~> 1.1)
       mixlib-cli
       mixlib-config
@@ -38,7 +38,7 @@ GEM
       tomlrb
     mixlib-log (3.2.3)
       ffi (>= 1.15.5)
-    mixlib-shellout (3.3.9)
+    mixlib-shellout (3.4.10)
       chef-utils
     parallel (1.27.0)
     parser (3.3.10.0)
