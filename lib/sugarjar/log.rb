@@ -1,5 +1,6 @@
 require 'mixlib/log'
 
+# rubocop:disable Style/OneClassPerFile
 module Mixlib
   module Log
     # A simple formatter so that 'info' is just like 'puts'
@@ -22,3 +23,4 @@ class SugarJar
     extend Mixlib::Log
   end
 end
+# rubocop:enable Style/OneClassPerFile
