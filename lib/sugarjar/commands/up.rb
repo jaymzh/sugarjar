@@ -117,7 +117,7 @@ class SugarJar
       # rubocop:enable Style/HashSyntax
       unless base
         SugarJar::Log.info(
-          'The brach we were tracking is gone, resetting tracking to ' +
+          'The branch we were tracking is gone, resetting tracking to ' +
           most_main,
         )
         git('branch', '-u', most_main)
