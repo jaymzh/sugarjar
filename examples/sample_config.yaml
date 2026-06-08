@@ -22,3 +22,9 @@ pr_autostack: true
 # Don't warn about deprecated config file options if they are in this
 # list
 ignore_deprecated_options: [ 'gh_cli' ]
+
+# User to use when cloning new github repos
+github_user: c00ldude
+
+# User to use when cloning new gitlab repos
+gitlab_user: c00ldude

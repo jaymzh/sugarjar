@@ -20,6 +20,16 @@ include_from: .sugarjar_local.yaml
 
 overwrite_from: .sugarjar_local_overwrite.yaml
 
+# `release_branches` tells SugarJar several things:
+#   1. These branches should not be repead when running `bclean`/`bcleanall`.
+#   2. When a feature-branch is made from a release branch (e.g. `2.x-branch`),
+#      it will actually track the release branch's upstream
+#      (e.g. `upstream/2.x-bramch`), allowing it to work the same as as a
+#      feature made off of main.
+release_branches:
+  - 2.x-branch
+  - 3.x-branch
+
 # `lint` is a list of scripts to run when `sj lint` is executed (or, if
 # configured, to run on `sj spush`/`sj fpush` - see `on_push` below).
 # Regardless of where `sj` is run from, these scripts will be run from the root
