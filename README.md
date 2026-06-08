@@ -37,6 +37,8 @@ Jump to what you're most interested in:
      #work-with-stacked-branches-more-easily)
    * [Creating Stacked PRs with subfeatures](
      #creating-stacked-prs-with-subfeatures)
+   * [Smart release branch handling](
+     #smart-release-branch-handling)
    * [Have a better lint/unittest experience!](
      #have-a-better-lintunittest-experience)
    * [Better push defaults](#better-push-defaults)
@@ -84,6 +86,9 @@ been merged:
 ![bcleanall screenshot](
 https://github.com/jaymzh/sugarjar/blob/main/images/bcleanall.png
 )
+
+*NOTE*: You can add long-lived release-branches to your RepoConfig to prevent
+cleaning; see [Smart release branch handling](️#smart-release-branch-handling).
 
 There is also `sj rbclean` ("remote branch clean") (and `sj rbcleanall`) for
 cleanup of remote branches. *Note*: This cannot differentiate between
@@ -364,7 +369,7 @@ branch, it rebases on top of the push target branch.
 
 ### Pulling in suggestions from the web
 
-When someone 'suggests' a change in the GitHub WebUI, once you choose to commit
+When someone 'suggests' a change in the GH/GL WebUI, once you choose to commit
 them, your origin and local branches are no longer in-sync. The
 `pullsuggestions` command will attempt to merge in any remote commits to your
 local branch. This command will show a diff and ask for confirmation before
@@ -473,7 +478,7 @@ It's mostly a backronym. Like jellyfish, I wanted two letters that were on home
 row on different sides of the keyboard to make it easy to type. I looked at the
 possible options that where there and not taken and tried to find one I could
 make an appropriate name out of. Since this utility adds lots of sugar to git
-and github, it seemed appropriate.
+and github/gitlab, it seemed appropriate.
 
 **I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 
