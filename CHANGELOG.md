@@ -1,11 +1,11 @@
 # SugarJar Changelog
 
-## 2.0.3 (...)
+## 3.0.0 (2026-06-08)
 
-* Add support for gitlab
+* Add support for GitLab
 * Add release-branch handling
-* Fixes to sync/fsync to not leave repo in consistent state
-* When in manual lint/unit, allow user to skip amending
+* Fixes to `sync`/`fsync` to not leave repo in consistent state
+* When in manual lint/unit, allow user to skip amending, and keep testing
 * Fix typos in various messages
 
 ## 2.0.2 (2026-01-08)
