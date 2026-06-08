@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sugarjar (2.0.2)
+    sugarjar (3.0.0)
       deep_merge
       mixlib-log
       mixlib-shellout
