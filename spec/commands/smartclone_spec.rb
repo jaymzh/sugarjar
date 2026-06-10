@@ -16,12 +16,14 @@ describe 'SugarJar::Commands' do
 
       it 'uses git' do
         repo = 'git@github.com:myuser/repo.git'
+        sj.instance_variable_set(:@forge_user, opts['github_user'])
         expect(sj).to_not receive(:forge)
         expect(sj).to receive(:git).with('clone', repo, 'repo')
         sj.smartclone(repo)
       end
 
       it 'passes additional arguments to git' do
+        sj.instance_variable_set(:@forge_user, opts['github_user'])
         expect(sj).to_not receive(:forge)
         expect(sj).to receive(:git).with('clone', repo, 'somedir',
                                          '--something')
