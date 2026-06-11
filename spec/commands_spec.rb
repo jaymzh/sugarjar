@@ -146,6 +146,7 @@ describe 'SugarJar::Commands' do
       'https://github.com/org/repo.git',
     ].each do |url|
       it "generates correct URL from #{url}" do
+        expect(sj).to receive(:forge_host).and_return('github.com')
         expect(sj.send(:forked_repo, url, 'test')).
           to eq('git@github.com:test/repo.git')
       end
