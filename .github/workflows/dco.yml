@@ -17,11 +17,11 @@ jobs:
         egress-policy: audit
 
     - name: Get PR Commits
-      uses: tim-actions/get-pr-commits@198af03565609bb4ed924d1260247b4881f09e7d # master
+      uses: actionshub/get-pr-commits@6fc8a0242c2c5853e3e8b86bde9d176682e5c5fb # main
       id: 'get-pr-commits'
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: DCO Check
-      uses: tim-actions/dco@f2279e6e62d5a7d9115b0cb8e837b777b1b02e21 # master
+      uses: actionshub/dco@da8700138fd5b555270e7c3a49890746d0d2f93f # main
       with:
         commits: ${{ steps.get-pr-commits.outputs.commits }}
