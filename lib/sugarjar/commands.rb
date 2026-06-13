@@ -87,11 +87,9 @@ class SugarJar
       return @_forge_host if @_forge_host
 
       # otherwise, if we're in a repo, use the hostname of the remote
-      if SugarJar::Util.in_repo?
-        extract_host(remote_url_map['origin'])
-      else
-        @repo_forge == 'gitlab' ? 'gitlab.com' : 'github.com'
-      end
+      return extract_host(remote_url_map['origin']) if SugarJar::Util.in_repo?
+
+      @repo_forge == 'gitlab' ? 'gitlab.com' : 'github.com'
     end
 
     def repo_shortname(repo)
@@ -176,11 +174,7 @@ class SugarJar
     end
 
     def determine_main_branch(branches)
-      if branches.include?('main')
-        'main'
-      elsif branches.include?('master')
-        'master'
-      end
+      branches.include?('master') ? 'master' : 'main'
     end
 
     def main_branch
@@ -429,15 +423,13 @@ class SugarJar
     end
 
     def _determine_forge_type
-      return nil unless SugarJar::Util.in_repo?
+      if SugarJar::Util.in_repo?
+        gl = remote_url_map.values.any? { |x| x.include?('gitlab') }
+        return gl ? 'gitlab' : 'github'
+      end
 
-      if remote_url_map.values.any? do |x|
-        x.include?('gitlab')
-      end
-        'gitlab'
-      else
-        'github'
-      end
+      # if all else fails, guess GH
+      'github'
     end
 
     def _forge_cmd
