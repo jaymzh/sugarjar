@@ -70,7 +70,7 @@ class SugarJar
         # we don't need that since it defaults to the local branch name.
         #
         # Then we need --yes for it to not prompt us
-        args.unshift('--head', "#{push_org}/#{reponame}", '--yes')
+        args.unshift('--head', "#{push_org}/#{repo_name}", '--yes')
       end
 
       bin = SugarJar::Util.which(_forge_cmd)

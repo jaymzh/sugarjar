@@ -347,12 +347,12 @@ class SugarJar
 
     def extract_org(repo)
       if repo.start_with?('http')
-        File.basename(File.dirname(repo))
+        repo.split('://').last.split('/')[1..-2].join('/')
       elsif repo.start_with?('git@')
-        repo.split(':')[1].split('/')[0]
+        repo.split(':').last.split('/')[0..-2].join('/')
       else
-        # assume they passed in a ghcli-friendly name
-        repo.split('/').first
+        # assume they passed in a cli-friendly shortname
+        repo.split('/')[0..-2].join('/')
       end
     end
 
