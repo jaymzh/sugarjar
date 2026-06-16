@@ -103,6 +103,7 @@ describe 'SugarJar::Commands' do
   end
 
   context '#extract_org' do
+    # simple ones
     [
       # ssh
       'git@github.com:org/repo.git',
@@ -115,6 +116,41 @@ describe 'SugarJar::Commands' do
     ].each do |url|
       it "extracts the org from #{url}" do
         expect(sj.send(:extract_org, url)).to eq('org')
+      end
+    end
+
+    # glab can nest orgs and the whole path of orgs
+    # must be referenced
+
+    # single-nested orgs
+    [
+      # ssh
+      'git@gitlab.com:project/org/repo.git',
+      # http
+      'http://github.com/project/org/repo.git',
+      # https
+      'https://github.com/project/org/repo.git',
+      # shortname
+      'project/org/repo',
+    ].each do |url|
+      it "extracts the org from #{url}" do
+        expect(sj.send(:extract_org, url)).to eq('project/org')
+      end
+    end
+
+    # double-nested orgs
+    [
+      # ssh
+      'git@gitlab.com:some/project/org/repo.git',
+      # http
+      'http://github.com/some/project/org/repo.git',
+      # https
+      'https://github.com/some/project/org/repo.git',
+      # shortname
+      'some/project/org/repo',
+    ].each do |url|
+      it "extracts the org from #{url}" do
+        expect(sj.send(:extract_org, url)).to eq('some/project/org')
       end
     end
   end
