@@ -13,9 +13,7 @@ class SugarJar
       #
       # Unless the repo is in our own org and cannot be forked, then it
       # will fail.
-      if org == @forge_user
-        git('clone', canonicalize_repo(repo), dir, *)
-      else
+      if @use_forks && @forge_user != org
         if @repo_forge == 'gitlab'
           _gitlab_clone(org, repo, dir, *)
         else
@@ -26,6 +24,8 @@ class SugarJar
         Dir.chdir dir do
           git('branch', '-u', "upstream/#{main_branch}")
         end
+      else
+        git('clone', canonicalize_repo(repo), dir, *)
       end
 
       SugarJar::Log.info('Remotes "origin" and "upstream" configured.')

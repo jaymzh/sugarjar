@@ -11,6 +11,7 @@ class SugarJar
       'pr_autofill' => true,
       'pr_autostack' => nil,
       'color' => true,
+      'use_forks' => true,
       'ignore_deprecated_options' => [],
     }.freeze
 

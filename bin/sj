@@ -104,6 +104,14 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on(
+    '--[no-]use-forks',
+    'Create (add a remote for) forks, when the organization does not match ' +
+    'the user. [default: true]',
+  ) do |val|
+    options['use_forks'] = val
+  end
+
+  opts.on(
     '--[no-]pr-autostack',
     'When creating a PR, if this is a subfeature, should we make it a ' +
     'PR on the PR for the parent feature. If not specified, we prompt ' +

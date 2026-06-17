@@ -2,7 +2,7 @@ require_relative '../../lib/sugarjar/commands'
 
 describe 'SugarJar::Commands' do
   let(:opts) do
-    { 'no_change' => true, 'github_user' => 'myuser' }
+    { 'no_change' => true, 'github_user' => 'myuser', 'use_forks' => true }
   end
   context '#smartclone' do
     let(:sj) do
@@ -15,7 +15,6 @@ describe 'SugarJar::Commands' do
       end
 
       it 'uses git' do
-        repo = 'git@github.com:myuser/repo.git'
         sj.instance_variable_set(:@forge_user, opts['github_user'])
         expect(sj).to_not receive(:forge)
         expect(sj).to receive(:git).with('clone', repo, 'repo')
@@ -38,6 +37,7 @@ describe 'SugarJar::Commands' do
             'no_change' => true,
             'github_user' => 'myuser',
             'forge_type' => 'github',
+            'use_forks' => true,
           }
         end
 
@@ -64,6 +64,24 @@ describe 'SugarJar::Commands' do
           expect(sj).to receive(:git).with('branch', '-u', 'upstream/main')
           sj.smartclone(repo, 'somedir', '--something')
         end
+
+        context 'with no_fork set' do
+          let(:opts) do
+            {
+              'no_change' => true,
+              'github_user' => 'myuser',
+              'forge_type' => 'github',
+              'use_forks' => false,
+            }
+          end
+
+          it 'bypasses fork' do
+            sj.instance_variable_set(:@forge_user, opts['github_user'])
+            expect(sj).to_not receive(:forge)
+            expect(sj).to receive(:git).with('clone', repo, 'repo')
+            sj.smartclone(repo)
+          end
+        end
       end
 
       context 'gitlab' do
@@ -72,6 +90,7 @@ describe 'SugarJar::Commands' do
             'no_change' => true,
             'github_user' => 'myuser',
             'forge_type' => 'gitlab',
+            'use_forks' => true,
           }
         end
 
@@ -144,6 +163,24 @@ describe 'SugarJar::Commands' do
           expect(sj).to receive(:main_branch).and_return('main')
           expect(sj).to receive(:git).with('branch', '-u', 'upstream/main')
           sj.smartclone(repo, 'somedir', '--something')
+        end
+
+        context 'with no_fork set' do
+          let(:opts) do
+            {
+              'no_change' => true,
+              'github_user' => 'myuser',
+              'forge_type' => 'github',
+              'use_forks' => false,
+            }
+          end
+
+          it 'bypasses fork' do
+            sj.instance_variable_set(:@forge_user, opts['github_user'])
+            expect(sj).to_not receive(:forge)
+            expect(sj).to receive(:git).with('clone', repo, 'repo')
+            sj.smartclone(repo)
+          end
         end
       end
     end

@@ -115,7 +115,8 @@ https://github.com/jaymzh/sugarjar/blob/main/images/sclone.png
 
 This will:
 
-* Fork the repo to your personal org (if you don't already have a fork)
+* Fork the repo to your personal org (if you don't already have a fork,
+  and if it's not already in your personal org)
 * Clone your fork
 * Add the original as an 'upstream' remote
 
@@ -125,6 +126,9 @@ just a $org/$repo.
 Like `git clone`, `sj smartclone` will accept an additional argument as the
 destination directory to clone to. It will also pass any other unknown options
 to `git clone` under the hood.
+
+If you don't work with fork-based workflows, you can set `use_forks: false`
+in your config, or pass in `--no-use-forks` to `sj sclone`.
 
 ### Work with stacked branches more easily
 
