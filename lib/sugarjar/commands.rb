@@ -96,17 +96,9 @@ class SugarJar
       # if it's already a shortname, return
       return repo unless repo.start_with?('http', 'git@')
 
-      # otherwise, parse it
-      if repo.start_with?('http')
-        bits = repo.split('/')
-      elsif repo.start_with?('git@')
-        relevant = repo.split(':').last
-        bits = relevant.split('/')
-      end
-      repo = bits[-1].gsub('.git', '')
-      org = bits[-2]
-
-      "#{org}/#{repo}"
+      repo_name = extract_repo(repo)
+      org_name = extract_org(repo)
+      [org_name, repo_name].join('/')
     end
 
     def set_commit_template
