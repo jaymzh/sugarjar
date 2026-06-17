@@ -235,4 +235,47 @@ describe 'SugarJar::Commands' do
       end
     end
   end
+
+  context '#repo_shortname' do
+    [
+      # ssh
+      'git@github.com:org/repo.git',
+      # http
+      'http://github.com/org/repo.git',
+      # https
+      'https://github.com/org/repo.git',
+    ].each do |url|
+      it "shortens #{url} properly" do
+        expect(sj.send(:repo_shortname, url)).to eq('org/repo')
+      end
+    end
+
+    [
+      # ssh
+      'git@github.com:project/org/repo.git',
+      # http
+      'http://github.com/project/org/repo.git',
+      # https
+      'https://github.com/project/org/repo.git',
+    ].each do |url|
+      it "shortens #{url} properly" do
+        expect(sj.send(:repo_shortname, url)).to eq('project/org/repo')
+      end
+    end
+
+    [
+      # ssh
+      'git@github.com:some/project/org/repo.git',
+      # http
+      'http://github.com/some/project/org/repo.git',
+      # https
+      'https://github.com/some/project/org/repo.git',
+      # returns exactly the same thing if no URL
+      'some/project/org/repo',
+    ].each do |url|
+      it "shortens #{url} properly" do
+        expect(sj.send(:repo_shortname, url)).to eq('some/project/org/repo')
+      end
+    end
+  end
 end
