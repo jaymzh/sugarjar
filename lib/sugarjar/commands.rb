@@ -88,7 +88,10 @@ class SugarJar
       return @_forge_host if @_forge_host
 
       # otherwise, if we're in a repo, use the hostname of the remote
-      return extract_host(remote_url_map['origin']) if SugarJar::Util.in_repo?
+      if SugarJar::Util.in_repo?
+        url = remote_url_map.values.first
+        return extract_host(url)
+      end
 
       @repo_forge == 'gitlab' ? 'gitlab.com' : 'github.com'
     end
