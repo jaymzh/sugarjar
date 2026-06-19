@@ -1,5 +1,16 @@
 # SugarJar Changelog
 
+## 3.0.1 (2026-06-19)
+
+* Update tests for more resiliency in various package-building environments
+* Better fallbacks for forge type
+* Add config option to disable fork-based flows
+* Fix false-positive for "primary branch doesn't match" error
+* gitlab: Handle 3-level repos better
+* gitlab: Fix `smartpullrequest` issues
+* gitlab: significant improvement to `smartclone`
+* Add `--fork-name` option to enable forking to a different repo name
+
 ## 3.0.0 (2026-06-08)
 
 * Add support for GitLab

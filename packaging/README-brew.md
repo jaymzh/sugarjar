@@ -1,5 +1,8 @@
 # Homebrew Packaging Notes
 
+NOTE: Homebrew now auto-updates on release, so this should mostly
+be unneeded.
+
 ## Prep PR
 
 * Get latest brew sources, `brew update`
