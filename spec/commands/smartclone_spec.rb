@@ -47,7 +47,8 @@ describe 'SugarJar::Commands' do
 
         it 'uses forge and sets upstream' do
           expect(sj).to receive(:forge).with(
-            'repo', 'fork', '--clone', repo, 'repo'
+            'repo', 'fork', '--clone', repo, 'repo',
+            '--fork-name', 'repo'
           )
           expect(Dir).to receive(:chdir).with('repo').and_yield
           expect(sj).to receive(:main_branch).and_return('main')
@@ -57,7 +58,8 @@ describe 'SugarJar::Commands' do
 
         it 'passes additional arguments to gh repo fork' do
           expect(sj).to receive(:forge).with(
-            'repo', 'fork', '--clone', repo, 'somedir', '--something'
+            'repo', 'fork', '--clone', repo, 'somedir',
+            '--fork-name', 'repo', '--something'
           )
           expect(Dir).to receive(:chdir).with('somedir').and_yield
           expect(sj).to receive(:main_branch).and_return('main')
@@ -104,7 +106,8 @@ describe 'SugarJar::Commands' do
 
         it 'uses forge and sets upstream' do
           expect(sj).to receive(:forge_nofail).with(
-            'repo', 'fork', 'somethingelse/repo', '--clone=false'
+            'repo', 'fork', 'somethingelse/repo', '--clone=false',
+            '--name', 'repo'
           ).and_return(shell_out)
           expect(shell_out).to receive(:error?).and_return(false)
           expect(sj).to receive(:git).with('clone', repo, 'repo')
@@ -124,7 +127,8 @@ describe 'SugarJar::Commands' do
 
         it 'ignores error 409 from "glab repo fork"' do
           expect(sj).to receive(:forge_nofail).with(
-            'repo', 'fork', 'somethingelse/repo', '--clone=false'
+            'repo', 'fork', 'somethingelse/repo', '--clone=false',
+            '--name', 'repo'
           ).and_return(shell_out)
           expect(shell_out).to receive(:error?).and_return(true)
           expect(shell_out).to receive(:stderr).and_return(' 409 ')
@@ -145,7 +149,8 @@ describe 'SugarJar::Commands' do
 
         it 'passes additional arguments to git clone' do
           expect(sj).to receive(:forge_nofail).with(
-            'repo', 'fork', 'somethingelse/repo', '--clone=false'
+            'repo', 'fork', 'somethingelse/repo', '--clone=false',
+            '--name', 'repo'
           ).and_return(shell_out)
           expect(shell_out).to receive(:error?).and_return(false)
           expect(sj).to receive(:git).with('clone', repo, 'somedir',

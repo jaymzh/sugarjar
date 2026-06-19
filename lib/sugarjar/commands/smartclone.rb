@@ -1,9 +1,15 @@
 class SugarJar
   class Commands
-    def smartclone(repo, dir = nil, *)
-      reponame = extract_repo(repo)
-      dir ||= reponame
+    def smartclone(repo, *args)
       org = extract_org(repo)
+      reponame = extract_repo(repo)
+      dir = if args.length.positive? && !args.first.start_with?('-')
+              args.shift
+            else
+              reponame
+            end
+
+      forkname = @fork_name || reponame
 
       SugarJar::Log.info("Cloning #{reponame}...")
 
@@ -15,9 +21,12 @@ class SugarJar
       # will fail.
       if @use_forks && @forge_user != org
         if @repo_forge == 'gitlab'
-          _gitlab_clone(org, repo, dir, *)
+          _gitlab_clone(org, repo, dir, forkname, *args)
         else
-          forge('repo', 'fork', '--clone', canonicalize_repo(repo), dir, *)
+          forge(
+            'repo', 'fork', '--clone', canonicalize_repo(repo), dir,
+            '--fork-name', forkname, *args
+          )
         end
 
         # make the main branch track upstream
@@ -25,17 +34,19 @@ class SugarJar
           git('branch', '-u', "upstream/#{main_branch}")
         end
       else
-        git('clone', canonicalize_repo(repo), dir, *)
+        git('clone', canonicalize_repo(repo), dir, *args)
       end
 
       SugarJar::Log.info('Remotes "origin" and "upstream" configured.')
     end
     alias sclone smartclone
 
-    def _gitlab_clone(_org, repo, dir, *)
+    def _gitlab_clone(_org, repo, dir, forkname, *)
       # The gitlab CLI is much less forgiving about already-forked
       # repos, and it has no option to clone to a differently-named
       # directory. So we have to special case it.
+
+      extract_repo(repo)
 
       # glab requires a short-name for the fork command...
       shortname = repo_shortname(repo)
@@ -43,7 +54,9 @@ class SugarJar
       # We call fork without --clone since --clone can't clone
       # to another directory. Also, we must specify =false, or it
       # will prompt
-      s = forge_nofail('repo', 'fork', shortname, '--clone=false')
+      s = forge_nofail(
+        'repo', 'fork', shortname, '--clone=false', '--name', forkname
+      )
 
       # It fails with:
       #    409 {message: [Project namespace name has already been taken,
