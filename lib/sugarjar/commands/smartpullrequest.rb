@@ -103,7 +103,9 @@ class SugarJar
           "\tgit remote set-head #{upstream} -a",
         )
       end
-      return if upstream_branch == 'origin'
+
+      # If we don't have an upstream and an origin, we're done
+      return if upstream == 'origin'
 
       origin_branch = main_remote_branch('origin')
       # NOTE: that on GL, forks don't fork any branches by default, even
