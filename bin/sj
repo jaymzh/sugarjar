@@ -112,6 +112,14 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on(
+    '--fork-name NAME',
+    'When forking a repo (in `smartclone`), fork the repo to a different ' +
+    'name. See the help for `smartclone` below.',
+  ) do |val|
+    options['fork_name'] = val
+  end
+
+  opts.on(
     '--[no-]pr-autostack',
     'When creating a PR, if this is a subfeature, should we make it a ' +
     'PR on the PR for the parent feature. If not specified, we prompt ' +
@@ -232,14 +240,39 @@ COMMANDS:
               Walk all remote branches, and try to delete them if it's safe. See
               "rbclean" for details.
 
-  smartclone, sclone
+  smartclone, sclone <repo> [<dir>]
               A smart wrapper to "git clone" that handles forking and managing
               remotes for you.
-              It will clone a git repository using hub-style short name
-              ("$org/$repo"). If the org of the repository is not the same
-              as your github-user then it will fork the repo for you to
-              your account (if not already done) and then setup your remotes
+
+              If the org of the repository is not the same as your forge user
+              then it will fork the repo for you to your account (if not
+              already done), clone the repo, and then setup your remotes
               so that "origin" is your fork and "upstream" is the upstream.
+
+              It is assumed that there will be at least one positional
+              argument, and it will be the repo in any format (git, ssh,
+              forge-style shortname [e.g. e.g. "$org/$repo"]). A second
+              positional argument will be interpreted as the directory to
+              clone into.
+
+              If you want to change the name of the repo in your fork of it,
+              you may pass in --fork-name to specify another.
+
+              Note that if you pass in additional options after ' -- ', they
+              will be passed to 'gh' in the case of GitHub, or 'git' in the
+              case of GitLab.
+
+              For example to clone foo/bar/docs on gitlab, but have the
+              repo named 'bar-docs' when it's cloned to your org, and to
+              have the directory be called 'bar-docs':
+
+                sj sclone foo/bar/docs bar-docs \
+                  --forge-type glab --fork-name bar-docs
+
+              Or for GitHub:
+
+                sj sclone bar/docs bar-docs \
+                  --forge-type github --fork-name bar-docs
 
   smartlog, sl
               Inspired by Facebook's "sl" extension to Mercurial, this command

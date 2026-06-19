@@ -34,6 +34,7 @@ class SugarJar
       @pr_autostack = options['pr_autostack']
       @feature_prefix = options['feature_prefix']
       @use_forks = options['use_forks']
+      @fork_name = options['fork_name']
       @checks = {}
       @main_branch = nil
       @main_remote_branches = {}
