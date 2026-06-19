@@ -1,10 +1,5 @@
 # Rolling a release
 
-## Optionally, update Gemfile.lock
-
-* Update gems with `bundle update --all`
-* Test to make sure we work with all new deps
-
 ## Prep the release
 
 * Update version number in `lib/sugarjar/version.rb`
@@ -13,7 +8,7 @@
 
 ## Tag the release
 
-* version='0.0.X'
+* version='a.b.c'
 * Add a tag: `git tag -a v${version?} -m "version ${version?}" -s`
 * Push the tag: `git push origin --tags`
 
