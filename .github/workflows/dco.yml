@@ -22,6 +22,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: DCO Check
-      uses: actionshub/dco@da8700138fd5b555270e7c3a49890746d0d2f93f # main
+      uses: actionshub/dco@89fdb4274332ed0a71465b4b8830ede8ed78056b # main
       with:
         commits: ${{ steps.get-pr-commits.outputs.commits }}
