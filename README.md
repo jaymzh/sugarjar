@@ -128,7 +128,13 @@ destination directory to clone to. It will also pass any other unknown options
 to `git clone` under the hood.
 
 If you don't work with fork-based workflows, you can set `use_forks: false`
-in your config, or pass in `--no-use-forks` to `sj sclone`.
+in your config for the right host:
+
+```yaml
+host_configs:
+  default:
+    use_forks: false
+```
 
 ### Work with stacked branches more easily
 
@@ -347,6 +353,14 @@ e.g. `$USER/`.
 For example, if your prefix was `user/`, then `sj feature foo` would create
 `user/foo`, and `sj co foo` would switch to `user/foo`.
 
+Here's an example:
+
+```yaml
+host_configs:
+  default:
+    feature_prefix: "jsmith/"
+```
+
 ### Smartlog
 
 Smartlog will show you a tree diagram of your branches! Simply run `sj
@@ -454,24 +468,18 @@ prone, so this setting will automatically set this up for each developer.
 Like `gh` and `glab`, SugarJar supports Enterprise versions of GitHub and
 GitLab. In fact, we provide extra features just for it.
 
-In most cases, when using `sj smartclone`, pass in `--forge-host`, and
-that's about all you need, everything else should be handlded automagically.
-
-However, you can set `forge_host` in your global or user config, but since most
-users will also have a few opensource repos, you can override it in the
-Repository Config as well.
+By default, SugarJar will pick up the appropriate information from the repo
+itself, so the only real interesting part is `smartclone`. In most cases,
+SugarJar will automatically determine the proper forge-host based on the URL
+you pass in. However, if you use short names ("repo/org" or
+"company/repo/org"), then you can either pass in `--default-forge-host`, or, if
+you want to always default to a given host, you can set a top-level
+`default_forge_host` in your SugarJar config:
 
 So, for example you might have:
 
 ```yaml
-forge_host: gh.sample.com
-```
-
-In your `~/.config/sugarjar/config.yaml`, but if the `.sugarjar.yaml` in your
-repo has:
-
-```yaml
-forge_host: github.com
+default_forge_host: gh.sample.com
 ```
 
 ## FAQ

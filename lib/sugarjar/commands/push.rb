@@ -23,7 +23,7 @@ class SugarJar
       dirty_check!
 
       unless run_prepush
-        if @ignore_prerun_failure
+        if @config['ignore_prerun_failure']
           SugarJar::Log.warn(
             'Pre-push checks failed, but --ignore-prerun-failure was ' +
             'specified, so carrying on anyway',

@@ -25,39 +25,21 @@ class SugarJar
 
     def initialize(options)
       SugarJar::Log.debug("Commands.initialize options: #{options}")
-      @ignore_dirty = options['ignore_dirty']
-      @ignore_prerun_failure = options['ignore_prerun_failure']
+      @config = options
       @repo_config = SugarJar::RepoConfig.config
       SugarJar::Log.debug("Repoconfig: #{@repo_config}")
-      @color = options['color']
-      @pr_autofill = options['pr_autofill']
-      @pr_autostack = options['pr_autostack']
-      @feature_prefix = options['feature_prefix']
-      @use_forks = options['use_forks']
-      @fork_name = options['fork_name']
+
       @checks = {}
       @main_branch = nil
       @main_remote_branches = {}
-      # This is CONFIGURED host, which may be null, as opposed
-      # to the method forge_host which will always return something
-      @_forge_host = @repo_config['forge_host'] || options['forge_host']
-      @repo_forge = @repo_config['forge_type'] || options['forge_type'] ||
-                    _determine_forge_type
 
-      unless @repo_forge.nil?
-        cmd = _forge_cmd
-        unless SugarJar::Util.which_nofail(cmd)
-          die("No '#{cmd}' found, please install it'")
-        end
-      end
+      @host_config = gen_host_config
 
-      user_option = "#{@repo_forge}_user"
-      @forge_user = @repo_config[user_option] || options[user_option]
-
-      # Tell the cli where to talk to, if not default
-      if @_forge_host
-        ENV['GH_HOST'] = @_forge_host
-        ENV['GL_HOST'] = @_forge_host
+      if @host_config['forge_type'] && !forge_cli_avail?
+        SugarJar::Log.error(
+          "Forge CLI #{_forge_cmd} is unavailable, please install",
+        )
+        exit 1
       end
 
       return if options['no_change']
@@ -67,9 +49,28 @@ class SugarJar
 
     private
 
+    def gen_host_config(host = nil)
+      host ||= _determine_forge_host
+      _config_for_host(host) || {}
+    end
+
+    def _config_for_host(host)
+      SugarJar::Log.debug("config_for_host called for #{host}")
+      r = @config.dig('host_configs', 'default').dup || {}
+      r.merge!(@config.dig('host_configs', host) || {})
+      r['forge_host'] = host
+      # if people specified a forge_type, honor it
+      r['forge_type'] ||= _determine_forge_type(host)
+      SugarJar::Log.debug("Determined config for host: #{r}")
+      r
+    end
+
     def forked_repo(repo, username)
+      host = @host_config['forge_host'] || extract_host(repo)
       repo = extract_repo(repo)
-      "git@#{forge_host}:#{username}/#{repo}.git"
+      raise 'Cannot determine host' unless host
+
+      "git@#{host}:#{username}/#{repo}.git"
     end
 
     # gh utils will default to https, but we should always default to SSH
@@ -78,23 +79,24 @@ class SugarJar
       # if they fully-qualified it, we're good
       return repo if repo.start_with?('http', 'git@')
 
+      host = @host_config['forge_host'] || extract_host(repo)
       # otherwise, it's a shortname
-      cr = "git@#{forge_host}:#{repo}.git"
+      cr = "git@#{host}:#{repo}.git"
       SugarJar::Log.debug("canonicalized #{repo} to #{cr}")
       cr
     end
 
-    def forge_host
-      # if one is specifically configured, use that
-      return @_forge_host if @_forge_host
+    def _determine_forge_host
+      # DO NOT USE in the general case - ONLY for filling in @host_config
+      # (doesn't consult host_config). Use @host_config['forge_host']
+      # in general.
 
-      # otherwise, if we're in a repo, use the hostname of the remote
+      # if we're in a repo, use the hostname of the remote
       if SugarJar::Util.in_repo?
         url = remote_url_map.values.first
         return extract_host(url)
       end
-
-      @repo_forge == 'gitlab' ? 'gitlab.com' : 'github.com'
+      @config['default_forge_host']
     end
 
     def repo_shortname(repo)
@@ -156,7 +158,7 @@ class SugarJar
     def dirty_check!
       return unless dirty?
 
-      if @ignore_dirty
+      if @config['ignore_dirty']
         SugarJar::Log.warn(
           'Your repo is dirty, but --ignore-dirty was specified, so ' +
           'carrying on anyway.',
@@ -302,7 +304,7 @@ class SugarJar
     end
 
     def color(string, *colors)
-      if @color
+      if @config['color']
         pastel.decorate(string, *colors)
       else
         string
@@ -321,12 +323,12 @@ class SugarJar
     end
 
     def fprefix(name)
-      return name unless @feature_prefix
+      return name unless @host_config['feature_prefix']
 
-      return name if name.start_with?(@feature_prefix)
+      return name if name.start_with?(@host_config['feature_prefix'])
       return name if all_local_branches.include?(name)
 
-      newname = "#{@feature_prefix}#{name}"
+      newname = "#{@host_config['feature_prefix']}#{name}"
       SugarJar::Log.debug(
         "Munging feature name: #{name} -> #{newname} due to feature prefix",
       )
@@ -412,29 +414,43 @@ class SugarJar
     end
 
     def git(*)
-      SugarJar::Util.git(*, :color => @color)
+      SugarJar::Util.git(*, :color => @config['color'])
     end
 
     def git_nofail(*)
-      SugarJar::Util.git_nofail(*, :color => @color)
+      SugarJar::Util.git_nofail(*, :color => @config['color'])
     end
 
-    def _determine_forge_type
+    def _determine_forge_type(host = nil)
+      if @config['force_forge_type']
+        SugarJar::Log.warn(
+          'Using forge_type from --force-forge-type, not detecting forge' +
+          ' type. This should not be necessary, it is not recommended you' +
+          ' set this.',
+        )
+        return @config['force_forge_type']
+      end
+
+      if host
+        return host.include?('gitlab') ? 'gitlab' : 'github'
+      end
+
       if SugarJar::Util.in_repo?
         gl = remote_url_map.values.any? { |x| x.include?('gitlab') }
         return gl ? 'gitlab' : 'github'
       end
 
-      # if all else fails, guess GH
-      'github'
+      # in smartclone mode, when creating the object, we will in fact
+      # be unable to determine this, that's expacted
+      SugarJar::Log.debug('Unable to determine forge_type!')
     end
 
     def _forge_cmd
-      @repo_forge == 'gitlab' ? 'glab' : 'gh'
+      @host_config['forge_type'] == 'gitlab' ? 'glab' : 'gh'
     end
 
     def forge(*)
-      if @repo_forge == 'gitlab'
+      if @host_config['forge_type'] == 'gitlab'
         SugarJar::Util.glcli(*)
       else
         SugarJar::Util.ghcli(*)
@@ -442,7 +458,7 @@ class SugarJar
     end
 
     def forge_nofail(*)
-      if @repo_forge == 'gitlab'
+      if @host_config['forge_type'] == 'gitlab'
         SugarJar::Util.glcli_nofail(*)
       else
         SugarJar::Util.ghcli_nofail(*)

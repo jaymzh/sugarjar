@@ -7,7 +7,7 @@ class SugarJar
 
       # does not use dirty_check! as we want a custom message
       if dirty?
-        if @ignore_dirty
+        if @config['ignore_dirty']
           SugarJar::Log.warn(
             'Your repo is dirty, but --ignore-dirty was specified, so ' +
             'carrying on anyway. If the linter autocorrects, the displayed ' +

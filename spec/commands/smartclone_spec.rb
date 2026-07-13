@@ -9,20 +9,22 @@ describe 'SugarJar::Commands' do
       SugarJar::Commands.new(opts)
     end
 
+    before do
+      allow(SugarJar::Util).to receive(:in_repo?).and_return(false)
+    end
+
     context 'repo is in our own org' do
       let(:repo) do
         'git@github.com:myuser/repo.git'
       end
 
       it 'uses git' do
-        sj.instance_variable_set(:@forge_user, opts['github_user'])
         expect(sj).to_not receive(:forge)
         expect(sj).to receive(:git).with('clone', repo, 'repo')
         sj.smartclone(repo)
       end
 
       it 'passes additional arguments to git' do
-        sj.instance_variable_set(:@forge_user, opts['github_user'])
         expect(sj).to_not receive(:forge)
         expect(sj).to receive(:git).with('clone', repo, 'somedir',
                                          '--something')
@@ -35,9 +37,14 @@ describe 'SugarJar::Commands' do
         let(:opts) do
           {
             'no_change' => true,
-            'github_user' => 'myuser',
-            'forge_type' => 'github',
-            'use_forks' => true,
+            'host_configs' => {
+              'default' => {
+                'use_forks' => true,
+              },
+              'github.com' => {
+                'user' => 'myuser',
+              },
+            },
           }
         end
 
@@ -78,7 +85,6 @@ describe 'SugarJar::Commands' do
           end
 
           it 'bypasses fork' do
-            sj.instance_variable_set(:@forge_user, opts['github_user'])
             expect(sj).to_not receive(:forge)
             expect(sj).to receive(:git).with('clone', repo, 'repo')
             sj.smartclone(repo)
@@ -90,10 +96,20 @@ describe 'SugarJar::Commands' do
         let(:opts) do
           {
             'no_change' => true,
-            'github_user' => 'myuser',
-            'forge_type' => 'gitlab',
-            'use_forks' => true,
+            'host_configs' => {
+              'default' => {
+                'use_forks' => true,
+              },
+              'gitlab.com' => {
+                'user' => 'myuser',
+              },
+            },
           }
+        end
+
+        before do
+          expect(SugarJar::Util).to receive(:in_repo?).at_least(:once).
+            and_return(false)
         end
 
         let(:repo) do
@@ -114,9 +130,6 @@ describe 'SugarJar::Commands' do
           expect(Dir).to receive(:chdir).with('repo').exactly(2).times.and_yield
           expect(sj).to receive(:git).with('remote', 'rename', 'origin',
                                            'upstream')
-          expect(sj).to receive(:forked_repo).and_return(
-            'git@gitlab.com:myuser/repo.git',
-          )
           expect(sj).to receive(:git).with(
             'remote', 'add', 'origin', 'git@gitlab.com:myuser/repo.git'
           )
@@ -136,9 +149,6 @@ describe 'SugarJar::Commands' do
           expect(Dir).to receive(:chdir).with('repo').exactly(2).times.and_yield
           expect(sj).to receive(:git).with('remote', 'rename', 'origin',
                                            'upstream')
-          expect(sj).to receive(:forked_repo).and_return(
-            'git@gitlab.com:myuser/repo.git',
-          )
           expect(sj).to receive(:git).with(
             'remote', 'add', 'origin', 'git@gitlab.com:myuser/repo.git'
           )
@@ -159,9 +169,6 @@ describe 'SugarJar::Commands' do
             times.and_yield
           expect(sj).to receive(:git).with('remote', 'rename', 'origin',
                                            'upstream')
-          expect(sj).to receive(:forked_repo).and_return(
-            'git@gitlab.com:myuser/repo.git',
-          )
           expect(sj).to receive(:git).with(
             'remote', 'add', 'origin', 'git@gitlab.com:myuser/repo.git'
           )
@@ -181,7 +188,6 @@ describe 'SugarJar::Commands' do
           end
 
           it 'bypasses fork' do
-            sj.instance_variable_set(:@forge_user, opts['github_user'])
             expect(sj).to_not receive(:forge)
             expect(sj).to receive(:git).with('clone', repo, 'repo')
             sj.smartclone(repo)

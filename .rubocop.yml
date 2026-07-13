@@ -10,6 +10,9 @@ Layout/LineLength:
 Metrics/BlockNesting:
   Enabled: false
 
+Metrics/ParameterLists:
+  Enabled: false
+
 Naming/FileName:
   Enabled: false
 

@@ -6,6 +6,103 @@ describe 'SugarJar::Commands' do
     SugarJar::Commands.new({ 'no_change' => true })
   end
 
+  context '#_config_for_host' do
+    let(:base_config) do
+      {
+        'host_configs' => {
+          'default' => {
+            'use_forks' => true,
+          },
+          'github.com' => {
+            'user' => 'ghuser',
+          },
+          'gitlab.com' => {
+            'user' => 'gluser',
+          },
+        },
+      }
+    end
+
+    it 'provides defaults when no overrides specified' do
+      sj = SugarJar::Commands.new(base_config)
+      c = sj.send(:_config_for_host, 'github.com')
+      {
+        'forge_type' => 'github',
+        'forge_host' => 'github.com',
+        'user' => 'ghuser',
+        'use_forks' => true,
+      }.each do |k, v|
+        expect(c[k]).to eq(v)
+      end
+    end
+
+    it 'uses overrides when they are available' do
+      config = base_config.dup
+      config['host_configs']['github.com'] = {
+        'user' => 'special_user',
+        'use_forks' => false,
+      }
+      sj = SugarJar::Commands.new(config)
+      c = sj.send(:_config_for_host, 'github.com')
+      {
+        'forge_type' => 'github',
+        'user' => 'special_user',
+        'use_forks' => false,
+      }.each do |k, v|
+        expect(c[k]).to eq(v)
+      end
+    end
+
+    it 'handles partial overrides' do
+      config = base_config.dup
+      config['host_configs']['github.com']['use_forks'] = false
+      sj = SugarJar::Commands.new(config)
+      c = sj.send(:_config_for_host, 'github.com')
+      {
+        'forge_type' => 'github',
+        'user' => 'ghuser',
+        'use_forks' => false,
+      }.each do |k, v|
+        expect(c[k]).to eq(v)
+      end
+    end
+
+    it 'picks the correct override from many' do
+      config = base_config.dup
+      {
+        'github.com' => {
+          'user' => 'one',
+          'use_forks' => false,
+        },
+        'mycompany.github.com' => {
+          'user' => 'two',
+          'use_forks' => false,
+        },
+        'something.gitlab.com' => {
+          'user' => 'three',
+        },
+        'gitlab.com' => {
+          'user' => 'four',
+        },
+      }.each do |host, cfg|
+        config['host_configs'][host] = cfg
+      end
+      # bypass the git repo we're running in or it will taint the @config
+      expect(SugarJar::Util).to receive(:in_repo?).at_least(
+        :once,
+      ).times.and_return(false)
+      sj = SugarJar::Commands.new(config)
+      {
+        'github.com' => 'one',
+        'mycompany.github.com' => 'two',
+        'something.gitlab.com' => 'three',
+        'gitlab.com' => 'four',
+      }.each do |host, answer|
+        expect(sj.send(:_config_for_host, host)['user']).to eq(answer)
+      end
+    end
+  end
+
   context '#set_commit_template' do
     it 'Does nothing if not in repo' do
       expect(SugarJar::RepoConfig).to receive(:config).and_return(
@@ -90,7 +187,12 @@ describe 'SugarJar::Commands' do
   context '#fprefix' do
     it 'Adds prefixes when needed' do
       sj = SugarJar::Commands.new(
-        { 'no_change' => true, 'feature_prefix' => 'someuser/' },
+        {
+          'no_change' => true,
+          'host_configs' => {
+            'default' => { 'feature_prefix' => 'someuser/' },
+          },
+        },
       )
       expect(sj).to receive(:all_local_branches).and_return(['/nonexistent'])
       expect(sj.send(:fprefix, 'test')).to eq('someuser/test')
@@ -182,7 +284,6 @@ describe 'SugarJar::Commands' do
       'https://github.com/org/repo.git',
     ].each do |url|
       it "generates correct URL from #{url}" do
-        expect(sj).to receive(:forge_host).and_return('github.com')
         expect(sj.send(:forked_repo, url, 'test')).
           to eq('git@github.com:test/repo.git')
       end
@@ -191,14 +292,25 @@ describe 'SugarJar::Commands' do
     context 'given short names' do
       # shortname
       url = 'org/repo'
+
       it 'generates correct URL from shortnames on GH' do
-        expect(sj).to receive(:forge_host).and_return('github.com')
+        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+          :once,
+        ).times.and_return(false)
+        sj = SugarJar::Commands.new(
+          { 'no_change' => true, 'default_forge_host' => 'github.com' },
+        )
         expect(sj.send(:forked_repo, url, 'test')).
           to eq('git@github.com:test/repo.git')
       end
 
       it 'generates correct URL from shortnames on GL' do
-        expect(sj).to receive(:forge_host).and_return('gitlab.com')
+        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+          :once,
+        ).times.and_return(false)
+        sj = SugarJar::Commands.new(
+          { 'no_change' => true, 'default_forge_host' => 'gitlab.com' },
+        )
         expect(sj.send(:forked_repo, url, 'test')).
           to eq('git@gitlab.com:test/repo.git')
       end
@@ -223,13 +335,23 @@ describe 'SugarJar::Commands' do
       # shortname
       url = 'org/repo'
       it "canonicalizes short name #{url} on GH" do
-        expect(sj).to receive(:forge_host).and_return('github.com')
+        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+          :once,
+        ).times.and_return(false)
+        sj = SugarJar::Commands.new(
+          { 'no_change' => true, 'default_forge_host' => 'github.com' },
+        )
         expect(sj.send(:canonicalize_repo, url)).
           to eq('git@github.com:org/repo.git')
       end
 
       it "canonicalizes short name #{url} on GH" do
-        expect(sj).to receive(:forge_host).and_return('gitlab.com')
+        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+          :once,
+        ).times.and_return(false)
+        sj = SugarJar::Commands.new(
+          { 'no_change' => true, 'default_forge_host' => 'gitlab.com' },
+        )
         expect(sj.send(:canonicalize_repo, url)).
           to eq('git@gitlab.com:org/repo.git')
       end

@@ -3,13 +3,26 @@ class SugarJar
     def smartclone(repo, *args)
       org = extract_org(repo)
       reponame = extract_repo(repo)
+      host = extract_host(repo) || @config['default_forge_host']
+      unless host
+        raise 'Failed to determine host. Please specify --default-forge-host,' +
+              ' and file a bug.'
+      end
+      @host_config = gen_host_config(host)
+      raise 'Failed to determine forge_type' unless @host_config['forge_type']
+
+      # set env vars of the host, just for completeness
+      # since it's short-lived we just set both vars
+      ENV['GH_HOST'] = host
+      ENV['GL_HOST'] = host
+
       dir = if args.length.positive? && !args.first.start_with?('-')
               args.shift
             else
               reponame
             end
 
-      forkname = @fork_name || reponame
+      forkname = @config['fork_name'] || reponame
 
       SugarJar::Log.info("Cloning #{reponame}...")
 
@@ -19,8 +32,8 @@ class SugarJar
       #
       # Unless the repo is in our own org and cannot be forked, then it
       # will fail.
-      if @use_forks && @forge_user != org
-        if @repo_forge == 'gitlab'
+      if @host_config['use_forks'] && @host_config['user'] != org
+        if @host_config['forge_type'] == 'gitlab'
           _gitlab_clone(org, repo, dir, forkname, *args)
         else
           forge(
@@ -79,7 +92,7 @@ class SugarJar
         # and then configure remotes properly
         git('remote', 'rename', 'origin', 'upstream')
 
-        fork_url = forked_repo(repo, @forge_user)
+        fork_url = forked_repo(repo, @host_config['user'])
         git('remote', 'add', 'origin', fork_url)
       end
     end

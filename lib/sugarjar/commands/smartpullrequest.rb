@@ -19,7 +19,7 @@ class SugarJar
 
       curr = current_branch
       base = tracked_branch
-      if @pr_autofill
+      if @config['pr_autofill']
         SugarJar::Log.info('Autofilling in PR from commit message')
         num_commits = git(
           'rev-list', '--count', curr, "^#{base}"
@@ -41,14 +41,14 @@ class SugarJar
               ' PR is rebased.',
             )
           # nil is prompt, true is always, false is never
-          elsif @pr_autostack.nil?
+          elsif @config['pr_autostack'].nil?
             $stdout.print(
               'It looks like this is a subfeature, would you like to base ' +
               "this PR on #{base}? [y/n] ",
             )
             ans = $stdin.gets.strip
             args.unshift('--base', base) if %w{Y y}.include?(ans)
-          elsif @pr_autostack
+          elsif @config['pr_autostack']
             args.unshift('--base', base)
           end
         elsif base.include?('/') && base != most_main
@@ -60,7 +60,7 @@ class SugarJar
 
       # <org>:<branch> is the GH API syntax for:
       #   look for a branch of name <branch>, from a fork in owner <org>
-      if @repo_forge == 'github'
+      if @host_config['forge_type'] == 'github'
         # On GitHub, the head is the org and the *BRANCH* name to use as
         # the head branch...
         args.unshift('--head', "#{push_org}:#{curr}")
@@ -87,7 +87,7 @@ class SugarJar
     private
 
     def _pr_cmd
-      @repo_forge == 'gitlab' ? 'mr' : 'pr'
+      @host_config['forge_type'] == 'gitlab' ? 'mr' : 'pr'
     end
 
     def assert_common_main_branch!
