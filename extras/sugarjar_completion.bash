@@ -18,7 +18,7 @@ _sugarjar_completions()
     local prefix=''
     if [ -e "$SJCONFIG" ]; then
         if type yq &>/dev/null; then
-            prefix=$(yq .feature_prefix $SJCONFIG)
+            prefix=$(yq -r .feature_prefix $SJCONFIG)
         else
             # the xargs removes extra spaces
             prefix=$(grep feature_prefix $SJCONFIG | cut -f2 -d: | xargs)
