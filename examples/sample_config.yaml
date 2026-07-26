@@ -23,8 +23,14 @@ pr_autostack: true
 # list
 ignore_deprecated_options: [ 'gh_cli' ]
 
-# User to use when cloning new github repos
-github_user: c00ldude
-
-# User to use when cloning new gitlab repos
-gitlab_user: c00ldude
+host_configs:
+  default:
+    use_forks: true
+  github.com:
+    user: c00ldude
+  gitlab.com:
+    user: thisc00ldude
+  gitlab.company.com:
+    user: tsmith
+    use_forks: false
+    feature_prefix: "tsmith/"

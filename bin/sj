@@ -31,39 +31,21 @@ parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'OPTIONS:'
 
-  opts.on('--feature-prefix', 'Prefix to use for feature branches') do |prefix|
-    options['feature_prefix'] = prefix
-  end
-
   opts.on(
-    '--forge-host HOST',
-    '--github-host HOST',
+    '--default-forge-host HOST',
     'The host of your forge (github, gitlab, etc.). Generally only needed' +
     ' when cloning (smartclone), as we can usually figure out from within' +
-    ' a cloned repo. Currently accepts --github-host for backwards' +
-    ' compatibility.',
+    ' a cloned repo.',
   ) do |host|
-    options['forge_host'] = host
-  end
-
-  opts.on('--forge-type TYPE', 'Forge type: github, gitlab') do |type|
-    options['forge_type'] = type
+    options['default_forge_host'] = host
   end
 
   opts.on(
-    '--github-user USER',
-    'User for github repos, unless specified in the repoconfig.' +
-    ' Defaults to your local username',
-  ) do |user|
-    options['github_user'] = user
-  end
-
-  opts.on(
-    '--gitlab-user USER',
-    'User for gitlab repos, unless specified in the repoconfig.' +
-    ' Defaults to your local username',
-  ) do |user|
-    options['gitlab_user'] = user
+    '--force-forge-type TYPE',
+    'GENERALLY NOT NEEDED. In case SJ cannot detect the type of a forge ' +
+    'from the hostname during smartclone. Forge type: github, gitlab',
+  ) do |type|
+    options['force_forge_type'] = type
   end
 
   opts.on('-h', '--help', 'Print this help message') do
@@ -101,14 +83,6 @@ parser = OptionParser.new do |opts|
     'commit if we are using "gh". [default: true]',
   ) do |autofill|
     options['pr_autofill'] = autofill
-  end
-
-  opts.on(
-    '--[no-]use-forks',
-    'Create (add a remote for) forks, when the organization does not match ' +
-    'the user. [default: true]',
-  ) do |val|
-    options['use_forks'] = val
   end
 
   opts.on(

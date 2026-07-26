@@ -17,7 +17,14 @@ describe 'SugarJar::Commands' do
 
     it 'attempts to checkout the branch with feature prefix, if it exists' do
       sj = SugarJar::Commands.new(
-        { 'no_change' => true, 'feature_prefix' => 'fp/' },
+        {
+          'no_change' => true,
+          'host_configs' => {
+            'default' => {
+              'feature_prefix' => 'fp/',
+            },
+          },
+        },
       )
       branch = 'foo'
       allow(sj).to receive(:assert_in_repo!)
@@ -32,7 +39,14 @@ describe 'SugarJar::Commands' do
 
     it 'will checkout non-prefixed branch if prefixed branch does not exist' do
       sj = SugarJar::Commands.new(
-        { 'no_change' => true, 'feature_prefix' => 'fp/' },
+        {
+          'no_change' => true,
+          'host_configs' => {
+            'default' => {
+              'feature_prefix' => 'fp/',
+            },
+          },
+        },
       )
       branch = 'foo'
       allow(sj).to receive(:assert_in_repo!)

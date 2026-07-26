@@ -1,25 +1,52 @@
 require 'yaml'
 require_relative 'log'
+require 'deep_merge'
 
 class SugarJar
   # This parses SugarJar configs (not to be confused with repoconfigs).
   # This is stuff like log level, github-user, etc.
   class Config
     DEFAULTS = {
-      'github_user' => ENV.fetch('USER'),
-      'gitlab_user' => ENV.fetch('USER'),
+      'default_forge_host' => nil,
       'pr_autofill' => true,
       'pr_autostack' => nil,
       'color' => true,
-      'use_forks' => true,
       'ignore_deprecated_options' => [],
+      'host_configs' => {
+        'default' => {
+          'user' => ENV.fetch('USER'),
+          'use_forks' => true,
+        },
+      },
+    }.freeze
+
+    # things we have a command-line option for, but doesn't make sense
+    # in a config file.
+    EXTRA_CONFIGS = %w{fork_name force_forge_type}.freeze
+
+    TOP_LEVEL_CONFIGS = (DEFAULTS.keys + EXTRA_CONFIGS).freeze
+
+    DEPRECATED_OPTIONS = %w{
+      fallthru
+      gh_cli
+      github_user
+      gitlab_user
+      github_host
+      gitlab_host
     }.freeze
 
     def self._find_ordered_files
+      real_files = []
       [
-        '/etc/sugarjar/config.yaml',
-        "#{Dir.home}/.config/sugarjar/config.yaml",
-      ].select { |f| File.exist?(f) }
+        '/etc/sugarjar',
+        "#{Dir.home}/.config/sugarjar",
+      ].each do |dir|
+        %w{yaml yml}.each do |ext|
+          f = File.join(dir, "config.#{ext}")
+          real_files << f if File.exist?(f)
+        end
+      end
+      real_files
     end
 
     def self.config
@@ -28,13 +55,11 @@ class SugarJar
       _find_ordered_files.each do |f|
         SugarJar::Log.debug("Loading config #{f}")
         data = YAML.safe_load_file(f)
+        next unless data
+
         warn_on_deprecated_configs(data, f)
-        if data['github_host']
-          data['forge_host'] = data['github_host'] if data['forge_host'].nil?
-          data.delete('github_host')
-        end
-        # an empty file is a `nil` which you can't merge
-        c.merge!(YAML.safe_load_file(f)) if data
+        data = data.slice(*TOP_LEVEL_CONFIGS)
+        c.deep_merge!(data)
         SugarJar::Log.debug("Modified config: #{c}")
       end
       c
@@ -42,7 +67,7 @@ class SugarJar
 
     def self.warn_on_deprecated_configs(data, fname)
       ignore_deprecated_options = data['ignore_deprecated_options'] || []
-      %w{fallthru gh_cli}.each do |opt|
+      DEPRECATED_OPTIONS.each do |opt|
         next unless data.key?(opt)
 
         if ignore_deprecated_options.include?(opt)
@@ -55,29 +80,6 @@ class SugarJar
         SugarJar::Log.warn(
           "#{fname}: contains deprecated option `#{opt}`. You can " +
           'suppress this warning with `ignore_deprecated_options`.',
-        )
-      end
-
-      # github_host has special handling
-      return unless data['github_host']
-
-      if ignore_deprecated_options.include?('github_host')
-        SugarJar::Log.debug(
-          "#{fname}: Deprecated option `github_host` found, but not " +
-          'warning due to `ignore_deprecated_options` in that file.',
-        )
-      elsif data.key?('forge_host')
-        SugarJar::Log.warn(
-          "#{fname}: Deprecated option `github_host` found. " +
-          'Ignoring in favor of newer `force_host` option. You can ' +
-          'suppress this warning with `ignore_deprecated_options`.',
-        )
-      else
-        SugarJar::Log.warn(
-          "#{fname}: Deprecated option `github_host` found. " +
-          'Treating it as if it was `forge_host` for now. Please update ' +
-          'your config file to use this new option. You can suppress ' +
-          'this warning with `ignore_deprecated_options`.',
         )
       end
     end
