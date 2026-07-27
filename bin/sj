@@ -187,6 +187,10 @@ COMMANDS:
 
               Aliased to 'bcleanall' for backwards compatibility.
 
+  modernizeconfig, fixconfig
+              Will take a sugarjar config file and modernize it for all of
+              the changes in 4.x. The new version will be printed to stdout.
+
   pullsuggestions, ps
               Pull any suggestions *that have been committed* in the GitHub UI.
               This will show the diff and prompt for confirmation before

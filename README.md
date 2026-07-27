@@ -30,6 +30,10 @@ If you don't, there's a ton of useful stuff for everyone!
 
 Jump to what you're most interested in:
 
+> [!NOTE]
+> There is a new 'modernizeconfig' option to automatically convert your
+> config for the significant changes in 4.x.
+
 * [Common Use-cases](#common-use-cases)
    * [Auto Cleanup Squash-merged branches](#auto-cleanup-squash-merged-branches)
    * [Smarter clones and remotes](#smarter-clones-and-remotes)
@@ -393,6 +397,28 @@ them, your origin and local branches are no longer in-sync. The
 local branch. This command will show a diff and ask for confirmation before
 attempting the merge and  - if allowed to continue - will use a fast-forward
 merge.
+
+### Modernize your config
+
+In 4.0, we significantly revamped how the configuration works, adding the new
+`host_configs` section, and deprecating or moving many top-level configs. In
+order to make this transition easier, there is now a `modernizeconfig` command
+to convert it for you!
+
+```shell
+sj modernizeconfig ~/.config/sugarjar/config.yml
+```
+
+This will generate a new config for you on stdout, and you can then choose
+to overwrite your old one after inspecting it. For example:
+
+```shell
+$ sj modernizeconfig ~/.config/sugarjar/config.yml > /tmp/new_sj_config.yml
+$ diff -u ~/.config/sugarjar/config.yml /tmp/new_sj_config.yml
+...
+$ mv ~/.config/sugarjar/config.yml ~/.config/sugarjar/config.yml.old
+$ mv /tmp/new_sj_config.yml ~/.config/sugarjar/config.yml
+```
 
 ### And more!
 
