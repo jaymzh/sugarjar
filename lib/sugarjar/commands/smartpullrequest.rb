@@ -24,12 +24,17 @@ class SugarJar
         num_commits = git(
           'rev-list', '--count', curr, "^#{base}"
         ).stdout.strip.to_i
-        if num_commits > 1
+        if num_commits > 1 && @host_config['forge_type'] == 'github'
           args.unshift('--fill-first')
         else
           args.unshift('--fill')
         end
       end
+      base_opt = if @host_config['forge_type'] == 'github'
+                   '--base'
+                 else
+                   '--target-branch'
+                 end
       unless user_specified_base
         if subfeature?(base)
           if upstream_org != push_org
@@ -47,14 +52,14 @@ class SugarJar
               "this PR on #{base}? [y/n] ",
             )
             ans = $stdin.gets.strip
-            args.unshift('--base', base) if %w{Y y}.include?(ans)
+            args.unshift(base_opt, base) if %w{Y y}.include?(ans)
           elsif @config['pr_autostack']
-            args.unshift('--base', base)
+            args.unshift(base_opt, base)
           end
         elsif base.include?('/') && base != most_main
           # If our base is a remote branch, then use that as the
           # base branch of the PR
-          args.unshift('--base', base.split('/').last)
+          args.unshift(base_opt, base.split('/').last)
         end
       end
 
