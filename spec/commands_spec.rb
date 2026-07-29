@@ -101,6 +101,26 @@ describe 'SugarJar::Commands' do
         expect(sj.send(:_config_for_host, host)['user']).to eq(answer)
       end
     end
+
+    it 'honors CLI overrides' do
+      SugarJar::Log.level = :debug
+      # bypass the git repo we're running in or it will taint the @config
+      expect(SugarJar::Util).to receive(:in_repo?).at_least(
+        :once,
+      ).times.and_return(false)
+      config = base_config.dup
+      config['_cli_overrides'] = {
+        'user' => 'forced_user',
+        'forge_type' => 'forced_type',
+      }
+      sj = SugarJar::Commands.new(config)
+      %w{github.com gitlab.com}.each do |host|
+        expect(sj.send(:_config_for_host, host)['user']).to eq('forced_user')
+        expect(sj.send(:_config_for_host, host)['forge_type']).to eq(
+          'forced_type',
+        )
+      end
+    end
   end
 
   context '#set_commit_template' do

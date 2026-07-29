@@ -124,8 +124,12 @@ This will:
 * Clone your fork
 * Add the original as an 'upstream' remote
 
-Note that it takes short names for repos. No need to specify a full URL,
-just a $org/$repo.
+Note that if you pass in a full-formed URL (like
+`git@github.com:chef/omnibus-toolchain.git`), SugarJar will infer the host and
+the forge type (gitub, gitlab, etc.). However, it does accept short names for
+repos ($org/$repo) - however, for cloning, since there is no repo yet for
+SugarJar to determine the forge from, you will need either to specify
+`--default-forge-host`, or have `default_forge_host` set in your config file.
 
 Like `git clone`, `sj smartclone` will accept an additional argument as the
 destination directory to clone to. It will also pass any other unknown options
@@ -139,6 +143,8 @@ host_configs:
   default:
     use_forks: false
 ```
+
+See [Configuration](#Configuration) for more details on the config file.
 
 ### Work with stacked branches more easily
 
