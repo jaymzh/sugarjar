@@ -66,6 +66,22 @@ class SugarJar
     end
 
     def self.warn_on_deprecated_configs(data, fname)
+      # if it doesn't have host_configs **and** it has one of the
+      # previous user options, that were effectively required before
+      # and have now moved to host_configs, then we treat it as an
+      # old config
+      if %w{github_user gitlab_user}.any? { |useropt| data.key?(useropt) } &&
+         !data['host_configs']
+        SugarJar::Log.warn(
+          "#{fname} appears to be an old-style config.\nIt likely will " +
+          'not result in the behavior you want. You should run' +
+          "\n\n\tsj modernizeconfig #{fname}\n\n" +
+          'To convert it, check the result looks right, and replaces your ' +
+          "existing config.\n",
+        )
+        return
+      end
+
       ignore_deprecated_options = data['ignore_deprecated_options'] || []
       DEPRECATED_OPTIONS.each do |opt|
         next unless data.key?(opt)
