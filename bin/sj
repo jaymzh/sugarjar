@@ -23,6 +23,7 @@ if ENV['SUGARJAR_LOGLEVEL']
   options['log_level'] = SugarJar::Log.level = ENV['SUGARJAR_LOGLEVEL'].to_sym
 end
 
+options['_cli_overrides'] = {}
 parser = OptionParser.new do |opts|
   opts.banner = 'Usage: sj <command> [<args>] [<options>]'
 
@@ -33,19 +34,30 @@ parser = OptionParser.new do |opts|
 
   opts.on(
     '--default-forge-host HOST',
-    'The host of your forge (github, gitlab, etc.). Generally only needed' +
-    ' when cloning (smartclone), as we can usually figure out from within' +
-    ' a cloned repo.',
+    'The default host of your forge (github, gitlab, etc.) when it cannot ' +
+    'be determined automatically. In nearly every case SJ will ' +
+    'automatically determine this. However, for `smartclone`, if ' +
+    'you use shortnames (e.g. org/repo) that do not contain a host, this ' +
+    'is the default to assume. Most useful in your config file when set ' +
+    'to your most comomn forge host (e.g. github.com)',
   ) do |host|
     options['default_forge_host'] = host
   end
 
   opts.on(
-    '--force-forge-type TYPE',
+    '--forge-type TYPE',
     'GENERALLY NOT NEEDED. In case SJ cannot detect the type of a forge ' +
-    'from the hostname during smartclone. Forge type: github, gitlab',
+    'from the hostname during smartclone. Only available in CLI, not a ' +
+    'config file option. Forge type: github, gitlab.',
   ) do |type|
-    options['force_forge_type'] = type
+    options['_cli_overrides']['forge_type'] = type
+  end
+
+  opts.on(
+    '--forge-user USER',
+    'Bypass the config and just use USER as the forge user.',
+  ) do |user|
+    options['_cli_overrides']['user'] = user
   end
 
   opts.on('-h', '--help', 'Print this help message') do

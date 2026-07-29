@@ -62,6 +62,10 @@ class SugarJar
       r['forge_host'] = host
       # if people specified a forge_type, honor it
       r['forge_type'] ||= _determine_forge_type(host)
+
+      # there are a few things we allow the CLI to override
+      r.merge!(@config['_cli_overrides'] || {})
+
       SugarJar::Log.debug("Determined config for host: #{r}")
       r
     end
@@ -429,15 +433,6 @@ class SugarJar
     end
 
     def _determine_forge_type(host = nil)
-      if @config['force_forge_type']
-        SugarJar::Log.warn(
-          'Using forge_type from --force-forge-type, not detecting forge' +
-          ' type. This should not be necessary, it is not recommended you' +
-          ' set this.',
-        )
-        return @config['force_forge_type']
-      end
-
       if host
         return host.include?('gitlab') ? 'gitlab' : 'github'
       end
