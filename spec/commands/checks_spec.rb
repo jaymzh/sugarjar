@@ -109,7 +109,7 @@ describe 'SugarJar::Commands' do
   context '#run_check' do
     it 'amends diff if linter autocorrects and user says yes' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:repo_root).and_return('root')
+      expect(SugarJar::Git).to receive(:repo_root).and_return('root')
       expect(Dir).to receive(:chdir).with('root').and_yield
       expect(sj).to receive(:get_checks).with('lint').
         and_return(['lint_foo'])
@@ -131,7 +131,7 @@ describe 'SugarJar::Commands' do
 
     it 'quits if linter autocorrects and user says no' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:repo_root).and_return('root')
+      expect(SugarJar::Git).to receive(:repo_root).and_return('root')
       expect(Dir).to receive(:chdir).with('root').and_yield
       expect(sj).to receive(:get_checks).with('lint').
         and_return(['lint_foo'])
@@ -158,7 +158,7 @@ describe 'SugarJar::Commands' do
       sj = SugarJar::Commands.new({ 'no_change' => true })
       %w{lint unit}.each do |type|
         cmd = "#{type}_foo"
-        expect(SugarJar::Util).to receive(:repo_root).and_return('root')
+        expect(SugarJar::Git).to receive(:repo_root).and_return('root')
         expect(Dir).to receive(:chdir).with('root').and_yield
         expect(sj).to receive(:get_checks).with(type).and_return([cmd])
         expect(SugarJar::Util).to receive(:which_nofail).with(cmd).

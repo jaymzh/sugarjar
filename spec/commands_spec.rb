@@ -88,7 +88,7 @@ describe 'SugarJar::Commands' do
         config['host_configs'][host] = cfg
       end
       # bypass the git repo we're running in or it will taint the @config
-      expect(SugarJar::Util).to receive(:in_repo?).at_least(
+      expect(SugarJar::Git).to receive(:in_repo?).at_least(
         :once,
       ).times.and_return(false)
       sj = SugarJar::Commands.new(config)
@@ -105,9 +105,12 @@ describe 'SugarJar::Commands' do
     it 'honors CLI overrides' do
       SugarJar::Log.level = :debug
       # bypass the git repo we're running in or it will taint the @config
-      expect(SugarJar::Util).to receive(:in_repo?).at_least(
+      expect(SugarJar::Git).to receive(:in_repo?).at_least(
         :once,
       ).times.and_return(false)
+      # 'forced_type' isn't a real forge, so avoid actually checking for a
+      # CLI for it
+      allow(SugarJar::Util).to receive(:which_nofail).and_return('/bin/true')
       config = base_config.dup
       config['_cli_overrides'] = {
         'user' => 'forced_user',
@@ -129,7 +132,7 @@ describe 'SugarJar::Commands' do
         { 'commit_template' => '.commit_template.txt' },
       )
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:in_repo?).and_return(false)
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(false)
       expect(SugarJar::Log).to receive(:debug).with(/Skipping/)
       sj.send(:set_commit_template)
     end
@@ -139,8 +142,8 @@ describe 'SugarJar::Commands' do
         { 'commit_template' => '.commit_template.txt' },
       )
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:in_repo?).and_return(true)
-      expect(SugarJar::Util).to receive(:repo_root).and_return('/nonexistent')
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::Git).to receive(:repo_root).and_return('/nonexistent')
       expect(File).to receive(:exist?).
         with('/nonexistent/.commit_template.txt').and_return(false)
       expect(SugarJar::Log).to receive(:fatal).with(/exist/)
@@ -152,8 +155,8 @@ describe 'SugarJar::Commands' do
         { 'commit_template' => '.commit_template.txt' },
       )
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:in_repo?).and_return(true)
-      expect(SugarJar::Util).to receive(:repo_root).and_return('/nonexistent')
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::Git).to receive(:repo_root).and_return('/nonexistent')
       expect(File).to receive(:exist?).
         with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
@@ -169,8 +172,8 @@ describe 'SugarJar::Commands' do
         { 'commit_template' => '.commit_template.txt' },
       )
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:in_repo?).and_return(true)
-      expect(SugarJar::Util).to receive(:repo_root).and_return('/nonexistent')
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::Git).to receive(:repo_root).and_return('/nonexistent')
       expect(File).to receive(:exist?).
         with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
@@ -189,8 +192,8 @@ describe 'SugarJar::Commands' do
         { 'commit_template' => '.commit_template.txt' },
       )
       sj = SugarJar::Commands.new({ 'no_change' => true })
-      expect(SugarJar::Util).to receive(:in_repo?).and_return(true)
-      expect(SugarJar::Util).to receive(:repo_root).and_return('/nonexistent')
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::Git).to receive(:repo_root).and_return('/nonexistent')
       expect(File).to receive(:exist?).
         with('/nonexistent/.commit_template.txt').and_return(true)
       so = double('shell_out')
@@ -314,7 +317,7 @@ describe 'SugarJar::Commands' do
       url = 'org/repo'
 
       it 'generates correct URL from shortnames on GH' do
-        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+        expect(SugarJar::Git).to receive(:in_repo?).at_least(
           :once,
         ).times.and_return(false)
         sj = SugarJar::Commands.new(
@@ -325,7 +328,7 @@ describe 'SugarJar::Commands' do
       end
 
       it 'generates correct URL from shortnames on GL' do
-        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+        expect(SugarJar::Git).to receive(:in_repo?).at_least(
           :once,
         ).times.and_return(false)
         sj = SugarJar::Commands.new(
@@ -355,7 +358,7 @@ describe 'SugarJar::Commands' do
       # shortname
       url = 'org/repo'
       it "canonicalizes short name #{url} on GH" do
-        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+        expect(SugarJar::Git).to receive(:in_repo?).at_least(
           :once,
         ).times.and_return(false)
         sj = SugarJar::Commands.new(
@@ -366,7 +369,7 @@ describe 'SugarJar::Commands' do
       end
 
       it "canonicalizes short name #{url} on GH" do
-        expect(SugarJar::Util).to receive(:in_repo?).at_least(
+        expect(SugarJar::Git).to receive(:in_repo?).at_least(
           :once,
         ).times.and_return(false)
         sj = SugarJar::Commands.new(

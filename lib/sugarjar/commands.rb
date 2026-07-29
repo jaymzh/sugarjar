@@ -6,15 +6,16 @@ require_relative 'commands/branch'
 require_relative 'commands/checks'
 require_relative 'commands/debuginfo'
 require_relative 'commands/feature'
+require_relative 'commands/modernize_config'
 require_relative 'commands/pullsuggestions'
 require_relative 'commands/push'
 require_relative 'commands/smartclone'
 require_relative 'commands/smartpullrequest'
 require_relative 'commands/up'
-require_relative 'commands/modernize_config'
+require_relative 'forge'
+require_relative 'git'
 require_relative 'log'
 require_relative 'repoconfig'
-require_relative 'util'
 require_relative 'version'
 
 class SugarJar
@@ -35,12 +36,9 @@ class SugarJar
       @main_remote_branches = {}
 
       @host_config = gen_host_config
-
-      if @host_config['forge_type'] && !forge_cli_avail?
-        SugarJar::Log.error(
-          "Forge CLI #{_forge_cmd} is unavailable, please install",
-        )
-        exit 1
+      if @host_config['forge_type']
+        # initialize instance var here so checks run...
+        forge
       end
 
       return if options['no_change']
@@ -49,6 +47,15 @@ class SugarJar
     end
 
     private
+
+    def forge
+      return @forge if @forge
+      unless @host_config['forge_type']
+        raise 'Attempted to create Forge object before forge-type known!'
+      end
+
+      @forge = SugarJar::Forge.new(@host_config['forge_type'])
+    end
 
     def gen_host_config(host = nil)
       host ||= _determine_forge_host
@@ -97,7 +104,7 @@ class SugarJar
       # in general.
 
       # if we're in a repo, use the hostname of the remote
-      if SugarJar::Util.in_repo?
+      if SugarJar::Git.in_repo?
         url = remote_url_map.values.first
         return extract_host(url)
       end
@@ -114,7 +121,7 @@ class SugarJar
     end
 
     def set_commit_template
-      unless SugarJar::Util.in_repo?
+      unless SugarJar::Git.in_repo?
         SugarJar::Log.debug('Skipping set_commit_template: not in repo')
         return
       end
@@ -122,7 +129,10 @@ class SugarJar
       realpath = if @repo_config['commit_template'].start_with?('/')
                    @repo_config['commit_template']
                  else
-                   "#{Util.repo_root}/#{@repo_config['commit_template']}"
+                   File.join(
+                     SugarJar::Git.repo_root,
+                     @repo_config['commit_template'],
+                   )
                  end
       unless File.exist?(realpath)
         die(
@@ -155,7 +165,7 @@ class SugarJar
     end
 
     def assert_in_repo!
-      return if SugarJar::Util.in_repo?
+      return if SugarJar::Git.in_repo?
 
       die('sugarjar must be run from inside a git repo')
     end
@@ -329,10 +339,6 @@ class SugarJar
       end
     end
 
-    def forge_cli_avail?
-      !!SugarJar::Util.which_nofail(_forge_cmd)
-    end
-
     def fprefix(name)
       return name unless @host_config['feature_prefix']
 
@@ -352,7 +358,7 @@ class SugarJar
     end
 
     def repo_dir_name
-      SugarJar::Util.repo_root.split('/').last
+      SugarJar::Git.repo_root.split('/').last
     end
 
     def extract_org(repo)
@@ -394,7 +400,7 @@ class SugarJar
     end
 
     def worktrees
-      root = SugarJar::Util.repo_root
+      root = SugarJar::Git.repo_root
       s = git('worktree', 'list', '--porcelain')
       s.error!
       worktrees = {}
@@ -425,11 +431,11 @@ class SugarJar
     end
 
     def git(*)
-      SugarJar::Util.git(*, :color => @config['color'])
+      SugarJar::Git.run(*, :color => @config['color'])
     end
 
     def git_nofail(*)
-      SugarJar::Util.git_nofail(*, :color => @config['color'])
+      SugarJar::Git.run_nofail(*, :color => @config['color'])
     end
 
     def _determine_forge_type(host = nil)
@@ -437,7 +443,7 @@ class SugarJar
         return host.include?('gitlab') ? 'gitlab' : 'github'
       end
 
-      if SugarJar::Util.in_repo?
+      if SugarJar::Git.in_repo?
         gl = remote_url_map.values.any? { |x| x.include?('gitlab') }
         return gl ? 'gitlab' : 'github'
       end
@@ -445,26 +451,6 @@ class SugarJar
       # in smartclone mode, when creating the object, we will in fact
       # be unable to determine this, that's expacted
       SugarJar::Log.debug('Unable to determine forge_type!')
-    end
-
-    def _forge_cmd
-      @host_config['forge_type'] == 'gitlab' ? 'glab' : 'gh'
-    end
-
-    def forge(*)
-      if @host_config['forge_type'] == 'gitlab'
-        SugarJar::Util.glcli(*)
-      else
-        SugarJar::Util.ghcli(*)
-      end
-    end
-
-    def forge_nofail(*)
-      if @host_config['forge_type'] == 'gitlab'
-        SugarJar::Util.glcli_nofail(*)
-      else
-        SugarJar::Util.ghcli_nofail(*)
-      end
     end
   end
 end

@@ -15,7 +15,7 @@ describe 'SugarJar::RepoConfig' do
           'lint',
         ],
       }
-      expect(SugarJar::Util).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
       expect(SugarJar::RepoConfig).to receive(:repo_config_path).
         and_return('some_path')
       expect(SugarJar::RepoConfig).to receive(:config_file?).with('some_path').
@@ -54,7 +54,7 @@ describe 'SugarJar::RepoConfig' do
           'top2key3' => 'c',
         },
       }
-      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+      expect(SugarJar::Git).to receive(:in_repo?).at_least(1).times.
         and_return(true)
       allow(SugarJar::RepoConfig).to receive(:repo_config_path).
         with('base').and_return('base')
@@ -82,7 +82,7 @@ describe 'SugarJar::RepoConfig' do
       additional = {
         'new' => ['thing'],
       }
-      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+      expect(SugarJar::Git).to receive(:in_repo?).at_least(1).times.
         and_return(true)
       %w{base additional}.each do |word|
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).
@@ -135,7 +135,7 @@ describe 'SugarJar::RepoConfig' do
           'things' => 'stuff',
         },
       }
-      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+      expect(SugarJar::Git).to receive(:in_repo?).at_least(1).times.
         and_return(true)
       %w{base additional more}.each do |word|
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).
@@ -165,7 +165,7 @@ describe 'SugarJar::RepoConfig' do
       additional = {
         'something' => 'else',
       }
-      expect(SugarJar::Util).to receive(:in_repo?).at_least(1).times.
+      expect(SugarJar::Git).to receive(:in_repo?).at_least(1).times.
         and_return(true)
       %w{base additional}.each do |word|
         allow(SugarJar::RepoConfig).to receive(:repo_config_path).

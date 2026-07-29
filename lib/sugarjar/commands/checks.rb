@@ -1,4 +1,4 @@
-require_relative '../util'
+require_relative '../git'
 
 class SugarJar
   class Commands
@@ -78,7 +78,7 @@ class SugarJar
     # either the user amend, or bail out. If it's a manual run, then we
     # allow them to just go on.
     def run_check(type, autorun)
-      repo_root = SugarJar::Util.repo_root
+      repo_root = SugarJar::Git.repo_root
       Dir.chdir repo_root do
         checks = get_checks(type)
         # if we failed to determine the checks, the the checks have effectively

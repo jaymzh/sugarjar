@@ -1,4 +1,4 @@
-require_relative 'util'
+require_relative 'git'
 require_relative 'log'
 require 'yaml'
 require 'deep_merge'
@@ -10,7 +10,7 @@ class SugarJar
     CONFIG_NAME = '.sugarjar.yaml'.freeze
 
     def self.repo_config_path(config)
-      ::File.join(SugarJar::Util.repo_root, config)
+      ::File.join(SugarJar::Git.repo_root, config)
     end
 
     def self.hash_from_file(config_file)
@@ -25,7 +25,7 @@ class SugarJar
 
     def self.config(config = CONFIG_NAME)
       data = {}
-      unless SugarJar::Util.in_repo?
+      unless SugarJar::Git.in_repo?
         SugarJar::Log.debug('Not in repo, skipping repoconfig load')
         return data
       end

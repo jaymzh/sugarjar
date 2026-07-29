@@ -9,8 +9,14 @@ describe 'SugarJar::Commands' do
       SugarJar::Commands.new(opts)
     end
 
+    let(:forge_type) { 'github' }
+    let(:forge_double) do
+      instance_double(SugarJar::Forge, :type => forge_type)
+    end
+
     before do
-      allow(SugarJar::Util).to receive(:in_repo?).and_return(false)
+      allow(SugarJar::Git).to receive(:in_repo?).and_return(false)
+      allow(sj).to receive(:forge).and_return(forge_double)
     end
 
     context 'repo is in our own org' do
@@ -19,13 +25,15 @@ describe 'SugarJar::Commands' do
       end
 
       it 'uses git' do
-        expect(sj).to_not receive(:forge)
+        expect(forge_double).to_not receive(:run)
+        expect(forge_double).to_not receive(:run_nofail)
         expect(sj).to receive(:git).with('clone', repo, 'repo')
         sj.smartclone(repo)
       end
 
       it 'passes additional arguments to git' do
-        expect(sj).to_not receive(:forge)
+        expect(forge_double).to_not receive(:run)
+        expect(forge_double).to_not receive(:run_nofail)
         expect(sj).to receive(:git).with('clone', repo, 'somedir',
                                          '--something')
         sj.smartclone(repo, 'somedir', '--something')
@@ -53,7 +61,7 @@ describe 'SugarJar::Commands' do
         end
 
         it 'uses forge and sets upstream' do
-          expect(sj).to receive(:forge).with(
+          expect(forge_double).to receive(:run).with(
             'repo', 'fork', '--clone', repo, 'repo',
             '--fork-name', 'repo'
           )
@@ -64,7 +72,7 @@ describe 'SugarJar::Commands' do
         end
 
         it 'passes additional arguments to gh repo fork' do
-          expect(sj).to receive(:forge).with(
+          expect(forge_double).to receive(:run).with(
             'repo', 'fork', '--clone', repo, 'somedir',
             '--fork-name', 'repo', '--something'
           )
@@ -85,7 +93,8 @@ describe 'SugarJar::Commands' do
           end
 
           it 'bypasses fork' do
-            expect(sj).to_not receive(:forge)
+            expect(forge_double).to_not receive(:run)
+            expect(forge_double).to_not receive(:run_nofail)
             expect(sj).to receive(:git).with('clone', repo, 'repo')
             sj.smartclone(repo)
           end
@@ -93,6 +102,7 @@ describe 'SugarJar::Commands' do
       end
 
       context 'gitlab' do
+        let(:forge_type) { 'gitlab' }
         let(:opts) do
           {
             'no_change' => true,
@@ -107,11 +117,6 @@ describe 'SugarJar::Commands' do
           }
         end
 
-        before do
-          expect(SugarJar::Util).to receive(:in_repo?).at_least(:once).
-            and_return(false)
-        end
-
         let(:repo) do
           'git@gitlab.com:somethingelse/repo.git'
         end
@@ -121,9 +126,9 @@ describe 'SugarJar::Commands' do
         end
 
         it 'uses forge and sets upstream' do
-          expect(sj).to receive(:forge_nofail).with(
-            'repo', 'fork', 'somethingelse/repo', '--clone=false',
-            '--name', 'repo'
+          expect(forge_double).to receive(:run_nofail).with(
+            'repo', 'fork', 'somethingelse/repo', '--name', 'repo',
+            '--clone=false'
           ).and_return(shell_out)
           expect(shell_out).to receive(:error?).and_return(false)
           expect(sj).to receive(:git).with('clone', repo, 'repo')
@@ -139,9 +144,9 @@ describe 'SugarJar::Commands' do
         end
 
         it 'ignores error 409 from "glab repo fork"' do
-          expect(sj).to receive(:forge_nofail).with(
-            'repo', 'fork', 'somethingelse/repo', '--clone=false',
-            '--name', 'repo'
+          expect(forge_double).to receive(:run_nofail).with(
+            'repo', 'fork', 'somethingelse/repo', '--name', 'repo',
+            '--clone=false'
           ).and_return(shell_out)
           expect(shell_out).to receive(:error?).and_return(true)
           expect(shell_out).to receive(:stderr).and_return(' 409 ')
@@ -158,9 +163,9 @@ describe 'SugarJar::Commands' do
         end
 
         it 'passes additional arguments to git clone' do
-          expect(sj).to receive(:forge_nofail).with(
-            'repo', 'fork', 'somethingelse/repo', '--clone=false',
-            '--name', 'repo'
+          expect(forge_double).to receive(:run_nofail).with(
+            'repo', 'fork', 'somethingelse/repo', '--name', 'repo',
+            '--clone=false'
           ).and_return(shell_out)
           expect(shell_out).to receive(:error?).and_return(false)
           expect(sj).to receive(:git).with('clone', repo, 'somedir',
@@ -188,7 +193,8 @@ describe 'SugarJar::Commands' do
           end
 
           it 'bypasses fork' do
-            expect(sj).to_not receive(:forge)
+            expect(forge_double).to_not receive(:run)
+            expect(forge_double).to_not receive(:run_nofail)
             expect(sj).to receive(:git).with('clone', repo, 'repo')
             sj.smartclone(repo)
           end

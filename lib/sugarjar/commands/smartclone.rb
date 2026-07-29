@@ -11,6 +11,9 @@ class SugarJar
       @host_config = gen_host_config(host)
       raise 'Failed to determine forge_type' unless @host_config['forge_type']
 
+      # force object creation for error checking
+      forge
+
       # set env vars of the host, just for completeness
       # since it's short-lived we just set both vars
       ENV['GH_HOST'] = host
@@ -33,10 +36,11 @@ class SugarJar
       # Unless the repo is in our own org and cannot be forked, then it
       # will fail.
       if @host_config['use_forks'] && @host_config['user'] != org
-        if @host_config['forge_type'] == 'gitlab'
-          _gitlab_clone(org, repo, dir, forkname, *args)
+        case forge.type
+        when 'gitlab', 'forgejo'
+          _separate_fork_clone(org, repo, dir, forkname, *args)
         else
-          forge(
+          forge.run(
             'repo', 'fork', '--clone', canonicalize_repo(repo), dir,
             '--fork-name', forkname, *args
           )
@@ -54,7 +58,7 @@ class SugarJar
     end
     alias sclone smartclone
 
-    def _gitlab_clone(_org, repo, dir, forkname, *)
+    def _separate_fork_clone(_org, repo, dir, forkname, *)
       # The gitlab CLI is much less forgiving about already-forked
       # repos, and it has no option to clone to a differently-named
       # directory. So we have to special case it.
@@ -64,12 +68,16 @@ class SugarJar
       # glab requires a short-name for the fork command...
       shortname = repo_shortname(repo)
 
-      # We call fork without --clone since --clone can't clone
-      # to another directory. Also, we must specify =false, or it
-      # will prompt
-      s = forge_nofail(
-        'repo', 'fork', shortname, '--clone=false', '--name', forkname
-      )
+      # For both gitlab and forgejo we fork without clone:
+      #   * gitlab - it cannot clone to a chosen directory
+      #   * forgjo - it doesn't have an option to fork and clone in one
+      #
+      # Also note that for gitlab we must be explicit, if we don't
+      # set --clone=false it will prompt.
+      repo_ref = forge.type == 'gitlab' ? shortname : repo
+      args = ['repo', 'fork', repo_ref, '--name', forkname]
+      args << '--clone=false' if forge.type == 'gitlab'
+      s = forge.run_nofail(*args)
 
       # It fails with:
       #    409 {message: [Project namespace name has already been taken,
@@ -79,7 +87,7 @@ class SugarJar
       # collision. There's no way to tell, so we assume it means we've
       # already forked.
       if s.error?
-        if s.stderr.include?(' 409 ')
+        if forge.type == 'gitlab' && s.stderr.include?(' 409 ')
           SugarJar::Log.debug('Forking failed, probably already forked')
         else
           s.error!
