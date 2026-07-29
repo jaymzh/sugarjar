@@ -304,6 +304,12 @@ class SugarJar
       extract_org(url)
     end
 
+    def repo_name
+      # Take the url of the most-upstream remote, then pull the repo
+      # name from that
+      extract_repo(remote_url_map[upstream])
+    end
+
     def color(string, *colors)
       if @config['color']
         pastel.decorate(string, *colors)
@@ -341,7 +347,7 @@ class SugarJar
       s.error?
     end
 
-    def repo_name
+    def repo_dir_name
       SugarJar::Util.repo_root.split('/').last
     end
 
