@@ -24,16 +24,18 @@ class SugarJar
         num_commits = git(
           'rev-list', '--count', curr, "^#{base}"
         ).stdout.strip.to_i
-        if num_commits > 1 && @host_config['forge_type'] == 'github'
+        if num_commits > 1 && forge.type == 'github'
           args.unshift('--fill-first')
+        elsif forge.type == 'forgejo'
+          args += _forgejo_pr_opts
         else
           args.unshift('--fill')
         end
       end
-      base_opt = if @host_config['forge_type'] == 'github'
-                   '--base'
-                 else
+      base_opt = if forge.type == 'gitlab'
                    '--target-branch'
+                 else
+                   '--base'
                  end
       unless user_specified_base
         if subfeature?(base)
@@ -65,25 +67,20 @@ class SugarJar
 
       # <org>:<branch> is the GH API syntax for:
       #   look for a branch of name <branch>, from a fork in owner <org>
-      if @host_config['forge_type'] == 'github'
-        # On GitHub, the head is the org and the *BRANCH* name to use as
-        # the head branch...
-        args.unshift('--head', "#{push_org}:#{curr}")
-      else
+      if forge.type == 'gitlab'
         # On GitLab, the head is the repo (org/repo) to use as the head
         # _repo_, and then branch is configured seperately (with -s), but
         # we don't need that since it defaults to the local branch name.
         #
         # Then we need --yes for it to not prompt us
         args.unshift('--head', "#{push_org}/#{repo_name}", '--yes')
+      else
+        # On GitHub/Forgeji, the head is the org and the *BRANCH* name to use as
+        # the head branch...
+        args.unshift('--head', "#{push_org}:#{curr}")
       end
 
-      bin = SugarJar::Util.which(_forge_cmd)
-      subcmd = _pr_cmd
-      SugarJar::Log.trace(
-        "Running: #{bin} #{subcmd} create #{args.join(' ')}",
-      )
-      system(bin, subcmd, 'create', *args)
+      forge.run_with_system(_pr_cmd, 'create', *args)
     end
 
     alias spr smartpullrequest
@@ -92,7 +89,7 @@ class SugarJar
     private
 
     def _pr_cmd
-      @host_config['forge_type'] == 'gitlab' ? 'mr' : 'pr'
+      forge.type == 'gitlab' ? 'mr' : 'pr'
     end
 
     def assert_common_main_branch!
@@ -125,6 +122,12 @@ class SugarJar
         "'#{upstream_branch}'. It will then give you some commands to " +
         'run to update this clone.',
       )
+    end
+
+    def _forgejo_pr_opts
+      title = git('log', '-1', '--pretty=format:%s').stdout
+      body = git('show', '-s', '--format=%b').stdout
+      [title, "--body=#{body}"]
     end
   end
 end
