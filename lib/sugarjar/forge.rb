@@ -12,8 +12,9 @@ class SugarJar
       'forgejo' => 'fj',
     }.freeze
 
-    def initialize(type)
+    def initialize(type, host)
       @type = type
+      @host = host
       assert_cli_avail!
     end
 
@@ -38,8 +39,9 @@ class SugarJar
       s
     end
 
-    def run_with_system(*)
-      system(cmd, *)
+    def run_with_system(*args)
+      SugarJar::Log.trace("Running: #{cmd} #{args.join(' ')}")
+      system(cmd, *args)
     end
 
     private
@@ -48,18 +50,34 @@ class SugarJar
       SugarJar::Log.trace("Running: #{cli} #{args.join(' ')}")
       bin = SugarJar::Util.which_nofail(cli)
       s = Mixlib::ShellOut.new([bin] + args).run_command
-      if s.error? && s.stderr.include?("#{cli} auth")
+      if s.error? && ["#{cli} auth", 'Unauthorized'].intersect?(s.stderr)
         SugarJar::Log.info(
-          'glab was run but no gitlab token exists. Will run ' +
-          '"glab auth login" to force\ngh to authenticate...',
+          "#{cli} was run but no gitlab token exists. Will run " +
+          "'#{cli} auth login' to force\n#{cli} to authenticate...",
         )
-        unless system(bin, 'auth', 'login', '-p', 'ssh')
+        args = if cli == 'fj'
+                 [bin, '-H', @host, 'auth', 'login']
+               else
+                 [bin, 'auth', 'login', '-p', 'ssh']
+               end
+        unless system(*args)
           SugarJar::Log.fatal(
-            'That failed, I will bail out. Hub needs to get a github ' +
-            'token. Try running "gh auth login" (will list info about ' +
+            "That failed, I will bail out. #{cli} needs to get a " +
+            "token. Try running '#{cli} auth login' (will list info about " +
             'your account) and try this again when that works.',
           )
           exit(1)
+        end
+        if cli == 'fj'
+          fj = Mixlib::ShellOut.new([bin, 'auth', 'list']).run_command
+          unless fj.stdout.include?(@host)
+            SugarJar::Log.fatal(
+              'Logging in for you failed - this usually means you need to ' +
+              'create a token manually - the instructions should have been ' +
+              'printed above. Setup the token and then try again.',
+            )
+            exit(1)
+          end
         end
       end
       s

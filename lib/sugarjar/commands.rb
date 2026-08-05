@@ -34,11 +34,14 @@ class SugarJar
       @checks = {}
       @main_branch = nil
       @main_remote_branches = {}
+      @host_config = nil
 
-      @host_config = gen_host_config
-      if @host_config['forge_type']
-        # initialize instance var here so checks run...
-        forge
+      if SugarJar::Git.in_repo?
+        @host_config = gen_host_config
+        if @host_config['forge_type']
+          # initialize instance var here so checks run...
+          forge
+        end
       end
 
       return if options['no_change']
@@ -54,7 +57,9 @@ class SugarJar
         raise 'Attempted to create Forge object before forge-type known!'
       end
 
-      @forge = SugarJar::Forge.new(@host_config['forge_type'])
+      @forge = SugarJar::Forge.new(
+        @host_config['forge_type'], @host_config['forge_host']
+      )
     end
 
     def gen_host_config(host = nil)
@@ -78,9 +83,11 @@ class SugarJar
     end
 
     def forked_repo(repo, username)
-      host = @host_config['forge_host'] || extract_host(repo)
-      repo = extract_repo(repo)
+      host = @host_config&.dig('forge_host') || extract_host(repo) ||
+             @config['default_forge_host']
       raise 'Cannot determine host' unless host
+
+      repo = extract_repo(repo)
 
       "git@#{host}:#{username}/#{repo}.git"
     end
@@ -89,9 +96,10 @@ class SugarJar
     # unless otherwise specified since https will cause prompting.
     def canonicalize_repo(repo)
       # if they fully-qualified it, we're good
-      return repo if repo.start_with?('http', 'git@')
+      return repo if repo.start_with?('http', 'git@', 'ssh://')
 
-      host = @host_config['forge_host'] || extract_host(repo)
+      host = @host_config&.dig('forge_host') || extract_host(repo) ||
+             @config['default_forge_host']
       # otherwise, it's a shortname
       cr = "git@#{host}:#{repo}.git"
       SugarJar::Log.debug("canonicalized #{repo} to #{cr}")
@@ -188,7 +196,11 @@ class SugarJar
     end
 
     def determine_main_branch(branches)
-      branches.include?('master') ? 'master' : 'main'
+      if branches.include?('main')
+        'main'
+      elsif branches.include?('master')
+        'master'
+      end
     end
 
     def main_branch
@@ -379,6 +391,8 @@ class SugarJar
     def extract_host(repo)
       if repo.start_with?('git@')
         repo.split(':').first.split('@').last
+      elsif repo.start_with?('ssh://')
+        repo.split('/')[2].split('@').last
       elsif repo.start_with?('http')
         repo.split('/')[2]
       end
@@ -440,7 +454,14 @@ class SugarJar
 
     def _determine_forge_type(host = nil)
       if host
-        return host.include?('gitlab') ? 'gitlab' : 'github'
+        case host
+        when /gitlab/
+          return 'gitlab'
+        when /github/
+          return 'github'
+        when /forgejo|codeberg/
+          return 'forgejo'
+        end
       end
 
       if SugarJar::Git.in_repo?
