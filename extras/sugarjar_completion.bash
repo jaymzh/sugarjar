@@ -10,26 +10,27 @@ _sugarjar_completions()
 
     local -a suggestions
 
-    # grap the feature_prefix if we have one so that we
-    # can let the user ignore that part. If we have `yq`
-    # we'll use it as that's going to be always 100%
-    # reliable, but if we don't, do our best with shell
-    # utils
-    local prefix=''
+    # grap any and all feature_prefixes so that we can let the user ignore that
+    # part. If we have `yq` we'll use it as that's going to be always 100%
+    # reliable, but if we don't, do our best with shell utils
+    local prefixes=''
     if [ -e "$SJCONFIG" ]; then
         if type yq &>/dev/null; then
-            prefix=$(yq -r .feature_prefix $SJCONFIG)
+            yq_search='[.host_configs[].feature_prefix // empty] | unique[]'
+            prefixes=$(yq -r "$yq_search" $SJCONFIG | xargs)
         else
-            # the xargs removes extra spaces
-            prefix=$(grep feature_prefix $SJCONFIG | cut -f2 -d: | xargs)
+            prefixes=$(
+                grep feature_prefix $SJCONFIG | cut -f2 -d: | sort -u | xargs
+            )
         fi
     fi
 
     case "${COMP_WORDS[1]}" in
         co|checkout|bclean)
             local branches=$(git branch | sed -e 's/* //g' | xargs)
-            if [ -n "$prefix" ]; then
-                local branches=$(echo $branches | sed -e "s!$prefix!!g")
+            if [ -n "$prefixes" ]; then
+                regex=$(printf '%s\n' $prefixes | paste -sd'|')
+                local branches=$(echo $branches | sed -E "s!($regex)!!g")
             fi
             suggestions=($(compgen -W "$branches" -- "${COMP_WORDS[2]}"))
             COMPREPLY=("${suggestions[@]}")
