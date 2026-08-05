@@ -50,7 +50,11 @@ class SugarJar
       SugarJar::Log.trace("Running: #{cli} #{args.join(' ')}")
       bin = SugarJar::Util.which_nofail(cli)
       s = Mixlib::ShellOut.new([bin] + args).run_command
-      if s.error? && ["#{cli} auth", 'Unauthorized'].intersect?(s.stderr)
+      # rubocop:disable Style/ArrayIntersect
+      if s.error? && ["#{cli} auth", 'Unauthorized'].any? do |err|
+        s.stderr.include?(err)
+      end
+        # rubocop:enable Style/ArrayIntersect
         SugarJar::Log.info(
           "#{cli} was run but no gitlab token exists. Will run " +
           "'#{cli} auth login' to force\n#{cli} to authenticate...",
@@ -68,6 +72,7 @@ class SugarJar
           )
           exit(1)
         end
+
         if cli == 'fj'
           fj = Mixlib::ShellOut.new([bin, 'auth', 'list']).run_command
           unless fj.stdout.include?(@host)
