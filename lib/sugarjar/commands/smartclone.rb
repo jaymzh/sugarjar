@@ -11,7 +11,10 @@ class SugarJar
       @host_config = gen_host_config(host)
       raise 'Failed to determine forge_type' unless @host_config['forge_type']
 
-      # force object creation for error checking
+      # force object recreation - the initial creation would not
+      # have had the right data. Plus, we want it to check for the
+      # right cli
+      @forge = nil
       forge
 
       # set env vars of the host, just for completeness
@@ -87,7 +90,8 @@ class SugarJar
       # collision. There's no way to tell, so we assume it means we've
       # already forked.
       if s.error?
-        if forge.type == 'gitlab' && s.stderr.include?(' 409 ')
+        if %w{gitlab forgejo}.include?(forge.type) &&
+           s.stderr.include?(' 409 ')
           SugarJar::Log.debug('Forking failed, probably already forked')
         else
           s.error!
