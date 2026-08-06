@@ -1,4 +1,0 @@
-#!/bin/bash
-
-scripts/run_rubocop.sh -D "$@" || { echo "Rubocop failed"; exit 1; }
-scripts/run_mdl.sh "$@" || { echo "Rubocop failed"; exit 1; }

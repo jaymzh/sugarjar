@@ -9,7 +9,9 @@ on:
 permissions: {}
 
 jobs:
-  rubocop:
+  # Rather than setup ruby several times, we run rubocop and mdl in
+  # the same place, until the actionshub mdl checker is working again
+  ruby-linters:
     permissions:
       contents: read
       pull-requests: read
@@ -31,22 +33,24 @@ jobs:
     - name: install deps
       run: bundle install
     - name: Run rubocop
-      run: bundle exec rubocop --display-cop-names
-  markdownlint:
-    permissions:
-      contents: read
-      pull-requests: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-        with:
-          egress-policy: audit
+      run: ./scripts/run_rubocop.sh
+    - name: Run mdl
+      run: ./scripts/run_mdl.sh
+  #markdownlint:
+  #  permissions:
+  #    contents: read
+  #    pull-requests: read
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: Harden the runner (Audit all outbound calls)
+  #      uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+  #      with:
+  #        egress-policy: audit
 
-      - name: checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: MarkdownLint mdl Action
-        uses: actionshub/markdownlint@6c82ff529253530dfbf75c37570876c52692835f # 3.1.4
+  #    - name: checkout
+  #      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #    - name: MarkdownLint mdl Action
+  #      uses: actionshub/markdownlint@6c82ff529253530dfbf75c37570876c52692835f # 3.1.4
   linelint:
     permissions:
       contents: read
