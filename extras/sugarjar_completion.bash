@@ -16,7 +16,9 @@ _sugarjar_completions()
     local prefixes=''
     if [ -e "$SJCONFIG" ]; then
         if type yq &>/dev/null; then
-            yq_search='[.host_configs[].feature_prefix // empty] | unique[]'
+            # We don't use the '// empty' syntax here as thats only in
+            # very new yq, so use the more standard '| select(. != null)'
+            yq_search='[.host_configs[].feature_prefix | select(. != null)] | unique[]'
             prefixes=$(yq -r "$yq_search" $SJCONFIG | xargs)
         else
             prefixes=$(
