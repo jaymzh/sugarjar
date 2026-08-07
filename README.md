@@ -63,12 +63,16 @@ Jump to what you're most interested in:
 
 ### Auto cleanup squash-merged branches
 
+<details>
+
+<summary>Clean-up squash-merged PRs safely and easily</summary>
+
 It is common for a PR to go back and forth with a variety of nits, lint fixes,
 typos, etc. that can muddy history. So many projects will "squash and merge"
-when they accept a pull request. However, that means `git branch -d <branch>`
-doesn't work. Git will tell you the branch isn't fully merged. You can, of
-course `git branch -D <branch>`, but that does no safety checks at all, it
-forces the deletion.
+when they accept a pull request. However, that means `git branch -d
+BRANCH` doesn't work. Git will tell you the branch isn't fully merged.
+You can, of course `git branch -D BRANCH`, but that does no safety
+checks at all, it forces the deletion.
 
 Enter `sj lbclean` - it determines if the contents of your branch has been merge
 and safely deletes if so. (Note: `lbclean` stands for "local branch clean", and
@@ -82,7 +86,7 @@ https://github.com/jaymzh/sugarjar/blob/main/images/bclean.png
 Will delete a branch, if it has been merged, **even if it was squash-merged**.
 
 You can pass it a branch if you'd like (it defaults to the branch you're on):
-`sj bclean <branch>`.
+`sj bclean BRANCH`.
 
 But it gets better! You can use `sj bcleanall` to remove all branches that have
 been merged:
@@ -104,8 +108,13 @@ There is even `sj gbclean` ("global branch clean") (and `sj gbcleanall`) which
 will do both the local and remote cleaning.
 
 *NOTE*: Remote branch cleaning is still experimental, use with caution!
+</details>
 
 ### Smarter clones and remotes
+
+<details>
+
+<summary>Fork, clone, and add the upstream remote automatically</summary>
 
 There's a pattern to every new repo we want to contribute to. First we fork,
 then we clone the fork, then we add a remote of the upstream repo. It's
@@ -145,8 +154,13 @@ host_configs:
 ```
 
 See [Configuration](#Configuration) for more details on the config file.
+</details>
 
 ### Work with stacked branches more easily
+
+<details>
+
+<summary>Create and manage stacked/dependent branches easily</summary>
 
 It's important to break changes into reviewable chunks, but working with
 stacked branches can be confusing. SugarJar provides several tools to make this
@@ -243,8 +257,13 @@ https://github.com/jaymzh/sugarjar/blob/main/images/subfeature-detect-missing-ba
 
 SugarJar detects that branch is gone and thus this branch should now be based
 on the upstream main branch!
+</details>
 
 ### Creating Stacked PRs with subfeatures
+
+<details>
+
+<summary>Automatically base PRs for subfeatures on their parent branch</summary>
 
 When dependent branches are created with `subfeature`, when you create a PR,
 SugarJar will automatically set the 'base' of the PR to the parent branch. By
@@ -258,7 +277,13 @@ It looks like this is a subfeature, would you like to base this PR on mynewthing
 ...
 ```
 
+</details>
+
 ### Smart release branch handling
+
+<details>
+
+<summary>Configure and protect long-lived release branches</summary>
 
 You can tell sugar what release branches exist, and it will intelligently
 handle them. So of you specify, in your repoconfig:
@@ -275,8 +300,13 @@ Then:
   to `upstream/v2-branch` (or `origin/v2-branch` as appropriate)
 * `sj lbclean`/`sj lbcleanall` (of all varieties) will never reap release
   branches
+</details>
 
 ### Have a better lint/unittest experience!
+
+<details>
+
+<summary>Run lint and unittests automatically before pushing</summary>
 
 Ever made a PR, only to find out later that it failed tests because of some
 small lint issue? Not anymore! SJ can be configured to run things before
@@ -306,14 +336,24 @@ sj smartpush # or spush
 
 Run configured push-time actions (nothing, lint, unit, both), and do not
 push if any of them fail.
+</details>
 
 ### Better push defaults
+
+<details>
+
+<summary>Smart defaults for `smartpush`</summary>
 
 In addition to running pre-push tests for you `smartpush` also picks smart
 defaults for push. So if you `sj spush` with no arguments, it uses the
 `origin` remote and the same branch name you're on as the remote branch.
+</details>
 
 ### Cleaning up your own history
+
+<details>
+
+<summary>Safely amend commits and force-push with `amend`/`fpush`</summary>
 
 Perhaps you contribute to a project that prefers to use merge commits, so you
 like to clean up your own history. This is often difficult to get right - a
@@ -332,8 +372,13 @@ sure you're up-to-date with the remote before forcing the push. But man that
 command is a mouthful! Enter `sj fpush`. It has all the smarts of `sj
 smartpush` (runs configured pre-push actions), but adds `--force-with-lease` to
 the command!
+</details>
 
 ### Better feature branches
+
+<details>
+
+<summary>Create feature branches with the right base and prefix</summary>
 
 When you want to start a new feature, you want to start developing against
 latest. That's why `sj feature` defaults to creating a branch against what we
@@ -371,7 +416,13 @@ host_configs:
     feature_prefix: "jsmith/"
 ```
 
+</details>
+
 ### Smartlog
+
+<details>
+
+<summary>Visualize your branch tree</summary>
 
 Smartlog will show you a tree diagram of your branches! Simply run `sj
 smartlog` or `sj sl` for short.
@@ -379,8 +430,13 @@ smartlog` or `sj sl` for short.
 ![smartlog screenshot](
 https://github.com/jaymzh/sugarjar/blob/main/images/smartlog.png
 )
+</details>
 
 ### Sync work across workstations
+
+<details>
+
+<summary>Keep branches in sync across multiple machines</summary>
 
 If you work on multiple workstations, keeping your branches in-sync can be a
 pain. SugarJar provides `sync` to help with this.
@@ -394,8 +450,13 @@ from `origin/foo`. If you have local changes, that are not already on
 
 It's very similar to `sj up`, but instead of rebasing on top of the tracking
 branch, it rebases on top of the push target branch.
+</details>
 
 ### Pulling in suggestions from the web
+
+<details>
+
+<summary>Merge in GitHub/GitLab suggested changes</summary>
 
 When someone 'suggests' a change in the GH/GL WebUI, once you choose to commit
 them, your origin and local branches are no longer in-sync. The
@@ -403,8 +464,13 @@ them, your origin and local branches are no longer in-sync. The
 local branch. This command will show a diff and ask for confirmation before
 attempting the merge and  - if allowed to continue - will use a fast-forward
 merge.
+</details>
 
 ### Modernize your config
+
+<details>
+
+<summary>Convert your old config to the new `host_configs` format</summary>
 
 In 4.0, we significantly revamped how the configuration works, adding the new
 `host_configs` section, and deprecating or moving many top-level configs. In
@@ -426,9 +492,16 @@ $ mv ~/.config/sugarjar/config.yml ~/.config/sugarjar/config.yml.old
 $ mv /tmp/new_sj_config.yml ~/.config/sugarjar/config.yml
 ```
 
+</details>
+
 ### And more!
 
+<details>
+
+<summary>There's even more than this!</summary>
+
 See `sj help` for more commands!
+</details>
 
 ## Installation
 
