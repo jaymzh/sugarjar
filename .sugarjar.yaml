@@ -1,4 +1,4 @@
 on_push: [lint]
 lint_list_cmd: scripts/get_linters
 unit:
-  - scripts/unit
+  - scripts/run_rspec.sh
