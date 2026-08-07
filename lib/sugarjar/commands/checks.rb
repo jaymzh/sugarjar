@@ -48,7 +48,21 @@ class SugarJar
         )
         return false
       end
-      s.stdout.split("\n")
+      output = s.stdout
+      if output.start_with?("---\n")
+        begin
+          checks = YAML.safe_load(s.stdout)
+          return checks
+        rescue Psych::SyntaxError => e
+          SugarJar::Log.error(
+            "#{type}_list_cmd (#{cmd}) produced invalid YAML: #{e.message}",
+          )
+          return false
+        end
+      end
+
+      # otherwise it's one line per command
+      output.split("\n")
     end
 
     # determine if we're using the _list_cmd and if so run it to get the
@@ -81,15 +95,23 @@ class SugarJar
       repo_root = SugarJar::Git.repo_root
       Dir.chdir repo_root do
         checks = get_checks(type)
-        # if we failed to determine the checks, the the checks have effectively
+        # if we failed to determine the checks, then the checks have effectively
         # failed
         return false unless checks
 
         checks.each do |check|
-          SugarJar::Log.debug("Running #{type} #{check}")
+          if check.is_a?(Hash)
+            command = check['command']
+            name = check['name'] || command.split.first
+          else
+            command = check
+            name = check.split.first
+          end
+
+          SugarJar::Log.debug("Running #{type} #{name}: #{command}")
           skip_redo = false
 
-          short = check.split.first
+          short = command.split.first
           if short.include?('/')
             short = File.join(repo_root, short) unless short.start_with?('/')
             unless File.exist?(short)
@@ -99,12 +121,12 @@ class SugarJar
             SugarJar::Log.error("Configured #{type} #{short} does not exist!")
             return false
           end
-          s = Mixlib::ShellOut.new(check).run_command
+          s = Mixlib::ShellOut.new(command).run_command
 
           # Linters auto-correct, lets handle that gracefully
           if type == 'lint' && dirty?
             SugarJar::Log.info(
-              "[#{type}] #{short}: #{color('Corrected', :yellow)}",
+              "[#{type}] #{name}: #{color('Corrected', :yellow)}",
             )
             SugarJar::Log.warn(
               "The linter modified the repo. Here's the diff:\n",
@@ -142,14 +164,14 @@ class SugarJar
 
           if s.error?
             SugarJar::Log.info(
-              "[#{type}] #{short} #{color('failed', :red)}, output follows " +
+              "[#{type}] #{name} #{color('failed', :red)}, output follows " +
               "(see debug for more)\n#{s.stdout}",
             )
             SugarJar::Log.debug(s.format_for_exception)
             return false
           end
           SugarJar::Log.info(
-            "[#{type}] #{short}: #{color('OK', :green)}",
+            "[#{type}] #{name}: #{color('OK', :green)}",
           )
         end
       end

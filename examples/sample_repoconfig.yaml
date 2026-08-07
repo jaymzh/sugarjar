@@ -37,8 +37,11 @@ release_branches:
 # is assumed it is a relative path and `sj` will check that the file exists.
 
 lint:
+  # can be a string which is just a command to run...
   - scripts/run_rubocop.sh
-  - scripts/run_mdl.sh
+  # want it to have a pretty name? Entries can be a hash instead...
+  - name: mdl
+    command: scripts/run_mdl.sh
 
 # `unit` is a list of scripts to run when `sj unit` is executed (or, if
 # configured to run on `sj spush`/`sj fpush`- see `on_push` below).  Regardless
@@ -47,8 +50,11 @@ lint:
 # assumed it is a relative path and `sj` will check that the file exists.
 
 unit:
+  # like lint, supports bare strings...
   - bundle exec rspec
-  - scripts/run_tests.sh
+  # or hashes...
+  - name: unittests
+    command: scripts/run_tests.sh
 
 # `lint_list_cmd` is like `lint`, except it's a command to run which will
 # determine the proper lints to run and return them, one per line. This is
