@@ -103,7 +103,6 @@ describe 'SugarJar::Commands' do
     end
 
     it 'honors CLI overrides' do
-      SugarJar::Log.level = :debug
       # bypass the git repo we're running in or it will taint the @config
       expect(SugarJar::Git).to receive(:in_repo?).at_least(
         :once,
