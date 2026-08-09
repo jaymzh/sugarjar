@@ -13,9 +13,11 @@ https://github.com/jaymzh/sugarjar/workflows/DCO%20Check/badge.svg
 https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml/badge.svg
 )](https://github.com/jaymzh/sugarjar/actions/workflows/codeql.yml)
 
-Welcome to SugarJar - a git + github/gitlab helper. The only requirements are
-Ruby, `git`, and either [gh](https://cli.github.com/) or
-[glab](https://docs.gitlab.com/cli/), depending on which forge you are using.
+Welcome to SugarJar - a git + github/gitlab/forgejo helper. The only
+requirements are Ruby, `git`, and either [gh](https://cli.github.com/) or
+[glab](https://docs.gitlab.com/cli/),, or
+[fj](https://codeberg.org/forgejo-contrib/forgejo-cli) depending on which forge
+you are using.
 
 SugarJar is inspired by [arcanist](https://github.com/phacility/arcanist), and
 its replacement at Facebook, JellyFish. Many of the features they provide for
@@ -56,7 +58,7 @@ Jump to what you're most interested in:
 * [Configuration](#configuration)
 * [Repository Configuration](#repository-configuration)
    * [Commit Templates](#commit-templates)
-* [Enterprise GitHub](#enterprise-github)
+* [Enterprise GitHub/Gitlab/Forgejo](#enterprise-githubgitlabforgejo)
 * [FAQ](#faq)
 
 ## Common Use-cases
@@ -456,7 +458,7 @@ branch, it rebases on top of the push target branch.
 
 <details>
 
-<summary>Merge in GitHub/GitLab suggested changes</summary>
+<summary>Merge in GitHub/Gitlab/Forgejo suggested changes</summary>
 
 When someone 'suggests' a change in the GH/GL WebUI, once you choose to commit
 them, your origin and local branches are no longer in-sync. The
@@ -554,16 +556,15 @@ detail.
 
 ### Commit Templates
 
-While GitHub provides a way to specify a pull-request template by putting the
+While forges provides a way to specify a pull-request template by putting the
 right file into a repo, there is no way to tell git to automatically pick up a
 commit template by dropping a file in the repo. Users must do something like:
 `git config commit.template <file>`. Making each developer do this is error
 prone, so this setting will automatically set this up for each developer.
 
-## Enterprise GitHub/GitLab
+## Enterprise GitHub/GitLab/Forgejo
 
-Like `gh` and `glab`, SugarJar supports Enterprise versions of GitHub and
-GitLab. In fact, we provide extra features just for it.
+Like `gh`, `glab`, and `fj`, SugarJar supports Enterprise versions of forges.
 
 By default, SugarJar will pick up the appropriate information from the repo
 itself, so the only real interesting part is `smartclone`. In most cases,
@@ -587,7 +588,7 @@ It's mostly a backronym. Like jellyfish, I wanted two letters that were on home
 row on different sides of the keyboard to make it easy to type. I looked at the
 possible options that where there and not taken and tried to find one I could
 make an appropriate name out of. Since this utility adds lots of sugar to git
-and github/gitlab, it seemed appropriate.
+and github/gitlab/forgejo, it seemed appropriate.
 
 **I'd like to package SugarJar for my favorite distro/OS, is that OK?**
 
