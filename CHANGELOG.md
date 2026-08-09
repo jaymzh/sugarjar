@@ -1,5 +1,15 @@
 # SugarJar Changelog
 
+## 4.0.0 (2026-08-09)
+
+* Rework config file format to be more friendly to working with multiple forges
+* Add `modernizeconfig` command to help users migrate to new config file format
+* Various improvements to gitlab compatibility
+* Fix bugs around repo name detection when directory name doesn't match
+* Revamp `help` to be easier to read and navigate
+* Add support for Forgejo/Codeberg forges
+* Update repoconfig format to allow specifying names for checks
+
 ## 3.0.1 (2026-06-19)
 
 * Update tests for more resiliency in various package-building environments
