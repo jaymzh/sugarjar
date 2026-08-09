@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
     Dir.glob('extras/*')
 
   spec.add_dependency 'deep_merge'
+  spec.add_dependency 'diffy'
   spec.add_dependency 'mixlib-log'
   spec.add_dependency 'mixlib-shellout'
   spec.add_dependency 'pastel'

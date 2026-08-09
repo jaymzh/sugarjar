@@ -481,16 +481,8 @@ to convert it for you!
 sj modernizeconfig ~/.config/sugarjar/config.yml
 ```
 
-This will generate a new config for you on stdout, and you can then choose
-to overwrite your old one after inspecting it. For example:
-
-```shell
-$ sj modernizeconfig ~/.config/sugarjar/config.yml > /tmp/new_sj_config.yml
-$ diff -u ~/.config/sugarjar/config.yml /tmp/new_sj_config.yml
-...
-$ mv ~/.config/sugarjar/config.yml ~/.config/sugarjar/config.yml.old
-$ mv /tmp/new_sj_config.yml ~/.config/sugarjar/config.yml
-```
+This will generate a new config for you, show you a diff, and offer to either
+update the existing file, or save it off the side for you.
 
 </details>
 

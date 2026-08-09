@@ -76,8 +76,7 @@ class SugarJar
           "#{fname} appears to be an old-style config.\nIt likely will " +
           'not result in the behavior you want. You should run' +
           "\n\n\tsj modernizeconfig #{fname}\n\n" +
-          'To convert it, check the result looks right, and replaces your ' +
-          "existing config.\n",
+          "To automatically convert it.\n",
         )
         return
       end
