@@ -129,7 +129,8 @@ class SugarJar
         :usage => '',
         :description => <<~DESC,
           Will take a sugarjar config file and modernize it for all of
-          the changes in 4.x. The new version will be printed to stdout.
+          the changes in 4.x. You will be given a diff, and you can choose
+          to overwrite the file, or save the new one to a new file.
         DESC
       },
       'pullsuggestions' => {

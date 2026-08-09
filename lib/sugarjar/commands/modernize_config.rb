@@ -1,9 +1,47 @@
 class SugarJar
   class Commands
     def modernizeconfig(config)
+      require 'tempfile'
+      require 'diffy'
+
       data = YAML.safe_load_file(config)
-      data = _modernize(data)
-      puts data.to_yaml
+      data = _modernize(data).to_yaml
+      tfile = Tempfile.new('sugarjar')
+      tfile.write(data)
+      tfile.close
+      diff = Diffy::Diff.new(
+        config,
+        tfile.path,
+        :source => 'files',
+        :context => 2,
+        :include_diff_info => true,
+        :format => @config['color'] ? 'color' : 'text',
+      ).to_s
+      puts "Here is the diff from your existing config to the new one:\n"
+      puts diff
+      options = [
+        '[u]pdate my config, saving my old one to .bak',
+        '[w]rite new config to a temporary file for me to inspect',
+      ]
+      msg = "\nWould you like to\n\t" + options.join("\n\t") + "\n  > "
+      loop do
+        $stdout.print(msg)
+        ans = $stdin.gets.strip
+        case ans
+        when /^u/
+          old = "#{config}.bak"
+          File.rename(config, old)
+          File.write(config, data)
+          puts "#{config} updated. Old config in #{old}"
+          break
+        when /^w/
+          new = "#{config}.new"
+          File.write(new, data)
+          puts "New config written to #{new}"
+          break
+        end
+      end
+      tfile.unlink
     end
     alias fixconfig modernizeconfig
 
