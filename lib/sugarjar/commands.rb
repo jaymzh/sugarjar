@@ -352,7 +352,7 @@ class SugarJar
     end
 
     def fprefix(name)
-      return name unless @host_config['feature_prefix']
+      return name unless @host_config&.dig('feature_prefix')
 
       return name if name.start_with?(@host_config['feature_prefix'])
       return name if all_local_branches.include?(name)
