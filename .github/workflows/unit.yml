@@ -38,3 +38,7 @@ jobs:
       run: bundle install
     - name: Run rspec
       run: ./scripts/run_rspec.sh
+    - name: Run specs outside of repo
+      run: |-
+        cd ..
+        bundle exec --gemfile=sugarjar/Gemfile rspec sugarjar/spec
