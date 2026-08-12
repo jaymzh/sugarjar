@@ -352,12 +352,13 @@ class SugarJar
     end
 
     def fprefix(name)
-      return name unless @host_config&.dig('feature_prefix')
+      fp = @host_config&.dig('feature_prefix')
+      return name unless fp
 
-      return name if name.start_with?(@host_config['feature_prefix'])
+      return name if name.start_with?(fp)
       return name if all_local_branches.include?(name)
 
-      newname = "#{@host_config['feature_prefix']}#{name}"
+      newname = "#{fp}#{name}"
       SugarJar::Log.debug(
         "Munging feature name: #{name} -> #{newname} due to feature prefix",
       )

@@ -208,6 +208,10 @@ describe 'SugarJar::Commands' do
 
   context '#fprefix' do
     it 'Adds prefixes when needed' do
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::RepoConfig).to receive(:config).and_return({})
+      expect_any_instance_of(SugarJar::Commands).
+        to receive(:_determine_forge_host).and_return('github.com')
       sj = SugarJar::Commands.new(
         {
           'no_change' => true,
@@ -221,6 +225,10 @@ describe 'SugarJar::Commands' do
     end
 
     it 'Does not add prefixes when not needed' do
+      expect(SugarJar::Git).to receive(:in_repo?).and_return(true)
+      expect(SugarJar::RepoConfig).to receive(:config).and_return({})
+      expect_any_instance_of(SugarJar::Commands).
+        to receive(:_determine_forge_host).and_return('github.com')
       sj = SugarJar::Commands.new({ 'no_change' => true })
       expect(sj.send(:fprefix, 'test')).to eq('test')
     end
