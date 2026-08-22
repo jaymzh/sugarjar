@@ -169,7 +169,7 @@ stacked branches can be confusing. SugarJar provides several tools to make this
 easier.
 
 First, and foremost, is `feature` and `subfeature`. Regardless of stacking, the
-way to create a new feature bracnh with sugarjar is with `sj feature` (or `sj
+way to create a new feature branch with sugarjar is with `sj feature` (or `sj
 f` for short):
 
 ![feature screenshot](
