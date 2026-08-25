@@ -34,7 +34,7 @@ class SugarJar
     def upall
       assert_in_repo!
       all_local_branches.each do |branch|
-        next if MAIN_BRANCHES.include?(branch)
+        next if main_branch == branch
 
         git('checkout', branch)
         result = rebase
@@ -126,8 +126,7 @@ class SugarJar
       # If this is a subfeature based on a local branch which has since
       # been deleted, 'tracked branch' will automatically return <most_main>
       # so we don't need any special handling for that
-      if !MAIN_BRANCHES.include?(curr) && base == "origin/#{curr}" &&
-         !skip_base_warning
+      if main_branch != curr && base == "origin/#{curr}" && !skip_base_warning
         SugarJar::Log.warn(
           "This branch is tracking origin/#{curr}, which is probably your " +
           'downstream (where you push _to_) as opposed to your upstream ' +
