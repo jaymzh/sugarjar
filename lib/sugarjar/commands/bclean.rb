@@ -1,5 +1,8 @@
 class SugarJar
   class Commands
+    # only used for REMOTE branch cleanup. use main_branch() for everything else
+    MAIN_BRANCHES = %w{master main}.freeze
+
     def lbclean(name = nil)
       assert_in_repo!
       name ||= current_branch
@@ -66,7 +69,7 @@ class SugarJar
       all_local_branches.each do |branch|
         # skip_branch info will check for MAIN_BRANCHES, but we
         # quietly skip them.
-        next if MAIN_BRANCHES.include?(branch)
+        next if main_branch == branch
 
         should_skip, why = skip_branch_info(branch)
         if should_skip
@@ -103,7 +106,8 @@ class SugarJar
       curr = current_branch
       remote ||= 'origin'
       all_remote_branches(remote).each do |branch|
-        if (MAIN_BRANCHES + ['HEAD']).include?(branch)
+        # for remote branches, exclude all POSSIBLE primary branch names
+        if MAIN_BRANCHES.union([main_branch, 'HEAD']).include?(branch)
           SugarJar::Log.debug("Skipping #{branch}")
           next
         end
@@ -140,7 +144,7 @@ class SugarJar
 
     # rubocop:disable Naming/PredicateMethod
     def clean_branch(name, type = :local)
-      undeleteable = MAIN_BRANCHES.dup
+      undeleteable = [main_branch]
       undeleteable << 'HEAD' if type == :remote
       die("Cannot remove #{name} branch") if undeleteable.include?(name)
       SugarJar::Log.debug('Fetch relevant remote...')
@@ -233,7 +237,7 @@ class SugarJar
     end
 
     def skip_branch_info(name)
-      return true, 'main branch' if MAIN_BRANCHES.include?(name)
+      return true, 'primary branch' if main_branch == name
 
       wt_branches = worktree_branches
       rel_branches = release_branches

@@ -11,6 +11,8 @@ describe 'SugarJar::Commands' do
       expect(sj).to receive(:current_branch).and_return('foo')
       expect(sj).to receive(:tracked_branch).with(:fallback => false).
         and_return('upstream/main')
+      expect(sj).to receive(:all_local_branches).at_least(1).times.
+        and_return(%w{main foo})
       expect(sj).to receive(:git_nofail).with('rebase', 'upstream/main')
       sj.send(:rebase)
     end
@@ -20,6 +22,8 @@ describe 'SugarJar::Commands' do
       expect(sj).to receive(:current_branch).and_return('foo')
       expect(sj).to receive(:tracked_branch).with(:fallback => false).
         and_return('bar')
+      expect(sj).to receive(:all_local_branches).at_least(1).times.
+        and_return(%w{main foo})
       expect(sj).to receive(:git_nofail).with('rebase', 'bar')
       sj.send(:rebase)
     end

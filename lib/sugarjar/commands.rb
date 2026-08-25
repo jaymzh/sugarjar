@@ -23,8 +23,6 @@ class SugarJar
   # methods are "commands". Anything in private is internal implementation
   # details.
   class Commands
-    MAIN_BRANCHES = %w{master main}.freeze
-
     def initialize(options)
       SugarJar::Log.debug("Commands.initialize options: #{options}")
       @config = options
@@ -196,6 +194,8 @@ class SugarJar
     end
 
     def determine_main_branch(branches)
+      return @repo_config['primary_branch'] if @repo_config['primary_branch']
+
       if branches.include?('main')
         'main'
       elsif branches.include?('master')

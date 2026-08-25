@@ -20,6 +20,14 @@ include_from: .sugarjar_local.yaml
 
 overwrite_from: .sugarjar_local_overwrite.yaml
 
+# `primary_branch` allows you to configure a primary branch that is
+# non-standard. If your primary branch is `main` or `master`, you do not need
+# to set this, sugarjar will figure out out automatically.
+#
+# This can also be used to force a primary branch in the event you have
+# both `main` and `master` around.
+primary_branch: somethingweird
+
 # `release_branches` tells SugarJar several things:
 #   1. These branches should not be repead when running `bclean`/`bcleanall`.
 #   2. When a feature-branch is made from a release branch (e.g. `2.x-branch`),
