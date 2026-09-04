@@ -112,9 +112,8 @@ class SugarJar
       fetch_upstream
       curr = current_branch
       # this isn't a hash, it's a named param, silly rubocop
-      # rubocop:disable Style/HashSyntax
+      # rubocop:disable-next Style/HashSyntax
       base ||= tracked_branch(fallback: false)
-      # rubocop:enable Style/HashSyntax
       unless base
         SugarJar::Log.info(
           'The branch we were tracking is gone, resetting tracking to ' +

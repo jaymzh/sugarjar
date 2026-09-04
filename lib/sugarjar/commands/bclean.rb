@@ -142,7 +142,7 @@ class SugarJar
 
     private
 
-    # rubocop:disable Naming/PredicateMethod
+    # rubocop:disable-next Naming/PredicateMethod
     def clean_branch(name, type = :local)
       undeleteable = [main_branch]
       undeleteable << 'HEAD' if type == :remote
@@ -164,7 +164,6 @@ class SugarJar
       end
       true
     end
-    # rubocop:enable Naming/PredicateMethod
 
     def safe_to_clean?(branch)
       # cherry -v will output 1 line per commit on the target branch

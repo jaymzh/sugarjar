@@ -39,7 +39,7 @@ class SugarJar
       puts git(*args).stderr
     end
 
-    # rubocop:disable Naming/PredicateMethod
+    # rubocop:disable-next Naming/PredicateMethod
     def run_prepush
       @repo_config['on_push']&.each do |item|
         SugarJar::Log.debug("Running on_push check type #{item}")
@@ -50,6 +50,5 @@ class SugarJar
       end
       true
     end
-    # rubocop:enable Naming/PredicateMethod
   end
 end
