@@ -4,6 +4,7 @@ PATH
     sugarjar (4.0.0)
       deep_merge
       diffy
+      logger
       mixlib-log
       mixlib-shellout
       pastel
@@ -29,6 +30,7 @@ GEM
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
+    logger (1.7.0)
     mdl (0.18.0)
       kramdown (~> 2.5)
       kramdown-parser-gfm (~> 1.1)

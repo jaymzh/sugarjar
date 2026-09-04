@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.email = ['phil@ipom.com']
   spec.license = 'Apache-2.0'
   spec.homepage = 'https://github.com/jaymzh/sugarjar'
-  spec.required_ruby_version = '>= 3.2'
+  spec.required_ruby_version = '>= 3.3'
   docs = %w{
     README.md
     LICENSE
@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'deep_merge'
   spec.add_dependency 'diffy'
+  spec.add_dependency 'logger'
   spec.add_dependency 'mixlib-log'
   spec.add_dependency 'mixlib-shellout'
   spec.add_dependency 'pastel'
