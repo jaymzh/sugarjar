@@ -83,9 +83,17 @@ parser = OptionParser.new do |opts|
 
   opts.on(
     '--ignore-prerun-failure',
-    'Ignore preprun failure on *push commands. [default: false]',
+    '--ignore-check-failure',
+    'Ignore "on_push" check failure. [default: false]',
   ) do
     options['ignore_prerun_failure'] = true
+  end
+
+  opts.on(
+    '--skip-checks',
+    'Skip any checks configured for on_push. [default: false]',
+  ) do
+    options['skip_checks'] = true
   end
 
   opts.on(

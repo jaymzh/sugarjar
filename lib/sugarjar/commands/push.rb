@@ -41,6 +41,11 @@ class SugarJar
 
     # rubocop:disable-next Naming/PredicateMethod
     def run_prepush
+      if @config['skip_checks']
+        SugarJar::Log.debug('[prepush]: Skipping checks due to --skip-checks')
+        return true
+      end
+
       @repo_config['on_push']&.each do |item|
         SugarJar::Log.debug("Running on_push check type #{item}")
         unless run_check(item, true)
