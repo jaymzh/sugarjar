@@ -165,7 +165,7 @@ class SugarJar
           if s.error?
             SugarJar::Log.info(
               "[#{type}] #{name} #{color('failed', :red)}, output follows " +
-              "(see debug for more)\n#{s.stdout}",
+              "(use '-l debug' for more)\n#{s.stdout}",
             )
             SugarJar::Log.debug(s.format_for_exception)
             return false
