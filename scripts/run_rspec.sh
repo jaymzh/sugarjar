@@ -12,6 +12,5 @@ else
     cd "$REPODIR" || { echo "Failed to cd to repo root"; exit 1; }
     args=()
 fi
-# shellcheck disable=SC2086
-echo $CMD "${args[@]}"
+#echo "Running: $CMD" "${args[@]}"
 exec $CMD "${args[@]}"

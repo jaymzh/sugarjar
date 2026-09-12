@@ -19,22 +19,23 @@ _sugarjar_completions()
             # We don't use the '// empty' syntax here as thats only in
             # very new yq, so use the more standard '| select(. != null)'
             yq_search='[.host_configs[].feature_prefix | select(. != null)] | unique[]'
-            prefixes=$(yq -r "$yq_search" $SJCONFIG | xargs)
+            prefixes=$(yq -r "$yq_search" "$SJCONFIG" | xargs)
         else
             prefixes=$(
-                grep feature_prefix $SJCONFIG | cut -f2 -d: | sort -u | xargs
+                grep feature_prefix "$SJCONFIG" | cut -f2 -d: | sort -u | xargs
             )
         fi
     fi
 
     case "${COMP_WORDS[1]}" in
         co|checkout|bclean)
-            local branches=$(git branch | sed -e 's/* //g' | xargs)
+            local branches
+            branches=$(git branch | sed -e 's/* //g' | xargs)
             if [ -n "$prefixes" ]; then
-                regex=$(printf '%s\n' $prefixes | paste -sd'|')
-                local branches=$(echo $branches | sed -E "s!($regex)!!g")
+                regex=$(printf '%s\n' "$prefixes" | paste -sd'|')
+                branches=$(echo "$branches" | sed -E "s!($regex)!!g")
             fi
-            suggestions=($(compgen -W "$branches" -- "${COMP_WORDS[2]}"))
+            mapfile -t suggestions < <(compgen -W "$branches" -- "${COMP_WORDS[2]}")
             COMPREPLY=("${suggestions[@]}")
             ;;
         *)
