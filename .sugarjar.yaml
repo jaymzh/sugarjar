@@ -1,4 +1,11 @@
 on_push: [lint]
-lint_list_cmd: scripts/get_linters
+lint:
+  - name: rubocop
+    command: scripts/run_rubocop.sh -D -a
+  - name: mdl
+    command: scripts/run_mdl.sh -g .
+  - name: shellcheck
+    command: shellcheck $(find . -name \*.sh -o -name \*.bash)
 unit:
-  - scripts/run_rspec.sh
+  - name: rspec
+    command: scripts/run_rspec.sh

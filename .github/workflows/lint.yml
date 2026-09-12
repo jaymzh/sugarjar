@@ -9,6 +9,24 @@ on:
 permissions: {}
 
 jobs:
+  shell-check:
+    permissions:
+      contents: read
+      pull-requests: read
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+      with:
+        egress-policy: audit
+
+    - name: checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master
+
   # Rather than setup ruby several times, we run rubocop and mdl in
   # the same place, until the actionshub mdl checker is working again
   ruby-linters:
