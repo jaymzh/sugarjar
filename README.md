@@ -580,6 +580,20 @@ So, for example you might have:
 default_forge_host: gh.sample.com
 ```
 
+## AI Agent Skill
+
+A skill for AI Agents is provided in `skills`. You can add it to your agent with
+
+```shell
+ln -s /path/to/sugarjar/skills/sugarjar /path/to/agent-config/skills/sugarjar
+```
+
+For example, for Claude Code:
+
+```shell
+ln -s /path/to/sugarjar/skills/sugarjar ~/.claude/skills/sugarjar
+```
+
 ## FAQ
 
 **Why the name SugarJar?**
