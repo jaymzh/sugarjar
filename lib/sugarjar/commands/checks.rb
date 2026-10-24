@@ -158,7 +158,12 @@ class SugarJar
                 # the user chose this option
                 break
               when /^i/
+                # if we NOT in 'push', then honor ignore, don't redo this
+                # check and move on
                 unless autorun
+                  SugarJar::Log.info(
+                    "Ignoring linter-modified repo at user's request",
+                  )
                   skip_redo = true
                   break
                 end
