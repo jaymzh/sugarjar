@@ -133,16 +133,21 @@ class SugarJar
             )
             puts git('diff').stdout
             loop do
-              options = [
-                '[q]uit and inspect',
-                '[a]mend the changes to the current commit and re-run',
-              ]
-              options << '[i]gnore the changes and keep going' unless autorun
+              if @config['autocorrect_action'] && !autorun
+                ans = @config['autocorrect_action']
+              else
+                options = [
+                  '[q]uit and inspect',
+                  '[a]mend the changes to the current commit and re-run',
+                ]
+                options << '[i]gnore the changes and keep going' unless autorun
 
-              msg = "\nWould you like to\n\t" + options.join("\n\t") + "\n  > "
+                msg = "\nWould you like to\n\t" +
+                      options.join("\n\t") + "\n  > "
 
-              $stdout.print(msg)
-              ans = $stdin.gets.strip
+                $stdout.print(msg)
+                ans = $stdin.gets.strip
+              end
               case ans
               when /^q/
                 SugarJar::Log.info('Exiting at user request.')
@@ -157,8 +162,22 @@ class SugarJar
                   skip_redo = true
                   break
                 end
+              else
+                # if the answer was not a valid answer, normally we
+                # just loop and ask again, but if the answer came from
+                # @config['autocorrect_action']. we need to warn and clear
+                # it first
+                if @config['autocorrect_action'] && !autorun
+                  SugarJar::Log.warn(
+                    "--autocorrect-action #{@config['autocorrect_action']} " +
+                    'is invalid. Clearing and prompting again.',
+                  )
+                  @config.delete('autocorrect_action')
+                end
               end
             end
+            # re-run THIS check if it changed anything... UNLESS the user
+            # said "ignore the change", then we just move onto the next check
             redo unless skip_redo
           end
 
