@@ -26,6 +26,11 @@ end
 
 options['_cli_overrides'] = {}
 parser = OptionParser.new do |opts|
+  # Don't let single-dash flags (e.g. `-a` for `amend`) be treated as
+  # abbreviations of our long options (e.g. `--autocorrect-action`). We want
+  # them passed through to the underlying git command.
+  opts.require_exact = true
+
   opts.banner = 'Usage: sj <command> [<args>] [<options>]'
 
   opts.separator ''
@@ -94,6 +99,18 @@ parser = OptionParser.new do |opts|
     'Skip any checks configured for on_push. [default: false]',
   ) do
     options['skip_checks'] = true
+  end
+
+  opts.on(
+    '--autocorrect-action ACTION',
+    %w{ignore amend},
+    'An option specifically to `sj lint`. When a linter changes the code, ' +
+    'instead of prompting, do the action specified. Not recommended for ' +
+    'most users! Primarily used when called by AI agents validating code ' +
+    'and wanting to choose "ignore" for all prompts. Valid choices: ' +
+    '[amend, ignore]',
+  ) do |c|
+    options['autocorrect_action'] = c
   end
 
   opts.on(
